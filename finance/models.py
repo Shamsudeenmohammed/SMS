@@ -172,6 +172,5 @@ class FinanceSummary(models.Model):
 
     class Meta:
         verbose_name_plural = "Finance Summary"
-# ===========================
-# 6️⃣ General Fee Model (if needed)
+
 

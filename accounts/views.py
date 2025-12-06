@@ -399,6 +399,13 @@ def add_parent(request):
         })
 
 
+from django.db import IntegrityError, transaction
+from django.contrib import messages
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Parent, CustomUser
+from .forms import ParentProfileForm
+
 @login_required
 @transaction.atomic
 def edit_parent(request, pk):
@@ -411,14 +418,14 @@ def edit_parent(request, pk):
 
             if form.is_valid():
 
-                username = form.cleaned_data.get("username", user.username).strip()
-                email = form.cleaned_data.get("email", "").strip() or None
-                full_name = form.cleaned_data.get(
-                    "fullname", f"{user.first_name} {user.last_name}"
-                ).strip()
+                # Safe get with default fallback and strip
+                username = (form.cleaned_data.get("username") or user.username).strip()
+                email = (form.cleaned_data.get("email") or "").strip() or None
+                full_name = (form.cleaned_data.get(
+                    "fullname") or f"{user.first_name} {user.last_name}").strip()
 
-                # Username uniqueness
-                if User.objects.filter(username=username).exclude(pk=user.pk).exists():
+                # --- USERNAME CHECK ---
+                if CustomUser.objects.filter(username=username).exclude(pk=user.pk).exists():
                     messages.error(request, "❌ Username already exists.")
                     return render(request, "accounts/parent_form.html", {
                         "form": form,
@@ -426,17 +433,16 @@ def edit_parent(request, pk):
                         "editing": True,
                     })
 
-                # Email uniqueness ONLY when email provided
-                if email:
-                    if User.objects.filter(email__iexact=email).exclude(pk=user.pk).exists():
-                        messages.error(request, "❌ Email already exists.")
-                        return render(request, "accounts/parent_form.html", {
-                            "form": form,
-                            "title": "Edit Parent",
-                            "editing": True,
-                        })
+                # --- EMAIL CHECK ---
+                if email and CustomUser.objects.filter(email__iexact=email).exclude(pk=user.pk).exists():
+                    messages.error(request, "❌ Email already exists.")
+                    return render(request, "accounts/parent_form.html", {
+                        "form": form,
+                        "title": "Edit Parent",
+                        "editing": True,
+                    })
 
-                # Update user
+                # --- UPDATE USER ---
                 parts = full_name.split()
                 user.first_name = parts[0] if parts else ""
                 user.last_name = " ".join(parts[1:]) if len(parts) > 1 else ""
@@ -444,18 +450,27 @@ def edit_parent(request, pk):
                 user.email = email
                 user.save()
 
-                # Update profile
+                # --- UPDATE PARENT PROFILE ---
                 parent_obj = form.save(commit=False)
                 parent_obj.user = user
                 parent_obj.save()
                 form.save_m2m()
 
-                # Optional password update
+                # --- OPTIONAL PASSWORD UPDATE ---
                 new_password = request.POST.get("new_password")
+                confirm_password = request.POST.get("confirm_password")
                 if new_password:
-                    user.set_password(new_password)
-                    user.save()
-                    messages.success(request, "🔑 Parent updated and password reset.")
+                    if new_password == confirm_password or confirm_password is None:
+                        user.set_password(new_password)
+                        user.save()
+                        messages.success(request, "🔑 Parent updated and password reset.")
+                    else:
+                        messages.error(request, "❌ Passwords do not match.")
+                        return render(request, "accounts/parent_form.html", {
+                            "form": form,
+                            "title": "Edit Parent",
+                            "editing": True,
+                        })
                 else:
                     messages.success(request, "✅ Parent updated successfully.")
 
@@ -465,8 +480,8 @@ def edit_parent(request, pk):
 
         else:
             initial_data = {
-                'username': user.username,
-                'email': user.email,
+                'username': user.username or "",
+                'email': user.email or "",
                 'fullname': f"{user.first_name} {user.last_name}".strip(),
             }
             form = ParentProfileForm(instance=parent, initial=initial_data)
@@ -477,9 +492,11 @@ def edit_parent(request, pk):
             "editing": True,
         })
 
+    except IntegrityError as e:
+        messages.error(request, f"❌ Database error: {str(e)}")
+        return redirect("manage_parents")
     except Exception as e:
-        # Catch ANY unexpected error (email constraint, save issues, etc.)
-        messages.error(request, f"❌ SYSTEM ERROR: {str(e)}")
+        messages.error(request, f"❌ Unexpected error occurred: {str(e)}")
         return redirect("manage_parents")
 
 
@@ -872,28 +889,53 @@ User = get_user_model()
 # ==========================================
 # ➕ ADD TEACHER
 # ==========================================
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import Group
+from django.db import IntegrityError
+from .models import CustomUser, Teacher
+from .forms import UserForm, TeacherProfileForm
+
 def add_teacher(request):
     if request.method == 'POST':
         user_form = UserForm(request.POST)
         teacher_form = TeacherProfileForm(request.POST)
+
         if user_form.is_valid() and teacher_form.is_valid():
-            user = user_form.save(commit=False)
-            user.set_password("teacher123")  # Default password
-            user.role = 'teacher'
-            user.save()
+            try:
+                # 1️⃣ Create the user first (this triggers post_save -> auto Teacher)
+                user = user_form.save(commit=False)
+                user.set_password("teacher123")  # default password
+                user.role = 'teacher'
+                user.save()
 
-            # Assign teacher group (optional if you use groups)
-            teacher_group, _ = Group.objects.get_or_create(name='Teacher')
-            user.groups.add(teacher_group)
+                # 2️⃣ Assign Teacher group
+                teacher_group, _ = Group.objects.get_or_create(name='Teacher')
+                user.groups.add(teacher_group)
 
-            teacher = teacher_form.save(commit=False)
-            teacher.user = user
-            teacher.save()
+                # 3️⃣ Get the auto-created Teacher profile from the signal
+                teacher = getattr(user, 'teacher_profile', None)
+                if not teacher:
+                    # Safety fallback (in case signal didn’t run)
+                    teacher = Teacher.objects.create(user=user, staff_id=f"T-{user.id}")
 
-            messages.success(request, "✅ Teacher added successfully!")
-            return redirect('manage_teachers')
+                # 4️⃣ Update teacher profile with form data
+                teacher_form = TeacherProfileForm(request.POST, instance=teacher)
+                if teacher_form.is_valid():
+                    teacher_form.save()
+                    messages.success(request, "✅ Teacher added successfully!")
+                    return redirect('manage_teachers')
+                else:
+                    messages.error(request, "❌ There were errors in the teacher form.")
+
+            except IntegrityError as e:
+                messages.error(request, f"❌ Database error: {str(e)}")
+            except Exception as e:
+                messages.error(request, f"❌ Unexpected error: {str(e)}")
+
         else:
             messages.error(request, "❌ Please correct the errors below.")
+
     else:
         user_form = UserForm()
         teacher_form = TeacherProfileForm()
@@ -945,84 +987,82 @@ def import_teachers(request):
 
 
 
-# ==========================================
-# ✏️ EDIT TEACHER
+from django.db import IntegrityError
+from django.contrib import messages
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Teacher, CustomUser
+from .forms import UserForm, TeacherProfileForm
+
 @login_required
 def edit_teacher(request, pk):
-    teacher = get_object_or_404(Teacher, pk=pk)
-    user = teacher.user
+    try:
+        teacher = get_object_or_404(Teacher, pk=pk)
+        user = teacher.user
 
-    if request.method == "POST":
-        user_form = UserForm(request.POST, instance=user)
-        teacher_form = TeacherProfileForm(request.POST, instance=teacher)
+        if request.method == "POST":
+            user_form = UserForm(request.POST, instance=user)
+            teacher_form = TeacherProfileForm(request.POST, instance=teacher)
 
-        new_password = request.POST.get("new_password")
-        confirm_password = request.POST.get("confirm_password")
-        is_active = request.POST.get("is_active")
+            new_password = request.POST.get("new_password")
+            confirm_password = request.POST.get("confirm_password")
+            is_active = request.POST.get("is_active")
 
-        if user_form.is_valid() and teacher_form.is_valid():
+            if user_form.is_valid() and teacher_form.is_valid():
 
-            # --- USERNAME CHECK ---
-            username = user_form.cleaned_data.get("username").strip()
-            if User.objects.filter(username=username).exclude(pk=user.pk).exists():
-                messages.error(request, "❌ Username already exists.")
-                return render(request, "accounts/edit_teacher.html", {
-                    "user_form": user_form,
-                    "teacher_form": teacher_form,
-                    "teacher": teacher,
-                })
+                # --- USERNAME CHECK ---
+                username = (user_form.cleaned_data.get("username") or "").strip()
+                if CustomUser.objects.filter(username=username).exclude(pk=user.pk).exists():
+                    messages.error(request, "❌ Username already exists.")
+                    return render(request, "accounts/edit_teacher.html", locals())
 
-            # --- EMAIL CHECK ---
-            email = user_form.cleaned_data.get("email", "").strip()
-            email = email if email != "" else ""  # safe blank email
-
-            if email:
-                if User.objects.filter(email__iexact=email).exclude(pk=user.pk).exists():
+                # --- EMAIL CHECK ---
+                email = (user_form.cleaned_data.get("email") or "").strip()
+                if email and CustomUser.objects.filter(email__iexact=email).exclude(pk=user.pk).exists():
                     messages.error(request, "❌ Email already exists.")
-                    return render(request, "accounts/edit_teacher.html", {
-                        "user_form": user_form,
-                        "teacher_form": teacher_form,
-                        "teacher": teacher,
-                    })
+                    return render(request, "accounts/edit_teacher.html", locals())
 
-            # --- UPDATE USER ---
-            user.username = username
-            user.email = email
-            user_form.save()
+                # --- UPDATE USER ---
+                user.username = username
+                user.email = email
+                user_form.save()
 
-            # --- UPDATE TEACHER PROFILE ---
-            teacher_form.save()
+                # --- UPDATE TEACHER PROFILE ---
+                teacher_form.save()  # staff_id excluded, safe
 
-            # --- OPTIONAL PASSWORD RESET ---
-            if new_password:
-                if new_password == confirm_password:
-                    user.set_password(new_password)
-                    user.save()
-                    messages.info(request, f"🔑 Password reset for {user.username}.")
-                else:
-                    messages.error(request, "❌ Passwords do not match.")
-                    return render(request, "accounts/edit_teacher.html", {
-                        "user_form": user_form,
-                        "teacher_form": teacher_form,
-                        "teacher": teacher,
-                    })
+                # --- OPTIONAL PASSWORD RESET ---
+                if new_password:
+                    if new_password == confirm_password:
+                        user.set_password(new_password)
+                        user.save()
+                        messages.info(request, f"🔑 Password reset for {user.username}.")
+                    else:
+                        messages.error(request, "❌ Passwords do not match.")
+                        return render(request, "accounts/edit_teacher.html", locals())
 
-            # --- ACTIVE STATUS ---
-            user.is_active = bool(is_active)
-            user.save(update_fields=["is_active"])
+                # --- ACTIVE STATUS ---
+                user.is_active = bool(is_active)
+                user.save(update_fields=["is_active"])
 
-            messages.success(request, "✅ Teacher updated successfully.")
-            return redirect("manage_teachers")
+                messages.success(request, "✅ Teacher updated successfully.")
+                return redirect("manage_teachers")
 
-    else:
-        user_form = UserForm(instance=user)
-        teacher_form = TeacherProfileForm(instance=teacher)
+        else:
+            user_form = UserForm(instance=user)
+            teacher_form = TeacherProfileForm(instance=teacher)
 
-    return render(request, "accounts/edit_teacher.html", {
-        "user_form": user_form,
-        "teacher_form": teacher_form,
-        "teacher": teacher,
-    })
+        return render(request, "accounts/edit_teacher.html", {
+            "user_form": user_form,
+            "teacher_form": teacher_form,
+            "teacher": teacher,
+        })
+
+    except IntegrityError as e:
+        messages.error(request, f"❌ Database error: {str(e)}")
+        return redirect("manage_teachers")
+    except Exception as e:
+        messages.error(request, f"❌ Unexpected error occurred: {str(e)}")
+        return redirect("manage_teachers")
 
 
 

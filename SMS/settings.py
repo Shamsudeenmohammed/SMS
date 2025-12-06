@@ -44,10 +44,10 @@ INSTALLED_APPS = [
     'academics',
     'attendance',
     'finance',
+    'reportcard',
     'communications',
     'library',
     'inventory',
-    'reports',
     'results',
 ]
 

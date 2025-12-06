@@ -83,10 +83,30 @@ class Admin(BaseProfile):
 
 
 class Teacher(BaseProfile):
-    staff_id = models.CharField(max_length=20, unique=True)
+    staff_id = models.CharField(max_length=30, unique=True, blank=True)  # allow blank
     qualification = models.CharField(max_length=100, blank=True)
     department = models.CharField(max_length=100, blank=True)
     hire_date = models.DateField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.staff_id:
+            # Get initials from full name
+            full_name = self.user.get_full_name() or self.user.username
+            initials = "".join([name[0].upper() for name in full_name.split() if name])
+
+            year = now().year
+            # Find last staff_id with same year & initials
+            last_teacher = Teacher.objects.filter(staff_id__startswith=f"T-{year}-{initials}").order_by('staff_id').last()
+            if last_teacher and last_teacher.staff_id:
+                last_number = int(last_teacher.staff_id.split('-')[-1])
+                new_number = last_number + 1
+            else:
+                new_number = 1
+
+            self.staff_id = f"T-{year}-{initials}-{new_number:04d}"  # e.g., T-2025-JD-0001
+        super().save(*args, **kwargs)
+
+
 
 
 class Accountant(BaseProfile):
@@ -190,7 +210,7 @@ def create_user_profile(sender, instance, created, **kwargs):
         if instance.role == CustomUser.Roles.ADMIN:
             Admin.objects.create(user=instance)
         elif instance.role == CustomUser.Roles.TEACHER:
-            Teacher.objects.create(user=instance, staff_id=f"T-{instance.id}")
+            Teacher.objects.create(user=instance)
         elif instance.role == CustomUser.Roles.ACCOUNTANT:
             Accountant.objects.create(user=instance, employee_id=f"A-{instance.id}")
         elif instance.role == CustomUser.Roles.PARENT:

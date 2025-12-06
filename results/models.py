@@ -37,6 +37,8 @@ class ResultRecord(models.Model):
     total_score = models.DecimalField(max_digits=5, decimal_places=2, editable=False)
     grade = models.CharField(max_length=2, blank=True)
     remark = models.CharField(max_length=100, blank=True)
+    position = models.PositiveIntegerField(default=0)
+
 
     date_recorded = models.DateTimeField(default=timezone.now)
 

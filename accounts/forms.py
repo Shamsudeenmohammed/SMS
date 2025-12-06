@@ -71,7 +71,7 @@ class AdminProfileForm(BaseProfileForm):
 class TeacherProfileForm(BaseProfileForm):
     class Meta(BaseProfileForm.Meta):
         model = Teacher
-        exclude=['date_of_birth']
+        exclude=['date_of_birth','staff_id','user']
         fields = BaseProfileForm.Meta.fields + [
             "staff_id",
             "qualification",
@@ -184,7 +184,7 @@ def __init__(self, *args, **kwargs):
 class UserForm(AutoEmailGenerationMixin, forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ["first_name", "last_name", "username", "email", "phone_number", "role"]
+        fields = ["first_name", "last_name", "username", "email", "phone_number"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

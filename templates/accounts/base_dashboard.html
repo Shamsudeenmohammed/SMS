@@ -307,6 +307,8 @@
           <a href="{% url 'start_attendance_session' %}" class="nav-link">🕒 Start Session</a>
           <a href="#" class="nav-link">📝 Take Attendance</a>
           <a href="{% url 'mark_results' %}" class="nav-link">🖊️ Mark Results</a>
+          <a href="{% url 'select_report_options' %}" class="nav-link">📄 Generate Report</a>
+
           
         {% elif user.role == "student" %}
           <a href="{% url 'student_dashboard' %}" class="nav-link">🏠 Student Dashboard</a>

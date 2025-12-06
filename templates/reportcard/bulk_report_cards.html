@@ -1,0 +1,236 @@
+{% extends "accounts/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Bulk Report Cards{% endblock %}
+{% block header %}📑 Bulk Report Cards{% endblock %}
+
+{% block content %}
+
+<style>
+/* General styles for screen */
+.report-page {
+    padding: 20px;
+    background: white;
+    border: 2px solid #003366;
+    border-radius: 6px;
+    max-width: 900px;
+    margin: 12px auto;
+    font-family: "Segoe UI", sans-serif;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.watermark-img {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    opacity: 0.06;
+    z-index: 0;
+}
+
+.school-header { text-align: center; z-index: 2; position: relative; }
+.school-name { font-size: 22px; font-weight: 800; color: #002b55; }
+.school-subtitle { font-size: 12.5px; color: #444; }
+
+.meta {
+    margin-top: 14px;
+    font-size: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 18px;
+    z-index: 2;
+}
+.meta p { margin: 2px 0; }
+.meta p b { display: inline-block; width: 120px; }
+
+.table, .conduct-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 13.5px;
+}
+.table th, .conduct-table th { background: #002b55 !important; color: white; border: 1px solid #002b55; padding: 8px; }
+.table td, .conduct-table td { border: 1px solid #9aa; padding: 7px; text-align: center; }
+.conduct-table td { border: 1px solid #666; }
+
+.section-title { font-size: 16px; font-weight: 700; color: #002b55; border-bottom: 2px solid #002b55; width: fit-content; margin-top: 16px; }
+
+.data-box { background: #eef4ff; border-left: 4px solid #002b55; padding: 8px 12px; border-radius: 6px; font-size: 14px; margin-top: 10px; }
+
+.signature-row { margin-top: 18px; display: flex; justify-content: space-between; }
+.signature-line { margin-top: 36px; border-bottom: 1px solid black; }
+
+.actions { text-align: center; margin: 20px 0; }
+.print-btn { padding: 9px 18px; background: #002b55; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+
+/* PRINT SPECIFIC STYLES */
+@media print {
+    /* Hide everything except report cards */
+    body * {
+        visibility: hidden;
+    }
+    
+    /* Show only the print container and its children */
+    .print-container, .print-container * {
+        visibility: visible;
+    }
+    
+    /* Position the print container absolutely */
+    .print-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    
+    /* Hide dashboard elements */
+    header, nav, footer, .sidebar, .breadcrumb, .page-header,
+    .dashboard-content > :not(.print-container) {
+        display: none !important;
+    }
+    
+    /* Reset body for printing */
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+    }
+    
+    /* Report card styling for print */
+    .report-page {
+        page-break-after: always;
+        page-break-inside: avoid;
+        border: 1px solid #ccc;
+        box-shadow: none;
+        margin: 0;
+        padding: 15mm;
+        width: 210mm;
+        height: 297mm;
+        max-width: none;
+        border-radius: 0;
+    }
+    
+    .print-btn {
+        display: none !important;
+    }
+    
+    @page {
+        size: A4 portrait;
+        margin: 15mm;
+    }
+}
+</style>
+
+<div class="actions">
+    <button onclick="window.print()" class="print-btn">Print All Report Cards</button>
+</div>
+
+<div class="print-container">
+    {% for r in reports %}
+    <div class="report-page">
+
+        <img src="{% static 'img/watermark.png' %}" class="watermark-img">
+
+        <!-- HEADER -->
+        <div class="school-header">
+            <img src="{% static 'img/logo.png' %}" width="75">
+            <div class="school-name">YOUR SCHOOL NAME</div>
+            <div class="school-subtitle">Excellence | Discipline | Integrity</div>
+            <div style="margin-top:5px; font-weight:600;">Terminal Report Card</div>
+        </div>
+
+        <!-- Meta info -->
+        <div class="meta">
+            <p><b>Name:</b> {{ r.student.user.get_full_name }}</p>
+            <p><b>Student ID:</b> {{ r.student.student_id }}</p>
+            <p><b>Class:</b> {{ r.report.classroom.name }}</p>
+            <p><b>Session:</b> {{ session }}</p>
+            <p><b>Term:</b> {{ term }}</p>
+            <p><b>Average Score:</b> {{ r.avg_score }}</p>
+        </div>
+
+        <!-- Summary -->
+        <div class="data-box">
+            <p><b>Class Position:</b> {{ r.overall_position }} <span style="color:gray;">of {{ r.total_students }}</span></p>
+            <p><b>CGPA:</b> {{ r.cgpa|default:"N/A" }}</p>
+            <p><b>Attendance:</b> {{ r.attendance.present|default:"-" }}/{{ r.attendance.absent|default:"-" }} ({{ r.attendance.percent|default:"-" }}%)</p>
+        </div>
+
+        <!-- Academic Performance -->
+        <div class="section-title">Academic Performance</div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Subject</th><th>Test</th><th>Exam</th><th>Total</th><th>Grade</th><th>Remark</th><th>Pos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for res in r.results %}
+                <tr>
+                    <td style="text-align:left; padding-left:8px;">{{ res.subject.name }}</td>
+                    <td>{{ res.test_score }}</td>
+                    <td>{{ res.exam_score }}</td>
+                    <td>{{ res.total_score }}</td>
+                    <td>{{ res.grade }}</td>
+                    <td>{{ res.remark }}</td>
+                    <td>{{ res.position_display }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Conduct -->
+        <div class="section-title">Conduct & Attitude</div>
+        <table class="conduct-table">
+            <thead><tr><th>Behaviour</th><th>Rating</th></tr></thead>
+            <tbody>
+                <tr><td>Punctuality</td><td></td></tr>
+                <tr><td>Neatness</td><td></td></tr>
+                <tr><td>Class Participation</td><td></td></tr>
+                <tr><td>Respect & Discipline</td><td></td></tr>
+                <tr><td>Homework</td><td></td></tr>
+            </tbody>
+        </table>
+
+        <!-- Fees -->
+        <div class="section-title">Fees Information</div>
+        {% if r.report %}
+        <div class="data-box">
+            <p><b>Total Due:</b> GH₵ {{ r.fees.total_due|default:0 }}</p>
+            <p><b>Total Paid:</b> GH₵ {{ r.fees.total_paid|default:0 }}</p>
+            <p><b>Balance:</b> GH₵ {{ r.fees.balance|default:0 }}</p>
+        </div>
+        {% else %}
+        <p>No invoice available for this student.</p>
+        {% endif %}
+
+        <!-- Remarks -->
+        <div class="section-title">Remarks</div>
+        <p><b>Class Teacher:</b> ________________________________________________</p>
+        <p><b>Headmaster:</b> _________________________________________________</p>
+        <p><b>Reopening Date:</b> ______________________________________________</p>
+
+        <!-- Signature row -->
+        <div class="signature-row">
+            <div>
+                <div class="signature-line"></div>
+                <div style="font-size:13px;">Class Teacher Signature</div>
+            </div>
+            <div>
+                <div class="signature-line"></div>
+                <div style="font-size:13px;">Headmaster Signature</div>
+            </div>
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+
+<div class="actions">
+    <button onclick="window.print()" class="print-btn">Print All Report Cards</button>
+</div>
+
+{% endblock %}

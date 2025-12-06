@@ -1,0 +1,87 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3>{{ title }}</h3>
+                </div>
+                <div class="card-body">
+                    <p>You are about to generate report cards for {{ total_students }} student(s) for {{ term }} Term.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label>Next Term Fees (Optional):</label>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <input type="number" name="tuition" class="form-control" placeholder="Tuition" step="0.01">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="number" name="pta_levy" class="form-control" placeholder="PTA Levy" step="0.01">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="number" name="stationery" class="form-control" placeholder="Stationery" step="0.01">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="number" name="activities" class="form-control" placeholder="Activities" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Next Term Information:</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="date" name="reopening_date" class="form-control" placeholder="Reopening Date">
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="time" name="reporting_time" class="form-control" value="07:30">
+                                </div>
+                            </div>
+                            <textarea name="special_notes" class="form-control mt-2" rows="3" 
+                                      placeholder="Special notes for next term..."></textarea>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-file-pdf"></i> Generate {{ total_students }} Report Cards
+                            </button>
+                            <a href="{% url 'admin:results_resultrecord_changelist' %}" class="btn btn-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                    
+                    <hr>
+                    
+                    <h5>Selected Students:</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Name</th>
+                                    <th>Class</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                <tr>
+                                    <td>{{ student.student_id }}</td>
+                                    <td>{{ student.user.get_full_name }}</td>
+                                    <td>{{ student.current_class.name }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

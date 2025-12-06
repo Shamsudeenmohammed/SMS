@@ -1,0 +1,405 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Report Card Generator{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">📊 Report Card Generator</h1>
+            
+            <!-- Current Session Info -->
+            <div class="alert alert-info">
+                <h5>Current Academic Session: {{ current_session.name }}</h5>
+                <p>Total students with results: {{ total_students }}</p>
+            </div>
+            
+            <!-- Single Student Generation -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Generate Single Report Card</h5>
+                </div>
+                <div class="card-body">
+                    <form id="singleReportForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Select Student:</label>
+                                    <select id="studentSelect" class="form-control" required>
+                                        <option value="">-- Select Student --</option>
+                                        {% for student in students %}
+                                        <option value="{{ student.id }}">
+                                            {{ student.user.get_full_name }} ({{ student.student_id }}) - {{ student.current_class.name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Select Term:</label>
+                                    <select id="termSelect" class="form-control" required>
+                                        <option value="">-- Select Term --</option>
+                                        {% for term in terms %}
+                                        <option value="{{ term }}">{{ term }} Term</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Custom Fees Section -->
+                        <div class="mt-4">
+                            <h6>Customize Next Term Fees (Optional)</h6>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <input type="number" id="tuition" class="form-control" placeholder="Tuition" step="0.01">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="number" id="ptaLevy" class="form-control" placeholder="PTA Levy" step="0.01">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="number" id="stationery" class="form-control" placeholder="Stationery" step="0.01">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="number" id="activities" class="form-control" placeholder="Activities" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="button" id="previewBtn" class="btn btn-info">
+                                <i class="fas fa-eye"></i> Preview
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-file-pdf"></i> Generate Report Card
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Preview Area -->
+                    <div id="previewArea" class="mt-4" style="display: none;">
+                        <h6>Preview</h6>
+                        <div class="card">
+                            <div class="card-body" id="previewContent">
+                                <!-- Preview will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bulk Generation -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>Generate Multiple Report Cards</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label>Select Students:</label>
+                        <div class="form-check">
+                            <input type="checkbox" id="selectAll" class="form-check-input">
+                            <label class="form-check-label" for="selectAll">Select All</label>
+                        </div>
+                        <div class="student-checkboxes" style="max-height: 300px; overflow-y: auto;">
+                            {% for student in students %}
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input student-checkbox" 
+                                       value="{{ student.id }}" id="student_{{ student.id }}">
+                                <label class="form-check-label" for="student_{{ student.id }}">
+                                    {{ student.user.get_full_name }} ({{ student.student_id }}) - {{ student.current_class.name }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Select Term:</label>
+                                <select id="bulkTermSelect" class="form-control" required>
+                                    <option value="">-- Select Term --</option>
+                                    {% for term in terms %}
+                                    <option value="{{ term }}">{{ term }} Term</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Reopening Date (Optional):</label>
+                                <input type="date" id="reopeningDate" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" id="generateBulkBtn" class="btn btn-success">
+                        <i class="fas fa-bolt"></i> Generate Selected Report Cards
+                    </button>
+                    
+                    <div id="bulkProgress" class="mt-3" style="display: none;">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <p class="mt-2" id="progressText">Processing...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Generated Report Cards -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Recently Generated Report Cards</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Term</th>
+                                    <th>Session</th>
+                                    <th>Position</th>
+                                    <th>Percentage</th>
+                                    <th>Generated On</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentReports">
+                                <!-- Will be loaded via AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // CSRF token setup
+    const csrftoken = getCookie('csrftoken');
+    
+    // Select All functionality
+    $('#selectAll').change(function() {
+        $('.student-checkbox').prop('checked', $(this).prop('checked'));
+    });
+    
+    // Preview single report
+    $('#previewBtn').click(function() {
+        const studentId = $('#studentSelect').val();
+        const term = $('#termSelect').val();
+        
+        if (!studentId || !term) {
+            alert('Please select a student and term');
+            return;
+        }
+        
+        $.ajax({
+            url: `/report-cards/preview/${studentId}/${term}/`,
+            method: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    const data = response.preview;
+                    let previewHtml = `
+                        <h6>${data.student.name}</h6>
+                        <p><strong>Class:</strong> ${data.student.class}</p>
+                        <p><strong>Term:</strong> ${data.term} Term</p>
+                        <p><strong>Session:</strong> ${data.session}</p>
+                        
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Test</th>
+                                    <th>Exam</th>
+                                    <th>Total</th>
+                                    <th>Grade</th>
+                                    <th>Remark</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    
+                    data.subjects.forEach(subject => {
+                        previewHtml += `
+                            <tr>
+                                <td>${subject.name}</td>
+                                <td>${subject.test_score}</td>
+                                <td>${subject.exam_score}</td>
+                                <td>${subject.total_score}</td>
+                                <td>${subject.grade}</td>
+                                <td>${subject.remark}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    previewHtml += `
+                            </tbody>
+                        </table>
+                        <p><strong>Total Marks:</strong> ${data.summary.total_marks}</p>
+                        <p><strong>Percentage:</strong> ${data.summary.percentage.toFixed(2)}%</p>
+                    `;
+                    
+                    $('#previewContent').html(previewHtml);
+                    $('#previewArea').show();
+                }
+            }
+        });
+    });
+    
+    // Generate single report card
+    $('#singleReportForm').submit(function(e) {
+        e.preventDefault();
+        
+        const studentId = $('#studentSelect').val();
+        const term = $('#termSelect').val();
+        
+        const feesData = {};
+        if ($('#tuition').val()) feesData.tuition = parseFloat($('#tuition').val());
+        if ($('#ptaLevy').val()) feesData.pta_levy = parseFloat($('#ptaLevy').val());
+        if ($('#stationery').val()) feesData.stationery = parseFloat($('#stationery').val());
+        if ($('#activities').val()) feesData.activities = parseFloat($('#activities').val());
+        
+        $.ajax({
+            url: '/report-cards/generate/',
+            method: 'POST',
+            headers: {'X-CSRFToken': csrftoken},
+            contentType: 'application/json',
+            data: JSON.stringify({
+                student_id: studentId,
+                term: term,
+                fees: feesData
+            }),
+            success: function(response) {
+                if (response.success) {
+                    alert('Report card generated successfully!');
+                    if (response.download_url) {
+                        window.open(response.download_url, '_blank');
+                    }
+                    loadRecentReports();
+                } else {
+                    alert('Error: ' + response.error);
+                }
+            }
+        });
+    });
+    
+    // Generate bulk report cards
+    $('#generateBulkBtn').click(function() {
+        const studentIds = [];
+        $('.student-checkbox:checked').each(function() {
+            studentIds.push($(this).val());
+        });
+        
+        if (studentIds.length === 0) {
+            alert('Please select at least one student');
+            return;
+        }
+        
+        const term = $('#bulkTermSelect').val();
+        if (!term) {
+            alert('Please select a term');
+            return;
+        }
+        
+        const nextTermInfo = {};
+        const reopeningDate = $('#reopeningDate').val();
+        if (reopeningDate) nextTermInfo.reopening_date = reopeningDate;
+        
+        // Show progress bar
+        $('#bulkProgress').show();
+        const progressBar = $('.progress-bar');
+        const progressText = $('#progressText');
+        
+        let completed = 0;
+        const total = studentIds.length;
+        
+        // Process students one by one with progress
+        function processNextStudent(index) {
+            if (index >= total) {
+                progressBar.css('width', '100%');
+                progressText.text('Completed!');
+                setTimeout(() => {
+                    $('#bulkProgress').hide();
+                    progressBar.css('width', '0%');
+                    loadRecentReports();
+                }, 2000);
+                return;
+            }
+            
+            const studentId = studentIds[index];
+            completed = index + 1;
+            const percentage = (completed / total) * 100;
+            
+            progressBar.css('width', percentage + '%');
+            progressText.text(`Processing ${completed} of ${total}...`);
+            
+            $.ajax({
+                url: '/report-cards/generate/',
+                method: 'POST',
+                headers: {'X-CSRFToken': csrftoken},
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    student_id: studentId,
+                    term: term,
+                    next_term_info: nextTermInfo
+                }),
+                success: function() {
+                    // Process next student
+                    setTimeout(() => processNextStudent(index + 1), 500);
+                },
+                error: function() {
+                    // Continue with next student even if this one fails
+                    setTimeout(() => processNextStudent(index + 1), 500);
+                }
+            });
+        }
+        
+        // Start processing
+        processNextStudent(0);
+    });
+    
+    // Load recent reports
+    function loadRecentReports() {
+        $.ajax({
+            url: '/report-cards/list-json/',
+            method: 'GET',
+            success: function(response) {
+                let html = '';
+                response.report_cards.forEach(report => {
+                    html += `
+                        <tr>
+                            <td>${report.student_name}</td>
+                            <td>${report.term} Term</td>
+                            <td>${report.session_name}</td>
+                            <td>${report.position || 'N/A'}</td>
+                            <td>${report.percentage}%</td>
+                            <td>${report.generated_date}</td>
+                            <td>
+                                <a href="${report.download_url}" class="btn btn-sm btn-primary" target="_blank">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                <a href="/report-cards/${report.id}/" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                });
+                $('#recentReports').html(html);
+            }
+        });
+    }
+    
+    // Initial load
+    loadRecentReports();
+});
+</script>
+{% endblock %}

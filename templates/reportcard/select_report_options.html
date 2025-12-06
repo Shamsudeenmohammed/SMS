@@ -1,0 +1,125 @@
+{% extends "accounts/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Generate Report Cards{% endblock %}
+{% block header %}📄 Generate Report Cards{% endblock %}
+
+{% block content %}
+<style>
+.select-box {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 520px;
+    margin: auto;
+}
+.select-box label {
+    font-weight: bold;
+    margin-top: 10px;
+}
+.select-box select,
+.select-box input[type=text] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+.select-btn {
+    width: 100%;
+    padding: 12px;
+    background: #1a73e8;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+.select-btn:hover {
+    background: #0f5abc;
+}
+.checkbox-container {
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+</style>
+
+<div class="select-box">
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- CLASS SELECTION (searchable) -->
+        <label>Select Class</label>
+        <select name="class_id" id="class_dropdown" required>
+            <option value="">-- Select Class --</option>
+            {% for c in classes %}
+                <option value="{{ c.id }}"
+                    {% if selected_class_id == c.id|stringformat:"s" %}selected{% endif %}>
+                    {{ c.name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <!-- SHOW STUDENTS ONLY AFTER CLASS IS SELECTED -->
+        {% if students %}
+        <div class="checkbox-container">
+            <label>
+                <input type="checkbox" id="select_all_checkbox" name="select_all">
+                Select All Students in Class
+            </label>
+        </div>
+
+        <label>Students in Class</label>
+        <select name="student_ids" id="student_select" multiple size="6">
+            {% for student in students %}
+                <option value="{{ student.id }}">{{ student.user.get_full_name }}</option>
+            {% endfor %}
+        </select>
+        {% endif %}
+
+        <!-- ACTIVE SESSION -->
+        <label>Session (Active)</label>
+        <input type="text" value="{{ active_session }}" disabled>
+
+        <!-- TERM -->
+        <label>Term</label>
+        <select name="term" required>
+            <option value="">-- Select Term --</option>
+            {% for t in terms %}
+                <option value="{{ t }}">{{ t }}</option>
+            {% endfor %}
+        </select>
+
+        <button class="select-btn">Generate Reports</button>
+    </form>
+</div>
+
+<script>
+// Auto reload student list when class changes
+document.getElementById("class_dropdown").addEventListener("change", function () {
+    const classId = this.value;
+    if (classId) {
+        window.location.href = "?class_id=" + classId;
+    }
+});
+
+// Select all / none
+const selectAllCheckbox = document.getElementById("select_all_checkbox");
+const studentSelect = document.getElementById("student_select");
+
+if (selectAllCheckbox) {
+    selectAllCheckbox.addEventListener("change", function() {
+        for (let option of studentSelect.options) {
+            option.selected = this.checked;
+        }
+    });
+
+    studentSelect.addEventListener("change", function() {
+        const allSelected = Array.from(this.options).every(opt => opt.selected);
+        selectAllCheckbox.checked = allSelected;
+    });
+}
+</script>
+
+{% endblock %}

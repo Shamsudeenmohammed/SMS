@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Terminal Report - {{report_card.student.user.get_full_name}}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            color: #000;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px double #000;
+            padding-bottom: 15px;
+        }
+        
+        .school-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .report-title {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        
+        .student-info {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        
+        .info-label {
+            width: 150px;
+            font-weight: bold;
+        }
+        
+        .section {
+            margin: 25px 0;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #000;
+        }
+        
+        td {
+            padding: 8px;
+            border: 1px solid #000;
+            text-align: center;
+        }
+        
+        .subject-col {
+            text-align: left;
+            width: 30%;
+        }
+        
+        .signature-area {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #000;
+        }
+        
+        .signature-line {
+            display: inline-block;
+            width: 45%;
+            margin-top: 60px;
+        }
+        
+        .signature-name {
+            border-top: 1px solid #000;
+            padding-top: 5px;
+            margin-top: 40px;
+            text-align: center;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background-color: #e8e8e8;
+        }
+        
+        .note-box {
+            background-color: #fff8dc;
+            border: 1px solid #ffd700;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="school-name">{{ school_name|default:"BRIGHT FUTURE ACADEMY" }}</div>
+        <div class="report-title">Terminal Report – {{ report_card.term }} Term, {{ report_card.session }}</div>
+    </div>
+    
+    <div class="student-info">
+        <div class="info-row">
+            <div class="info-label">Name:</div>
+            <div>{{ report_card.student.user.get_full_name }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Student ID:</div>
+            <div>{{ report_card.student.student_id }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Class:</div>
+            <div>{{ report_card.student.current_class.name|default:"N/A" }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Term:</div>
+            <div>{{ report_card.term }} Term</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Date of Issue:</div>
+            <div>{{ current_date }}</div>
+        </div>
+    </div>
+    
+    <!-- Section 1: Academic Performance -->
+    <div class="section">
+        <div class="section-title">1. Academic Performance</div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th class="subject-col">Subject</th>
+                    <th>Class Score (40%)</th>
+                    <th>Exam Score (60%)</th>
+                    <th>Total (100%)</th>
+                    <th>Grade</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td class="subject-col">{{ item.subject.name }}</td>
+                    <td>{{ item.test_score }}</td>
+                    <td>{{ item.exam_score }}</td>
+                    <td>{{ item.total_score }}</td>
+                    <td>{{ item.grade }}</td>
+                    <td>{{ item.remark }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div style="margin-top: 20px;">
+            <p><strong>Overall Position:</strong> {{ report_card.position|default:"N/A" }} out of {{ report_card.total_students_in_class }}</p>
+            <p><strong>Overall Percentage:</strong> {{ report_card.percentage|floatformat:2 }}%</p>
+            <p><strong>Overall Grade:</strong> {{ report_card.overall_grade }}</p>
+            <p><strong>Overall Remark:</strong> {{ report_card.overall_remark }}</p>
+            <p><strong>Conduct:</strong> {{ report_card.conduct }}</p>
+            <p><strong>Teacher's Comment:</strong> {{ report_card.teachers_comment }}</p>
+        </div>
+    </div>
+    
+    <!-- Section 2: Fees for Next Term -->
+    <div class="section">
+        <div class="section-title">2. Fees for Next Term</div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th class="subject-col">Item</th>
+                    <th>Amount (GHS)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="subject-col">Tuition</td>
+                    <td>{{ report_card.next_term_tuition|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <td class="subject-col">PTA Levy</td>
+                    <td>{{ report_card.next_term_pta_levy|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <td class="subject-col">Textbooks & Stationery</td>
+                    <td>{{ report_card.next_term_stationery|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <td class="subject-col">Sports & Activities</td>
+                    <td>{{ report_card.next_term_activities|floatformat:2 }}</td>
+                </tr>
+                <tr class="total-row">
+                    <td class="subject-col"><strong>Total</strong></td>
+                    <td><strong>{{ report_card.next_term_total_fees|floatformat:2 }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="note-box">
+            <strong>Note:</strong> Fees should be paid in full before reopening day.
+        </div>
+    </div>
+    
+    <!-- Section 3: Next Term Information -->
+    <div class="section">
+        <div class="section-title">3. Next Term Information</div>
+        
+        <div style="margin: 15px 0;">
+            <p><strong>Reopening Date:</strong> {{ formatted_reopening_date }}</p>
+            <p><strong>Reporting Time:</strong> {{ report_card.next_term_reporting_time }}</p>
+            <p><strong>Dress Code:</strong> Full school uniform</p>
+            {% if report_card.next_term_special_notes %}
+            <p><strong>Special Note:</strong> {{ report_card.next_term_special_notes }}</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Signatures -->
+    <div class="signature-area">
+        <div class="signature-line" style="float: left;">
+            <div class="signature-name">
+                Head Teacher's Signature
+            </div>
+        </div>
+        
+        <div class="signature-line" style="float: right;">
+            <div class="signature-name">
+                Class Teacher's Signature
+            </div>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+    
+    <div class="footer">
+        <p>This is a computer-generated document. No physical signature is required.</p>
+        <p>Generated on: {{ current_date }}</p>
+    </div>
+</body>
+</html>

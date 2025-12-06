@@ -1,0 +1,350 @@
+{% extends "accounts/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Report Card{% endblock %}
+{% block header %}📄 Student Report Card{% endblock %}
+
+{% block content %}
+
+<style>
+/* ===========================
+   GLOBAL PAPER SETTINGS
+=========================== */
+@page {
+    size: A4;
+    margin: 10mm;
+}
+
+/* ensure printers keep colors */
+* {
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+/* ===========================
+   MAIN BOX
+=========================== */
+.report-box {
+    background: white;
+    padding: 26px;
+    border: 2px solid #003366;
+    border-radius: 6px;
+    width: 100%;
+    max-width: 920px;
+    margin: 8px auto;
+    font-family: "Segoe UI", sans-serif;
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* ===========================
+   WATERMARK IMAGE (uses <img>)
+   - absolute, centered, low-opacity
+   - visible on screen and print
+=========================== */
+.watermark-img {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    max-width: 600px;
+    opacity: 0.06;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* ensure watermark prints */
+@media print {
+    .watermark-img { opacity: 0.06 !important; }
+}
+@media print {
+    body * {
+        visibility: hidden !important;
+    }
+
+    .report-box, .report-box * {
+        visibility: visible !important;
+    }
+
+    .report-box {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100% !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .print-btn {
+        display: none !important;
+    }
+}
+
+
+/* ===========================
+   HEADER
+=========================== */
+.school-header {
+    text-align: center;
+    z-index: 2;           /* above watermark */
+    position: relative;
+}
+
+.school-name {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 3px;
+    color: #002b55;
+    text-transform: uppercase;
+}
+
+.school-subtitle {
+    font-size: 13px;
+    color: #444;
+    margin-top: 0;
+}
+
+/* ===========================
+   INFO SECTION
+=========================== */
+.meta {
+    margin-top: 14px;
+    font-size: 14px;
+    line-height: 1.55;
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 18px;
+}
+
+/* small label style */
+.meta p { margin: 2px 0; }
+.meta p b { width: 120px; display: inline-block; }
+
+/* ===========================
+   TABLE STYLING
+=========================== */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 13.5px;
+    z-index: 2;
+}
+
+.table th {
+    background: #002b55 !important;
+    color: white !important;
+    padding: 8px;
+    border: 1px solid #002b55;
+}
+
+.table td {
+    border: 1px solid #9aa;
+    padding: 7px;
+    text-align: center;
+    background: white !important;
+}
+
+/* compact rows to fit one page */
+.table tbody tr td { padding: 6px; }
+
+/* ===========================
+   SECTION TITLE
+=========================== */
+.section-title {
+    font-size: 16px;
+    margin-top: 16px;
+    font-weight: 700;
+    color: #002b55;
+    border-bottom: 2px solid #002b55;
+    width: fit-content;
+    padding-bottom: 3px;
+    z-index: 2;
+}
+
+/* ===========================
+   INFO BOX
+=========================== */
+.data-box {
+    background: #eef4ff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-top: 10px;
+    border-left: 4px solid #002b55;
+    z-index: 2;
+    font-size: 14px;
+}
+
+/* ===========================
+   CONDUCT TABLE
+=========================== */
+.conduct-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    z-index: 2;
+    font-size: 13.5px;
+}
+
+.conduct-table th {
+    background: #002b55 !important;
+    color: white !important;
+    border: 1px solid #002b55;
+    padding: 6px;
+}
+
+.conduct-table td {
+    border: 1px solid #666;
+    padding: 6px;
+}
+
+/* ===========================
+   SIGNATURES
+=========================== */
+.signature-row {
+    margin-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    z-index: 2;
+}
+
+.signature-box { width: 48%; font-size: 13px; }
+.signature-line { margin-top: 36px; border-bottom: 1px solid #000; }
+
+/* ===========================
+   PRINT BUTTON (hidden in print)
+=========================== */
+.print-btn {
+    margin-top: 14px;
+    padding: 9px 18px;
+    background: #002b55;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 2;
+}
+
+/* make content slightly denser to fit one page */
+/* tweak as needed for your font/print settings */
+.small { font-size: 13px; }
+</style>
+
+<div class="report-box">
+    <!-- watermark image (centered, behind content) -->
+    <img class="watermark-img" src="{% static 'img/watermark.png' %}" alt="watermark">
+
+    <!-- HEADER -->
+    <div class="school-header">
+        <img src="{% static 'img/logo.png' %}" width="80" style="vertical-align:middle; z-index:2;">
+        <div style="display:inline-block; vertical-align:middle; margin-left:8px; z-index:2;">
+            <div class="school-name">YOUR SCHOOL NAME</div>
+            <div class="school-subtitle">Excellence | Discipline | Integrity</div>
+            <div style="margin-top:6px; font-weight:600;">Terminal Report Card</div>
+        </div>
+    </div>
+
+    <!-- STUDENT INFO (two-column compact) -->
+    <div class="meta small" style="margin-top:12px;">
+        <p><b>Name:</b> {{ student.user.get_full_name }}</p>
+        <p><b>Student ID:</b> {{ student.student_id }}</p>
+        <p><b>Class:</b> {{ classroom.name }}</p>
+        <p><b>Session:</b> {{ session }}</p>
+        <p><b>Term:</b> {{ term }} Term</p>
+        <p><b>Average Score:</b> {{ avg_score }}</p>
+    </div>
+
+    <!-- SUMMARY BOX -->
+    <div class="data-box small" style="margin-top:8px;">
+        <div><b>Class Position:</b> {{ overall_position }} <span style="color:gray;">of {{ total_students }}</span></div>
+        <div><b>CGPA:</b> {{ cgpa|default:"N/A" }}</div>
+        <div><b>Attendance (P/A):</b> {{ attendance.present|default:"-" }}/{{ attendance.absent|default:"-" }} ({{ attendance.percent|default:"-" }}%)</div>
+    </div>
+
+    <!-- ACADEMIC TABLE -->
+    <div class="section-title">Academic Performance</div>
+
+    <table class="table small" role="table" aria-label="Academic Performance">
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Test</th>
+                <th>Exam</th>
+                <th>Total</th>
+                <th>Grade</th>
+                <th>Remark</th>
+                <th>Pos</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td style="text-align:left; padding-left:10px;">{{ result.subject.name }}</td>
+                <td>{{ result.test_score }}</td>
+                <td>{{ result.exam_score }}</td>
+                <td>{{ result.total_score }}</td>
+                <td>{{ result.grade }}</td>
+                <td>{{ result.remark }}</td>
+                <td>{{ result.position_display }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- CONDUCT -->
+    <div class="section-title">Conduct & Attitude</div>
+
+    <table class="conduct-table small" aria-label="Conduct">
+        <thead>
+            <tr><th>Behaviour</th><th>Rating</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Punctuality</td><td>_________</td></tr>
+            <tr><td>Neatness</td><td>_________</td></tr>
+            <tr><td>Class Participation</td><td>_________</td></tr>
+            <tr><td>Respect & Discipline</td><td>_________</td></tr>
+            <tr><td>Homework</td><td>_________</td></tr>
+        </tbody>
+    </table>
+
+    <!-- FEES -->
+    <div class="section-title">Fees Information</div>
+    {% if invoice %}
+    <div class="data-box small">
+        <div><b>Total Due:</b> GH₵ {{ invoice.total_due }}</div>
+        <div><b>Total Paid:</b> GH₵ {{ invoice.total_paid }}</div>
+        <div><b>Balance:</b> GH₵ {{ invoice.balance }}</div>
+    </div>
+    {% else %}
+    <p class="small">No invoice available for this term.</p>
+    {% endif %}
+
+    <!-- REMARKS & SIGNATURES -->
+    <div class="section-title">Remarks</div>
+    <div class="small">
+        <p><b>Class Teacher:</b> _______________________________________</p>
+        <p><b>Headmaster:</b> ________________________________________</p>
+        <p><b>Reopening Date:</b> ____________________________________</p>
+    </div>
+
+    <div class="signature-row">
+        <div class="signature-box small">
+            <div class="signature-line"></div>
+            <div>Class Teacher's Signature</div>
+        </div>
+        <div class="signature-box small">
+            <div class="signature-line"></div>
+            <div>Headmaster's Signature</div>
+        </div>
+    </div>
+
+  </div>
+  <button class="print-btn" onclick="window.print()">Print Report</button>
+
+{% endblock %}

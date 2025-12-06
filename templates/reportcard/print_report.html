@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Report Card - {{ student.user.get_full_name }}</title>
+<style>
+@page { size: A4; margin: 10mm; }
+body { font-family: "Segoe UI", sans-serif; margin: 0; padding: 0; }
+
+.report-page {
+    padding: 20px;
+    background: white;
+    border: 2px solid #003366;
+    border-radius: 6px;
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.watermark-img {
+    position: absolute;
+    left: 50%;
+    top: 48%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    opacity: 0.06;
+    z-index: 0;
+}
+
+.school-header { text-align: center; margin-bottom: 10px; }
+.school-name { font-size: 22px; font-weight: 800; color: #002b55; }
+.school-subtitle { font-size: 12.5px; color: #444; }
+
+.meta {
+    margin-top: 14px;
+    font-size: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 18px;
+}
+.meta p { margin: 2px 0; }
+.meta p b { display: inline-block; width: 120px; }
+
+.table, .conduct-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 13.5px;
+}
+.table th, .conduct-table th {
+    background: #002b55;
+    color: white;
+    border: 1px solid #002b55;
+    padding: 8px;
+}
+.table td, .conduct-table td {
+    border: 1px solid #9aa;
+    padding: 7px;
+    text-align: center;
+}
+.conduct-table td { border: 1px solid #666; }
+
+.section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #002b55;
+    border-bottom: 2px solid #002b55;
+    width: fit-content;
+    margin-top: 16px;
+}
+
+.data-box {
+    background: #eef4ff;
+    border-left: 4px solid #002b55;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.signature-row {
+    margin-top: 18px;
+    display: flex;
+    justify-content: space-between;
+}
+.signature-line {
+    margin-top: 36px;
+    border-bottom: 1px solid black;
+}
+</style>
+</head>
+<body>
+<div class="report-page">
+    <img class="watermark-img" src="{{ watermark_url }}" alt="watermark">
+
+    <div class="school-header">
+        <img src="{{ logo_url }}" width="80">
+        <div class="school-name">YOUR SCHOOL NAME</div>
+        <div class="school-subtitle">Excellence | Discipline | Integrity</div>
+        <div style="margin-top:6px; font-weight:600;">Terminal Report Card</div>
+    </div>
+
+    <div class="meta">
+        <p><b>Name:</b> {{ student.user.get_full_name }}</p>
+        <p><b>Student ID:</b> {{ student.student_id }}</p>
+        <p><b>Class:</b> {{ classroom.name }}</p>
+        <p><b>Session:</b> {{ session }}</p>
+        <p><b>Term:</b> {{ term }} Term</p>
+        <p><b>Average Score:</b> {{ avg_score }}</p>
+    </div>
+
+    <div class="data-box">
+        <div><b>Class Position:</b> {{ overall_position }} of {{ total_students }}</div>
+        <div><b>CGPA:</b> {{ cgpa|default:"N/A" }}</div>
+        <div><b>Attendance (P/A):</b> {{ attendance.present|default:"-" }}/{{ attendance.absent|default:"-" }} ({{ attendance.percent|default:"-" }}%)</div>
+    </div>
+
+    <div class="section-title">Academic Performance</div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Subject</th><th>Test</th><th>Exam</th><th>Total</th>
+                <th>Grade</th><th>Remark</th><th>Pos</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td style="text-align:left; padding-left:10px;">{{ result.subject.name }}</td>
+                <td>{{ result.test_score }}</td>
+                <td>{{ result.exam_score }}</td>
+                <td>{{ result.total_score }}</td>
+                <td>{{ result.grade }}</td>
+                <td>{{ result.remark }}</td>
+                <td>{{ result.position_display }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="section-title">Conduct & Attitude</div>
+    <table class="conduct-table">
+        <thead><tr><th>Behaviour</th><th>Rating</th></tr></thead>
+        <tbody>
+            <tr><td>Punctuality</td><td>_________</td></tr>
+            <tr><td>Neatness</td><td>_________</td></tr>
+            <tr><td>Class Participation</td><td>_________</td></tr>
+            <tr><td>Respect & Discipline</td><td>_________</td></tr>
+            <tr><td>Homework</td><td>_________</td></tr>
+        </tbody>
+    </table>
+
+    <div class="section-title">Fees Information</div>
+    {% if invoice %}
+    <div class="data-box">
+        <div><b>Total Due:</b> GH₵ {{ invoice.total_due }}</div>
+        <div><b>Total Paid:</b> GH₵ {{ invoice.total_paid }}</div>
+        <div><b>Balance:</b> GH₵ {{ invoice.balance }}</div>
+    </div>
+    {% else %}
+    <p>No invoice available for this term.</p>
+    {% endif %}
+
+    <div class="section-title">Remarks</div>
+    <div>
+        <p><b>Class Teacher:</b> _______________________________________</p>
+        <p><b>Headmaster:</b> ________________________________________</p>
+        <p><b>Reopening Date:</b> ____________________________________</p>
+    </div>
+
+    <div class="signature-row">
+        <div class="signature-line">Class Teacher's Signature</div>
+        <div class="signature-line">Headmaster's Signature</div>
+    </div>
+</div>
+</body>
+</html>

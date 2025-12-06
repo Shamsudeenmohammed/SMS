@@ -1,0 +1,17 @@
+<!-- reportcard/generate_form.html -->
+
+<h2>Generate Report Card for {{ student.user.get_full_name }}</h2>
+
+<p>Session: {{ report.session }} | Term: {{ report.term }}</p>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <label>Teacher Remark</label>
+    <textarea name="teacher_remark" required></textarea>
+
+    <label>Signature</label>
+    <input type="file" name="teacher_signature">
+
+    <button type="submit">Generate Report Card</button>
+</form>
