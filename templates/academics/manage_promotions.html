@@ -12,7 +12,7 @@
   padding: 2rem;
   box-shadow: 0 4px 16px rgba(0,0,0,0.4);
   animation: fadeIn 0.4s ease-in-out;
-  overflow-x: auto; /* horizontal scroll if needed */
+  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -205,17 +205,30 @@ button.danger-btn {
 </div>
 
 <script>
-/* Select/Deselect All */
+/* ========= Select/Deselect All (Only visible rows) ========= */
 document.getElementById("select-all").addEventListener("change", function(e) {
-  document.querySelectorAll("input[name='selected_students']").forEach(cb => cb.checked = e.target.checked);
+  document
+    .querySelectorAll("#studentTable tbody input[name='selected_students']")
+    .forEach(cb => {
+      if (!cb.disabled) cb.checked = e.target.checked; // affect visible only
+    });
 });
 
-/* Search Filter */
+/* ========= Search Filter + disable hidden checkboxes ========= */
 document.getElementById("searchInput").addEventListener("keyup", function() {
   const filter = this.value.toLowerCase();
+
   document.querySelectorAll("#studentTable tbody tr").forEach(row => {
     const text = row.textContent.toLowerCase();
-    row.style.display = text.includes(filter) ? "" : "none";
+    const match = text.includes(filter);
+
+    row.style.display = match ? "" : "none";
+
+    const checkbox = row.querySelector("input[type='checkbox']");
+    if (checkbox) {
+      checkbox.disabled = !match; // hidden rows disabled
+      if (!match) checkbox.checked = false; // uncheck hidden rows
+    }
   });
 });
 </script>

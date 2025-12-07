@@ -896,6 +896,10 @@ from django.db import IntegrityError
 from .models import CustomUser, Teacher
 from .forms import UserForm, TeacherProfileForm
 
+
+
+
+
 def add_teacher(request):
     if request.method == 'POST':
         user_form = UserForm(request.POST)
@@ -948,9 +952,22 @@ def add_teacher(request):
 # ==========================================
 # 📥 IMPORT TEACHERS (CSV Upload)
 # ==========================================
+import csv
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.db import IntegrityError, transaction
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from accounts.models import Teacher
+
+User = get_user_model()
+
+
 def import_teachers(request):
     if request.method == 'POST' and request.FILES.get('file'):
         file = request.FILES['file']
+
+        # Validate file type
         if not file.name.endswith('.csv'):
             messages.error(request, '❌ Please upload a CSV file.')
             return redirect('import_teachers')
@@ -958,29 +975,82 @@ def import_teachers(request):
         decoded_file = file.read().decode('utf-8').splitlines()
         reader = csv.DictReader(decoded_file)
 
-        count = 0
-        for row in reader:
-            email = row.get('email')
-            full_name = row.get('full_name')
-            subject = row.get('subject', '')
+        created_count = 0
+        skipped = 0
 
-            if not email or not full_name:
+        for row in reader:
+            try:
+                full_name = (row.get('full_name') or "").strip()
+                email = (row.get('email') or "").strip()
+                subject = row.get('subject', "").strip()
+
+                # Skip rows with no name
+                if not full_name:
+                    skipped += 1
+                    continue
+
+                # Generate username even if email missing
+                if email:
+                    username = email.split("@")[0]
+                else:
+                    # fallback username (unique)
+                    username = full_name.replace(" ", "").lower()[:10]
+
+                # Make username unique
+                base_username = username
+                counter = 1
+                while User.objects.filter(username=username).exists():
+                    username = f"{base_username}{counter}"
+                    counter += 1
+
+                # Split names
+                parts = full_name.split()
+                first_name = parts[0]
+                last_name = " ".join(parts[1:]) if len(parts) > 1 else ""
+
+                # ------------------------------------
+                # CREATE USER + auto Teacher profile
+                # ------------------------------------
+                with transaction.atomic():
+                    user = User.objects.create_user(
+                        username=username,
+                        email=email if email else None,
+                        first_name=first_name,
+                        last_name=last_name,
+                        password="teacher123",   # default password
+                        role="teacher"
+                    )
+
+                    # Assign Teacher group
+                    teacher_group, _ = Group.objects.get_or_create(name="Teacher")
+                    user.groups.add(teacher_group)
+
+                    # Get auto-created Teacher profile (from signal)
+                    teacher = getattr(user, "teacher_profile", None)
+                    if not teacher:
+                        # fallback if signal didn’t fire
+                        teacher = Teacher.objects.create(
+                            user=user,
+                            staff_id=f"T-{user.id}"
+                        )
+
+                    # Set subject if available
+                    if subject:
+                        teacher.subject = subject
+                        teacher.save()
+
+                created_count += 1
+
+            except IntegrityError:
+                skipped += 1
+                continue
+            except Exception as e:
+                skipped += 1
                 continue
 
-            if not User.objects.filter(email=email).exists():
-                user = User.objects.create_user(
-                    username=email.split('@')[0],
-                    email=email,
-                    first_name=full_name.split(' ')[0],
-                    last_name=' '.join(full_name.split(' ')[1:]),
-                    password='teacher123'  # default password
-                )
-                teacher_group, _ = Group.objects.get_or_create(name='Teacher')
-                user.groups.add(teacher_group)
-                Teacher.objects.create(user=user, subject=subject)
-                count += 1
-
-        messages.success(request, f'✅ Successfully imported {count} teachers.')
+        messages.success(request,
+            f"✅ Imported: {created_count} teachers | ⛔ Skipped: {skipped}"
+        )
         return redirect('manage_teachers')
 
     return render(request, 'accounts/import_teachers.html')

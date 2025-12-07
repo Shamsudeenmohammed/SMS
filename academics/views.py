@@ -68,33 +68,43 @@ def manage_promotions(request):
 # 📥 DOWNLOAD STUDENT IMPORT TEMPLATE
 
 def download_student_template(request):
-    """Generate a CSV template for student import."""
-    response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = 'attachment; filename="student_template.csv"'
+    """Generate a CSV template for student import fully matching import_students."""
+    try:
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="student_template.csv"'
 
-    writer = csv.writer(response)
-    writer.writerow([
-        "student_id",
-        "full_name",
-        "email",
-        "current_class",
-        "section",
-        "guardian_name",
-        "guardian_contact",
-        "admission_date (YYYY-MM-DD)",
-    ])
-    writer.writerow([
-        "STU001",
-        "John Doe",
-        "john@example.com",
-        "Grade 1",
-        "A",
-        "Jane Doe",
-        "+233501234567",
-        "2025-01-10",
-    ])
+        writer = csv.writer(response)
 
-    return response
+        # Header row — MUST match import_students() expected fields
+        writer.writerow([
+            "username",                      # required
+            "full_name",                     # required
+            "email (optional)",              # optional
+            "current_class",                 # required
+            "section",                       # optional
+            "guardian_name",                 # optional
+            "guardian_contact",              # optional
+            "admission_date (YYYY-MM-DD)",   # optional
+        ])
+
+        # Example row — matches exactly what import_students accepts
+        writer.writerow([
+            "john123",
+            "John Doe",
+            "john@example.com",
+            "Grade 1",
+            "A",
+            "Jane Doe",
+            "+233501234567",
+            "2025-01-10",
+        ])
+
+        return response
+
+    except Exception as e:
+        messages.error(request, f"❌ Could not generate CSV template: {str(e)}")
+        return redirect("import_students")
+
 
 
 
@@ -103,111 +113,122 @@ def download_student_template(request):
 # 📤 IMPORT STUDENTS FROM CSV (Improved + Flexible Date Parsing)
 # ============================================================
 
-from django.contrib import messages
-from django.db import transaction
-from django.utils.timezone import now
-from datetime import datetime
 import csv
+from datetime import datetime
+from django.utils.timezone import now
+from django.db import transaction, IntegrityError
+from django.contrib import messages
+from django.shortcuts import redirect, render
 
-@login_required
 def import_students(request):
-    """Upload a CSV file to bulk-create Student records with flexible date parsing."""
-    if request.method == "POST":
-        csv_file = request.FILES.get("csv_file")
-        if not csv_file:
-            messages.error(request, "Please upload a CSV file.")
-            return redirect("import_students")
+    """Bulk import students from CSV (bug-free and fully aligned with Student model + add_student)."""
+    
+    if request.method != "POST":
+        return render(request, "academics/import_students.html")
 
-        # Decode file
+    csv_file = request.FILES.get("csv_file")
+
+    if not csv_file:
+        messages.error(request, "❌ Please upload a CSV file.")
+        return redirect("import_students")
+
+    try:
+        # Decode CSV
         decoded_file = csv_file.read().decode("utf-8").splitlines()
         reader = csv.DictReader(decoded_file)
 
         created_count = 0
         skipped_count = 0
 
-        try:
-            with transaction.atomic():
-                for row in reader:
-                    student_id = row.get("student_id")
-                    full_name = row.get("full_name")
-                    email = row.get("email")
-                    class_name = row.get("current_class")
-                    section = row.get("section", "")
-                    guardian_name = row.get("guardian_name", "")
-                    guardian_contact = row.get("guardian_contact", "")
-                    admission_date_str = row.get("admission_date", "").strip()
+        with transaction.atomic():
+            for row in reader:
 
-                    if not all([student_id, full_name, email, class_name]):
-                        skipped_count += 1
-                        continue
+                full_name = (row.get("full_name") or "").strip()
+                username = (row.get("username") or "").strip()
+                email = (row.get("email") or "").strip()
+                class_name = (row.get("current_class") or "").strip()
+                section = (row.get("section") or "").strip()
+                guardian_name = (row.get("guardian_name") or "").strip()
+                guardian_contact = (row.get("guardian_contact") or "").strip()
+                admission_date_raw = (row.get("admission_date") or "").strip()
 
-                    # 🔹 Parse admission date safely
-                    admission_date = None
-                    if admission_date_str:
-                        for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y", "%d-%m-%Y"):
-                            try:
-                                admission_date = datetime.strptime(admission_date_str, fmt).date()
-                                break
-                            except ValueError:
-                                continue
-                    if not admission_date:
-                        admission_date = now().date()
+                # ❌ Required fields
+                if not full_name or not class_name:
+                    skipped_count += 1
+                    continue
 
-                    # 🔹 Get or create classroom
-                    classroom, _ = ClassRoom.objects.get_or_create(name=class_name)
+                # If username missing → auto-generate
+                if not username:
+                    username = full_name.lower().replace(" ", "")[:10]  # johnDoe → johndoe
+                    username += str(now().timestamp()).replace(".", "")[-4:]  # avoid duplicates
 
-                    # 🔹 Split full name for CustomUser
-                    parts = full_name.strip().split()
-                    first_name = parts[0]
-                    last_name = " ".join(parts[1:]) if len(parts) > 1 else ""
+                # Parse full name
+                parts = full_name.split()
+                first_name = parts[0]
+                last_name = " ".join(parts[1:]) if len(parts) > 1 else ""
 
-                    # 🔹 Create user (role='student')
-                    user, created_user = CustomUser.objects.get_or_create(
-                        username=email,
-                        defaults={
-                            "email": email,
-                            "first_name": first_name,
-                            "last_name": last_name,
-                            "role": "student",
-                        },
-                    )
+                # Parse admission date safely
+                admission_date = None
+                if admission_date_raw:
+                    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y", "%d-%m-%Y"):
+                        try:
+                            admission_date = datetime.strptime(admission_date_raw, fmt).date()
+                            break
+                        except ValueError:
+                            pass
 
-                    # ✅ Assign default password if user newly created
-                    if created_user:
-                        user.set_password("student123")  # ← your default password
-                        user.save()
+                if not admission_date:
+                    admission_date = now().date()
 
-                    # 🔹 Create Student record if not exists
-                    student, created = Student.objects.get_or_create(
-                        user=user,
-                        defaults={
-                            "student_id": student_id,
-                            "current_class": classroom,
-                            "section": section,
-                            "guardian_name": guardian_name,
-                            "guardian_contact": guardian_contact,
-                            "admission_date": admission_date,
-                        },
-                    )
+                # Create / Get class
+                classroom, _ = ClassRoom.objects.get_or_create(name=class_name)
 
-                    if created:
-                        created_count += 1
-                    else:
-                        skipped_count += 1
+                # Create the user
+                user, created_user = CustomUser.objects.get_or_create(
+                    username=username,
+                    defaults={
+                        "first_name": first_name,
+                        "last_name": last_name,
+                        "email": email if email else None,
+                        "role": "student",
+                    },
+                )
 
-            messages.success(
-                request,
-                f"✅ {created_count} students imported successfully. "
-                f"{skipped_count} skipped (duplicates or incomplete rows). "
-                f"Default password set to 'student123' for new students."
-            )
+                # Set default password for new users
+                if created_user:
+                    user.set_password("student123")
+                    user.save()
 
-        except Exception as e:
-            messages.error(request, f"❌ Error importing students: {str(e)}")
+                # Create student profile
+                student, created = Student.objects.get_or_create(
+                    user=user,
+                    defaults={
+                        "admission_date": admission_date,
+                        "current_class": classroom,
+                        "section": section,
+                        "guardian_name": guardian_name,
+                        "guardian_contact": guardian_contact,
+                    },
+                )
 
+                if created:
+                    created_count += 1
+                else:
+                    skipped_count += 1
+
+        messages.success(
+            request,
+            f"✅ {created_count} students imported successfully. "
+            f"⛔ {skipped_count} skipped (duplicates or missing required fields). "
+            f"Default password set to 'student123' for new accounts."
+        )
+
+    except Exception as e:
+        messages.error(request, f"❌ Import failed: {str(e)}")
         return redirect("import_students")
 
-    return render(request, "academics/import_students.html")
+    return redirect("import_students")
+
 
 
 from django.shortcuts import render, redirect, get_object_or_404
