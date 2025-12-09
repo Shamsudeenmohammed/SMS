@@ -295,9 +295,10 @@
           <a href="{% url 'manage_students' %}" class="nav-link">🎓 Manage Students</a>
           <a href="{% url 'manage_teachers' %}" class="nav-link">👨‍🏫 Manage Teachers</a>
           <a href="{% url 'manage_classrooms' %}" class="nav-link">🏫 Manage Classrooms</a>
-          <a href="{% url 'subject_list' %}" class="nav-link">📚 Manage Courses</a>
+          <a href="{% url 'subject_list' %}" class="nav-link">📚 Manage Subjects</a>
           <a href="{% url 'manage_sessions' %}" class="nav-link">📚 Manage Sessions</a>
           <a href="{% url 'manage_parents' %}" class="nav-link">👨‍👩‍👧 Manage Parents</a>
+          <a href="{% url 'select_report_options' %}" class="nav-link">📄 Generate Report</a>
 
 
         {% elif user.role == "teacher" %}

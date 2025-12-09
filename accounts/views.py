@@ -294,6 +294,7 @@ from .models import Parent, Student  # adjust to your actual model paths
 logger = logging.getLogger(__name__)
 User = get_user_model()
 
+
 @login_required
 def add_parent(request):
     try:
@@ -303,30 +304,32 @@ def add_parent(request):
             if form.is_valid():
                 try:
                     with transaction.atomic():
+                        # use safe defaults so .strip() never runs on None
+                        username_input = (form.cleaned_data.get("username") or "").strip()
+                        email_raw = form.cleaned_data.get("email")
+                        email = (email_raw or "").strip() or None
 
-                        username_input = form.cleaned_data.get("username", "").strip()
-                        email = form.cleaned_data.get("email", "").strip() or None   
                         full_name = (
-                            form.cleaned_data.get("fullname")
-                            or form.cleaned_data.get("name")
+                            (form.cleaned_data.get("fullname") or "")
+                            or (form.cleaned_data.get("name") or "")
                             or "Parent User"
-                        ).strip()
+                        )
+                        full_name = full_name.strip()
 
-                        # Split full name
+                        # Split full name safely
                         parts = full_name.split()
                         first_name = parts[0] if parts else ""
                         last_name = " ".join(parts[1:]) if len(parts) > 1 else ""
 
-                        # Build unique username
-                        base = slugify(username_input) or slugify(full_name) or "parent"
+                        # Build unique username (fallback to full_name if username_input blank)
+                        base = slugify(username_input) if username_input else slugify(full_name) or "parent"
                         username = base
                         counter = 1
-
                         while User.objects.filter(username=username).exists():
                             username = f"{base}{counter}"
                             counter += 1
 
-                        # Email uniqueness only if provided
+                        # Email uniqueness only when provided
                         if email and User.objects.filter(email__iexact=email).exists():
                             messages.error(request, "❌ This email is already linked to another user.")
                             return render(request, "accounts/parent_form.html", {
@@ -348,8 +351,12 @@ def add_parent(request):
 
                         # Assign role if model has `role`
                         if hasattr(user, "role"):
-                            user.role = "parent"
-                            user.save()
+                            try:
+                                user.role = "parent"
+                                user.save(update_fields=["role"])
+                            except Exception:
+                                # non-fatal: log and continue
+                                logger.exception("Failed to set user.role for new parent")
 
                         # Create Parent Profile
                         parent_profile = form.save(commit=False)
@@ -357,27 +364,25 @@ def add_parent(request):
                         parent_profile.save()
                         form.save_m2m()
 
-                        # Attach children / students
-                        children_selected = (
-                            form.cleaned_data.get("children")
-                            or form.cleaned_data.get("students")
-                        )
-
+                        # Attach children / students (if present)
+                        children_selected = form.cleaned_data.get("children") or form.cleaned_data.get("students")
                         if children_selected:
-                            field = "children" if hasattr(parent_profile, "children") else "students"
-                            getattr(parent_profile, field).set(children_selected)
+                            # ensure the related name exists
+                            if hasattr(parent_profile, "children"):
+                                parent_profile.children.set(children_selected)
+                            elif hasattr(parent_profile, "students"):
+                                parent_profile.students.set(children_selected)
 
                         messages.success(
                             request,
-                            f"Parent '{full_name}' added successfully. "
-                            f"Username: {username} | Temporary Password: {temp_password}"
+                            f"Parent '{full_name}' added successfully. Username: {username} | Temporary Password: {temp_password}"
                         )
                         return redirect("manage_parents")
 
                 except Exception as inner_exc:
-                    logger.error(f"❗ Error while saving parent: {inner_exc}", exc_info=True)
+                    logger.exception("Error while saving parent")
                     messages.error(request, f"⚠️ Saving failed: {inner_exc}")
-            
+
             else:
                 messages.error(request, "⚠️ Please correct the highlighted errors.")
 
@@ -390,8 +395,8 @@ def add_parent(request):
         })
 
     except Exception as exc:
-        # Top-level catch
-        logger.error(f"🔥 UNEXPECTED ERROR in add_parent: {exc}", exc_info=True)
+        logger.exception("UNEXPECTED ERROR in add_parent")
+        messages.error(request, f"🔥 Unexpected error: {exc}")
         return render(request, "accounts/parent_form.html", {
             "form": ParentProfileForm(),
             "title": "Add Parent",
