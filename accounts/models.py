@@ -36,22 +36,24 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return f"{self.username} ({self.role})"
 
-    @property
-    def profile_photo(self):
-        """Return user profile picture URL or default."""
-        try:
-            if hasattr(self, "admin_profile"):
-                return self.admin_profile.photo.url
-            elif hasattr(self, "teacher_profile"):
-                return self.teacher_profile.photo.url
-            elif hasattr(self, "accountant_profile"):
-                return self.accountant_profile.photo.url
-            elif hasattr(self, "parent_profile"):
-                return self.parent_profile.photo.url
-            else:
-                return self.student_profile.photo.url
-        except:
-            return "/media/profiles/default.png"
+@property
+def profile_photo(self):
+    """Return user profile picture URL or default."""
+    try:
+        for profile_attr in [
+            "admin_profile",
+            "teacher_profile",
+            "accountant_profile",
+            "parent_profile",
+            "student_profile",
+        ]:
+            profile = getattr(self, profile_attr, None)
+            if profile and getattr(profile, "photo", None):
+                return profile.photo.url
+    except:
+        pass
+
+    return "/media/profiles/default.png"
 
 
 # ============================================================

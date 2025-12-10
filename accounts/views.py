@@ -1339,7 +1339,6 @@ from .models import Student, Teacher, Admin, Accountant, Parent  # import all ro
 def edit_profile(request):
     user = request.user
 
-    # 🔹 Dynamically select the correct profile model based on user.role
     role_model_map = {
         "student": Student,
         "teacher": Teacher,
@@ -1354,13 +1353,11 @@ def edit_profile(request):
     if model:
         profile, _ = model.objects.get_or_create(user=user)
 
-    # 🧩 Initialize forms
     if request.method == "POST":
         profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
         email_form = UserEmailForm(request.POST, instance=user)
         password_form = CustomPasswordChangeForm(user, request.POST)
 
-        # 🔹 Handle profile update
         if "update_profile" in request.POST:
             if profile_form.is_valid() and email_form.is_valid():
                 email_form.save()
@@ -1368,7 +1365,6 @@ def edit_profile(request):
                 messages.success(request, "✅ Profile updated successfully!")
                 return redirect("edit_profile")
 
-        # 🔹 Handle password change
         elif "change_password" in request.POST:
             if password_form.is_valid():
                 user = password_form.save()
@@ -1387,6 +1383,9 @@ def edit_profile(request):
         "profile_form": profile_form,
         "email_form": email_form,
         "password_form": password_form,
+        "profile_data": profile,  # REQUIRED
+        "role": user.role.capitalize(),  # optional
     }
     return render(request, "accounts/edit_profile.html", context)
+
 

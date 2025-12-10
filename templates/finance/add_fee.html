@@ -3,16 +3,48 @@
 {% block header %}💰 Add Student Fee{% endblock %}
 
 {% block content %}
+
 <div class="add-fee-container">
   <div class="form-box">
     <h2>Create Fee Record</h2>
+
     <form method="post">
       {% csrf_token %}
       {{ form.as_p }}
+
       <button type="submit" class="btn-save">Save Fee Record</button>
     </form>
   </div>
 </div>
+
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- jQuery + Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+$(document).ready(function() {
+
+  // Apply Select2 to the Student field
+  $('#id_student').select2({
+    placeholder: "Search student...",
+    allowClear: true,
+    width: '100%',
+    theme: 'classic'
+  });
+
+  // Apply Select2 to the Fee Type field
+  $('#id_fee_type').select2({
+    placeholder: "Search fee type...",
+    allowClear: true,
+    width: '100%',
+    theme: 'classic'
+  });
+
+});
+</script>
 
 <style>
 .add-fee-container {
@@ -64,6 +96,22 @@ form input:focus, form select:focus, form textarea:focus {
   border-color: #004aad;
 }
 
+/* Make select2 match your form style */
+.select2-container .select2-selection--single {
+  height: 42px !important;
+  padding: 6px 10px;
+  border: 1px solid #ccc !important;
+  border-radius: 8px !important;
+}
+
+.select2-selection__rendered {
+  line-height: 30px !important;
+}
+
+.select2-selection__arrow {
+  top: 8px !important;
+}
+
 .btn-save {
   background: #004aad;
   color: #fff;
@@ -83,4 +131,5 @@ form input:focus, form select:focus, form textarea:focus {
   transform: translateY(-2px);
 }
 </style>
+
 {% endblock %}
