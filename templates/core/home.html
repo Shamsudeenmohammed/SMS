@@ -1,0 +1,394 @@
+{% extends "core/base_public.html" %}
+{% load static %}
+
+{% block title %}Home | Student Management System{% endblock %}
+
+
+{% block content %}
+
+{% if latest_update %}
+<div class="floating-update">
+    <strong>📢 Latest Update:</strong>
+    {% if latest_update.link %}
+        <a href="{{ latest_update.link }}" target="_blank">
+            {{ latest_update.title }}
+        </a>
+    {% else %}
+        {{ latest_update.title }}
+    {% endif %}
+</div>
+{% endif %}
+
+
+<header>
+    <div class="slide active" style="background-image:url('{% static "images/hero1.jpg" %}')"></div>
+    <div class="slide" style="background-image:url('{% static "images/hero2.jpg" %}')"></div>
+    <div class="slide" style="background-image:url('{% static "images/hero3.jpg" %}')"></div>
+
+    <div class="hero-content">
+        <h1>Student Management System</h1>
+        <p>Empowering Schools with Smart, Secure & Intelligent Digital Solutions</p>
+
+        <div class="actions">
+            <a href="{% url 'custom_login' %}" class="btn">Access Portal</a>
+            <a href="#" class="btn outline">Admissions</a>
+        </div>
+    </div>
+</header>
+
+<section>
+    <h2>Our Core Modules</h2>
+    <div class="features">
+        <div class="card">
+            <h3>Academics</h3>
+            <p>Subjects, grading systems, analytics, and performance monitoring.</p>
+        </div>
+        <div class="card">
+            <h3>Attendance</h3>
+            <p>Real-time attendance tracking with automated summaries.</p>
+        </div>
+        <div class="card">
+            <h3>Finance</h3>
+            <p>Fees management, payments, balances and financial reports.</p>
+        </div>
+        <div class="card">
+            <h3>Results</h3>
+            <p>Instant report cards, transcripts and academic history.</p>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>About Our Institution</h2>
+    <div class="about">
+        <div>
+            <p>
+                Our Student Management System is built to modernize school administration,
+                streamline academic operations, and enhance communication between staff,
+                students and parents through secure digital solutions.
+            </p>
+        </div>
+        <img src="{% static 'images/campus.jpg' %}">
+    </div>
+</section>
+
+<section>
+    <h2>Campus Life</h2>
+    <div class="gallery">
+        <img src="{% static 'images/gallery1.jpg' %}">
+        <img src="{% static 'images/gallery2.jpg' %}">
+        <img src="{% static 'images/gallery3.jpg' %}">
+        <img src="{% static 'images/gallery4.jpg' %}">
+    </div>
+</section>
+
+<footer>
+    <div style="max-width:1200px;margin:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:40px;text-align:left;">
+
+        <!-- School Info -->
+        <div>
+            <h3>Student Management System</h3>
+            <p>
+                A modern digital platform designed to simplify academic
+                administration and enhance communication in schools.
+            </p>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+            <h3>Quick Links</h3>
+            <p><a href="#" style="color:#e5e7eb;text-decoration:none;">About Us</a></p>
+            <p><a href="#" style="color:#e5e7eb;text-decoration:none;">Admissions</a></p>
+            <p><a href="#" style="color:#e5e7eb;text-decoration:none;">Academics</a></p>
+            <p><a href="{% url 'custom_login' %}" style="color:#e5e7eb;text-decoration:none;">Portal Login</a></p>
+        </div>
+
+        <!-- Contact -->
+        <div>
+            <h3>Contact Us</h3>
+            <p>📍 Address: Accra, Ghana</p>
+            <p>📞 Phone: +233 000 000 000</p>
+            <p>✉ Email: info@schoolportal.com</p>
+        </div>
+
+        <!-- Live Stats -->
+        <div>
+            <h3>Live Statistics</h3>
+            <p>🎓 Students: <strong>{{ total_students }}</strong></p>
+            <p>👩‍🏫 Qualified Teachers: <strong>{{ total_teachers }}</strong></p>
+            <p>👨‍👩‍👧 Parents: <strong>{{ total_parents }}</strong></p>
+        </div>
+
+    </div>
+
+    <hr style="margin:30px auto;max-width:1200px;border:0;border-top:1px solid rgba(255,255,255,0.2);">
+
+    <p style="text-align:center;">
+        &copy; {{ year|default:2026 }} Student Management System • All Rights Reserved
+    </p>
+</footer>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let index = 0;
+
+setInterval(() => {
+    slides[index].classList.remove('active');
+    index = (index + 1) % slides.length;
+    slides[index].classList.add('active');
+}, 5000);
+</script>
+
+<style>
+
+/* ===== FLOATING UPDATE ===== */
+.floating-update {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    max-width: 340px;
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: #fff;
+    padding: 16px 20px;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    font-size: 14px;
+    z-index: 999;
+    animation: slideUp 0.8s ease, pulse 3s infinite;
+}
+
+.floating-update a {
+    color: #fff;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 rgba(37,99,235,0.4); }
+    50% { box-shadow: 0 0 25px rgba(37,99,235,0.8); }
+    100% { box-shadow: 0 0 0 rgba(37,99,235,0.4); }
+}
+
+
+/* ===== GLOBAL RESET ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+body {
+    background: #f6f8fc;
+    color: #1f2937;
+    line-height: 1.7;
+}
+
+/* ===== HERO / SLIDER ===== */
+.slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.6s ease-in-out;
+    pointer-events: none;
+}
+
+.slide.active {
+    opacity: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 10;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(
+        to bottom right,
+        rgba(15, 23, 42, 0.75),
+        rgba(30, 64, 175, 0.65)
+    );
+    backdrop-filter: blur(6px);
+}
+
+.hero-content h1 {
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+}
+
+.hero-content p {
+    max-width: 720px;
+    font-size: 1.2rem;
+    opacity: 0.95;
+    margin-bottom: 35px;
+}
+
+/* ===== HERO BUTTONS ===== */
+.actions {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.btn {
+    padding: 14px 36px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    color: #1e40af;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+.btn.outline {
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.85);
+    color: #ffffff;
+    box-shadow: none;
+}
+
+.btn.outline:hover {
+    background: #ffffff;
+    color: #1e40af;
+}
+
+/* ===== SECTIONS ===== */
+section {
+    padding: 90px 22px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+section h2 {
+    text-align: center;
+    font-size: clamp(1.9rem, 3vw, 2.4rem);
+    font-weight: 700;
+    margin-bottom: 55px;
+    color: #0f172a;
+}
+
+/* ===== FEATURES ===== */
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.card {
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(12px);
+    padding: 35px;
+    border-radius: 18px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    transition: all 0.35s ease;
+    border: 1px solid rgba(255,255,255,0.4);
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+}
+
+.card h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #2563eb;
+}
+
+.card p {
+    font-size: 0.95rem;
+    color: #4b5563;
+}
+
+/* ===== ABOUT ===== */
+.about {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 50px;
+    align-items: center;
+}
+
+.about p {
+    font-size: 1.05rem;
+    color: #374151;
+}
+
+.about img {
+    width: 100%;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+}
+
+/* ===== GALLERY ===== */
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 22px;
+}
+
+.gallery img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 18px;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.gallery img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 25px 55px rgba(0,0,0,0.25);
+}
+
+/* ===== FOOTER ===== */
+footer {
+    background: linear-gradient(135deg, #0f172a, #1e3a8a);
+    color: #e5e7eb;
+    text-align: center;
+    padding: 35px 20px;
+    font-size: 0.9rem;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+    .about {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-content p {
+        font-size: 1rem;
+    }
+}
+</style>
+
+{% endblock %}

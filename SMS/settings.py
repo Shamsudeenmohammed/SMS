@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'library',
     'inventory',
     'results',
+    'core',
 ]
 
 # -----------------------------------------

@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Student Management System{% endblock %}</title>
+
+    {% block extra_css %}
+    <style>
+/* ===== HEADER NAVIGATION ===== */
+.site-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 12px 20px;   /* 🔴 reduced padding */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 20px;      /* 🔴 smaller logo */
+    font-weight: 700;
+    color: #4c51bf;
+}
+
+.nav-links {
+    display: flex;
+    gap: 18px;            /* 🔴 reduced spacing */
+}
+
+.nav-links a {
+    text-decoration: none;
+    font-size: 14px;      /* 🔴 smaller text */
+    font-weight: 500;
+    color: #333;
+    padding: 6px 10px;    /* 🔴 smaller buttons */
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.nav-links a:hover {
+    background: #edf2ff;
+    color: #4c51bf;
+}
+
+.nav-links .login-btn {
+    background: #4c51bf;
+    color: white;
+}
+
+.nav-links .login-btn:hover {
+    background: #434190;
+}
+</style>
+
+    {% endblock %}
+    
+</head>
+
+<body>
+
+<!-- ===== HEADER / NAVIGATION ===== -->
+<header style="background:#0a3d62; padding:15px 40px;">
+    <nav style="display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="color:#fff;">SMS Portal</h2>
+        <ul style="list-style:none; display:flex; gap:25px;">
+            <li><a href="{% url 'core:home' %}" style="color:#fff; text-decoration:none;">Home</a></li>
+            <li><a href="#" style="color:#fff; text-decoration:none;">About</a></li>
+            <li><a href="#" style="color:#fff; text-decoration:none;">Admissions</a></li>
+            <li><a href="#" style="color:#fff; text-decoration:none;">Academics</a></li>
+            <li><a href="#" style="color:#fff; text-decoration:none;">Contact</a></li>
+            <li><a href="{% url 'custom_login' %}" style="color:#fff; text-decoration:none;">Login</a></li>
+        </ul>
+    </nav>
+</header>
+
+<!-- ===== PAGE CONTENT ===== -->
+{% block content %}{% endblock %}
+
+</body>
+</html>
