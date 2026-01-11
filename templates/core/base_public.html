@@ -6,82 +6,119 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Student Management System{% endblock %}</title>
 
-    {% block extra_css %}
-    <style>
-/* ===== HEADER NAVIGATION ===== */
-.site-header {
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
+{% block extra_css %}
+<style>
+/* ===== RESET ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+/* ===== HEADER ===== */
+header {
+    background: #0a3d62;
+    padding: 12px 20px;
 }
 
 .nav-container {
     max-width: 1200px;
     margin: auto;
-    padding: 12px 20px;   /* 🔴 reduced padding */
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
 }
 
+/* ===== LOGO ===== */
 .logo {
-    font-size: 20px;      /* 🔴 smaller logo */
+    color: #fff;
+    font-size: 20px;
     font-weight: 700;
-    color: #4c51bf;
 }
 
+/* ===== NAV LINKS ===== */
 .nav-links {
+    list-style: none;
     display: flex;
-    gap: 18px;            /* 🔴 reduced spacing */
+    gap: 22px;
 }
 
 .nav-links a {
+    color: #fff;
     text-decoration: none;
-    font-size: 14px;      /* 🔴 smaller text */
+    font-size: 14px;
     font-weight: 500;
-    color: #333;
-    padding: 6px 10px;    /* 🔴 smaller buttons */
-    border-radius: 6px;
-    transition: background 0.2s, color 0.2s;
 }
 
 .nav-links a:hover {
-    background: #edf2ff;
-    color: #4c51bf;
+    text-decoration: underline;
 }
 
-.nav-links .login-btn {
-    background: #4c51bf;
+/* ===== TOGGLE BUTTON ===== */
+.menu-toggle {
+    display: none;
+    font-size: 26px;
     color: white;
+    cursor: pointer;
 }
 
-.nav-links .login-btn:hover {
-    background: #434190;
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+    }
+
+    .nav-links {
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background: #0a3d62;
+        width: 220px;
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+        display: none;
+    }
+
+    .nav-links.show {
+        display: flex;
+    }
 }
 </style>
-
-    {% endblock %}
-    
+{% endblock %}
 </head>
 
 <body>
 
 <!-- ===== HEADER / NAVIGATION ===== -->
-<header style="background:#0a3d62; padding:15px 40px;">
-    <nav style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 style="color:#fff;">SMS Portal</h2>
-        <ul style="list-style:none; display:flex; gap:25px;">
-            <li><a href="{% url 'core:home' %}" style="color:#fff; text-decoration:none;">Home</a></li>
-            <li><a href="#" style="color:#fff; text-decoration:none;">About</a></li>
-            <li><a href="#" style="color:#fff; text-decoration:none;">Admissions</a></li>
-            <li><a href="#" style="color:#fff; text-decoration:none;">Academics</a></li>
-            <li><a href="#" style="color:#fff; text-decoration:none;">Contact</a></li>
-            <li><a href="{% url 'custom_login' %}" style="color:#fff; text-decoration:none;">Login</a></li>
+<header>
+    <nav class="nav-container">
+        <div class="logo">SMS Portal</div>
+
+        <!-- Toggle Button -->
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+        <!-- Navigation Links -->
+        <ul class="nav-links" id="navMenu">
+            <li><a href="{% url 'core:home' %}">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Admissions</a></li>
+            <li><a href="#">Academics</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="{% url 'custom_login' %}">Login</a></li>
         </ul>
     </nav>
 </header>
 
 <!-- ===== PAGE CONTENT ===== -->
 {% block content %}{% endblock %}
+
+<script>
+function toggleMenu() {
+    document.getElementById("navMenu").classList.toggle("show");
+}
+</script>
 
 </body>
 </html>
