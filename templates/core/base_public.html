@@ -6,100 +6,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Student Management System{% endblock %}</title>
 
-{% block extra_css %}
-<style>
-/* ===== RESET ===== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Segoe UI", Tahoma, sans-serif;
-}
+    <style>
+    /* ===== GLOBAL RESET (ONLY HERE) ===== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, sans-serif;
+    }
 
-/* ===== HEADER ===== */
-header {
-    background: #0a3d62;
-    padding: 12px 20px;
-}
+    body {
+        background: #f6f8fc;
+        color: #1f2937;
+        line-height: 1.6;
+    }
 
-.nav-container {
-    max-width: 1200px;
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+    /* ===== NAV HEADER ===== */
+    header.site-header {
+        background: #0a3d62;
+        padding: 12px 20px;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
 
-/* ===== LOGO ===== */
-.logo {
-    color: #fff;
-    font-size: 20px;
-    font-weight: 700;
-}
+    .nav-container {
+        max-width: 1200px;
+        margin: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+    }
 
-/* ===== NAV LINKS ===== */
-.nav-links {
-    list-style: none;
-    display: flex;
-    gap: 22px;
-}
-
-.nav-links a {
-    color: #fff;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.nav-links a:hover {
-    text-decoration: underline;
-}
-
-/* ===== TOGGLE BUTTON ===== */
-.menu-toggle {
-    display: none;
-    font-size: 26px;
-    color: white;
-    cursor: pointer;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-    .menu-toggle {
-        display: block;
+    .logo {
+        color: #fff;
+        font-size: 20px;
+        font-weight: 700;
     }
 
     .nav-links {
-        position: absolute;
-        top: 60px;
-        right: 0;
-        background: #0a3d62;
-        width: 220px;
-        flex-direction: column;
-        gap: 15px;
-        padding: 15px;
-        display: none;
+        list-style: none;
+        display: flex;
+        gap: 22px;
     }
 
-    .nav-links.show {
-        display: flex;
+    .nav-links a {
+        color: #fff;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 6px 8px;
     }
-}
-</style>
-{% endblock %}
+
+    .nav-links a:hover {
+        text-decoration: underline;
+    }
+
+    /* ===== MOBILE MENU ===== */
+    .menu-toggle {
+        display: none;
+        font-size: 26px;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+        .menu-toggle {
+            display: block;
+        }
+
+        .nav-links {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: #0a3d62;
+            width: 220px;
+            flex-direction: column;
+            padding: 15px;
+            gap: 15px;
+            display: none;
+            z-index: 2000;
+        }
+
+        .nav-links.show {
+            display: flex;
+        }
+    }
+
+    main {
+        min-height: 80vh;
+    }
+    </style>
+
+    {% block extra_css %}{% endblock %}
 </head>
 
 <body>
 
-<!-- ===== HEADER / NAVIGATION ===== -->
-<header>
+<header class="site-header">
     <nav class="nav-container">
         <div class="logo">SMS Portal</div>
 
-        <!-- Toggle Button -->
         <div class="menu-toggle" onclick="toggleMenu()">☰</div>
 
-        <!-- Navigation Links -->
         <ul class="nav-links" id="navMenu">
             <li><a href="{% url 'core:home' %}">Home</a></li>
             <li><a href="#">About</a></li>
@@ -111,13 +121,20 @@ header {
     </nav>
 </header>
 
-<!-- ===== PAGE CONTENT ===== -->
-{% block content %}{% endblock %}
+<main>
+    {% block content %}{% endblock %}
+</main>
 
 <script>
 function toggleMenu() {
     document.getElementById("navMenu").classList.toggle("show");
 }
+
+document.querySelectorAll("#navMenu a").forEach(link => {
+    link.addEventListener("click", () => {
+        document.getElementById("navMenu").classList.remove("show");
+    });
+});
 </script>
 
 </body>
