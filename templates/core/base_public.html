@@ -3,148 +3,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Student Management System{% endblock %}</title>
 
+    {% block extra_css %}
     <style>
-        /* ===== RESET ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Segoe UI", Tahoma, sans-serif;
-        }
+/* ===== HEADER NAVIGATION ===== */
+.site-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+}
 
-        body {
-            background: #f8fafc;
-        }
+.nav-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 12px 20px;   /* 🔴 reduced padding */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
-        /* ===== HEADER ===== */
-        header {
-            background: #0a3d62;
-            padding: 10px 20px;   /* smaller height */
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
+.logo {
+    font-size: 20px;      /* 🔴 smaller logo */
+    font-weight: 700;
+    color: #4c51bf;
+}
 
-        .nav-container {
-            max-width: 1200px;
-            margin: auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+.nav-links {
+    display: flex;
+    gap: 18px;            /* 🔴 reduced spacing */
+}
 
-        /* ===== LOGO ===== */
-        .logo {
-            color: #fff;
-            font-size: 20px;
-            font-weight: 700;
-        }
+.nav-links a {
+    text-decoration: none;
+    font-size: 14px;      /* 🔴 smaller text */
+    font-weight: 500;
+    color: #333;
+    padding: 6px 10px;    /* 🔴 smaller buttons */
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
+}
 
-        /* ===== NAV LINKS ===== */
-        .nav-links {
-            list-style: none;
-            display: flex;
-            gap: 20px;
-        }
+.nav-links a:hover {
+    background: #edf2ff;
+    color: #4c51bf;
+}
 
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            padding: 6px 10px;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
+.nav-links .login-btn {
+    background: #4c51bf;
+    color: white;
+}
 
-        .nav-links a:hover {
-            background: rgba(255,255,255,0.15);
-        }
+.nav-links .login-btn:hover {
+    background: #434190;
+}
+</style>
 
-        .login-btn {
-            background: #1e90ff;
-        }
-
-        .login-btn:hover {
-            background: #187bcd;
-        }
-
-        /* ===== MOBILE MENU ===== */
-        .menu-toggle {
-            display: none;
-            font-size: 24px;
-            color: white;
-            cursor: pointer;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .menu-toggle {
-                display: block;
-            }
-
-            .nav-links {
-                position: absolute;
-                top: 60px;
-                right: 0;
-                background: #0a3d62;
-                flex-direction: column;
-                width: 220px;
-                padding: 15px;
-                display: none;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            }
-
-            .nav-links.show {
-                display: flex;
-            }
-
-            .nav-links li {
-                margin-bottom: 10px;
-            }
-        }
-
-        /* ===== PAGE CONTENT ===== */
-        main {
-            padding: 30px 20px;
-            max-width: 1200px;
-            margin: auto;
-        }
-    </style>
+    {% endblock %}
+    
 </head>
 
 <body>
 
-<!-- ===== HEADER ===== -->
-<header>
-    <div class="nav-container">
-        <div class="logo">SMS Portal</div>
-
-        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-
-        <ul class="nav-links" id="navMenu">
-            <li><a href="{% url 'core:home' %}">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Admissions</a></li>
-            <li><a href="#">Academics</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="{% url 'custom_login' %}" class="login-btn">Login</a></li>
+<!-- ===== HEADER / NAVIGATION ===== -->
+<header style="background:#0a3d62; padding:15px 40px;">
+    <nav style="display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="color:#fff;">SMS Portal</h2>
+        <ul style="list-style:none; display:flex; gap:25px;">
+            <li><a href="{% url 'core:home' %}" style="color:#fff; text-decoration:none;">Home</a></li>
+            <li><a href="#" style="color:#fff; text-decoration:none;">About</a></li>
+            <li><a href="#" style="color:#fff; text-decoration:none;">Admissions</a></li>
+            <li><a href="#" style="color:#fff; text-decoration:none;">Academics</a></li>
+            <li><a href="#" style="color:#fff; text-decoration:none;">Contact</a></li>
+            <li><a href="{% url 'custom_login' %}" style="color:#fff; text-decoration:none;">Login</a></li>
         </ul>
-    </div>
+    </nav>
 </header>
 
 <!-- ===== PAGE CONTENT ===== -->
-<main>
-    {% block content %}{% endblock %}
-</main>
-
-<script>
-    function toggleMenu() {
-        document.getElementById("navMenu").classList.toggle("show");
-    }
-</script>
+{% block content %}{% endblock %}
 
 </body>
 </html>
