@@ -1,0 +1,119 @@
+{% extends "core/base_public.html" %}
+{% block title %}Admissions{% endblock %}
+
+{% block content %}
+
+<style>
+
+    /* ===== ADMISSIONS PAGE ===== */
+
+.admissions-hero {
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                url("/static/images/school-bg.jpg") center/cover no-repeat;
+    padding: 120px 20px;
+    color: #fff;
+    text-align: center;
+}
+
+.admissions-hero-content {
+    max-width: 800px;
+    margin: auto;
+}
+
+.admissions-hero h1 {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.admissions-hero p {
+    font-size: 1.2rem;
+    opacity: 0.95;
+}
+
+/* Main Section */
+.admissions-section {
+    padding: 80px 20px;
+    background: #f9fafc;
+}
+
+.admissions-container {
+    max-width: 1100px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.admissions-card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.admissions-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+}
+
+.admissions-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #1f2933;
+}
+
+.admissions-card p,
+.admissions-card li {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #4b5563;
+}
+
+.admissions-card ul {
+    padding-left: 20px;
+}
+
+.admissions-card li {
+    margin-bottom: 8px;
+}
+
+</style>
+
+<section class="admissions-hero">
+    <div class="admissions-hero-content">
+        <h1>Admissions</h1>
+        <p>Start your journey with us — learn how to apply and join our academic community.</p>
+    </div>
+</section>
+
+<section class="admissions-section">
+    <div class="admissions-container">
+        <div class="admissions-card">
+            <h2>Admission Process</h2>
+            <p>
+                Our admission process is simple and transparent. Applicants are assessed
+                based on academic performance, character, and readiness to learn.
+            </p>
+        </div>
+
+        <div class="admissions-card">
+            <h2>Requirements</h2>
+            <ul>
+                <li>Completed application form</li>
+                <li>Previous academic records</li>
+                <li>Birth certificate or ID</li>
+                <li>Passport-size photographs</li>
+            </ul>
+        </div>
+
+        <div class="admissions-card">
+            <h2>Application Deadlines</h2>
+            <p>
+                Applications are open throughout the year, with major intakes in
+                <strong>January</strong> and <strong>September</strong>.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

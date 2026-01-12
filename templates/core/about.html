@@ -1,0 +1,135 @@
+{% extends "core/base_public.html" %}
+{% block title %}About Us{% endblock %}
+
+{% block content %}
+
+<style>
+
+    /* ===== ABOUT PAGE ===== */
+
+.about-hero {
+    background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+                url("/static/images/about-bg.jpg") center/cover no-repeat;
+    padding: 120px 20px;
+    color: #ffffff;
+    text-align: center;
+}
+
+.about-hero-content {
+    max-width: 850px;
+    margin: auto;
+}
+
+.about-hero h1 {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.about-hero p {
+    font-size: 1.2rem;
+    opacity: 0.95;
+}
+
+/* Main Section */
+.about-section {
+    padding: 80px 20px;
+    background: #f9fafc;
+}
+
+.about-container {
+    max-width: 1100px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.about-card {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.about-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+}
+
+.about-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #1f2933;
+}
+
+.about-card p,
+.about-card li {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #4b5563;
+}
+
+.about-card ul {
+    padding-left: 20px;
+}
+
+.about-card li {
+    margin-bottom: 8px;
+}
+
+</style>
+
+<section class="about-hero">
+    <div class="about-hero-content">
+        <h1>About Our School</h1>
+        <p>
+            Building a foundation of knowledge, discipline, and character
+            for lifelong success.
+        </p>
+    </div>
+</section>
+
+<section class="about-section">
+    <div class="about-container">
+
+        <div class="about-card">
+            <h2>Who We Are</h2>
+            <p>
+                Our school is a center of academic excellence dedicated to nurturing
+                students intellectually, morally, and socially in a supportive
+                learning environment.
+            </p>
+        </div>
+
+        <div class="about-card">
+            <h2>Our Mission</h2>
+            <p>
+                To provide quality education that inspires creativity, critical thinking,
+                and responsible citizenship while empowering students to achieve
+                their full potential.
+            </p>
+        </div>
+
+        <div class="about-card">
+            <h2>Our Vision</h2>
+            <p>
+                To become a leading institution recognized for academic excellence,
+                character development, and innovation in education.
+            </p>
+        </div>
+
+        <div class="about-card">
+            <h2>Our Core Values</h2>
+            <ul>
+                <li>Academic Excellence</li>
+                <li>Integrity & Discipline</li>
+                <li>Respect & Responsibility</li>
+                <li>Innovation & Creativity</li>
+                <li>Community & Leadership</li>
+            </ul>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

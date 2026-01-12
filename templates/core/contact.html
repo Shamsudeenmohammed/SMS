@@ -1,0 +1,173 @@
+{% extends "core/base_public.html" %}
+{% block title %}Contact Us{% endblock %}
+
+{% block content %}
+
+<style>
+/* ===== CONTACT PAGE ===== */
+
+.contact-hero {
+    background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+                url("/static/images/contact-bg.jpg") center/cover no-repeat;
+    padding: 120px 20px;
+    color: #ffffff;
+    text-align: center;
+}
+
+.contact-hero-content {
+    max-width: 850px;
+    margin: auto;
+}
+
+.contact-hero h1 {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.contact-hero p {
+    font-size: 1.2rem;
+    opacity: 0.95;
+}
+
+/* Main Section */
+.contact-section {
+    padding: 80px 20px;
+    background: #f9fafc;
+}
+
+.contact-container {
+    max-width: 1100px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.contact-card {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.contact-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+}
+
+.contact-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #1f2933;
+}
+
+.contact-card p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #4b5563;
+}
+
+/* ===== CONTACT FORM ===== */
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.contact-form input,
+.contact-form textarea {
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s ease;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    border-color: #2563eb;
+}
+
+.contact-form button {
+    margin-top: 10px;
+    padding: 12px;
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.contact-form button:hover {
+    background: #1e40af;
+}
+
+.success-message {
+    background: #ecfdf5;
+    color: #065f46;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+}
+</style>
+
+<section class="contact-hero">
+    <div class="contact-hero-content">
+        <h1>Contact Us</h1>
+        <p>
+            We’re here to help. Reach out to us for inquiries, admissions,
+            or general information.
+        </p>
+    </div>
+</section>
+
+<section class="contact-section">
+    <div class="contact-container">
+
+        <div class="contact-card">
+            <h2>Contact Information</h2>
+            <p><strong>Email:</strong> info@yourschool.com</p>
+            <p><strong>Phone:</strong> +233 XXX XXX XXX</p>
+            <p><strong>Office Hours:</strong> Monday – Friday, 8:00 AM – 4:00 PM</p>
+        </div>
+
+        <div class="contact-card">
+            <h2>School Address</h2>
+            <p>
+                Your School Name<br>
+                P.O. Box XXX<br>
+                City, Region<br>
+                Ghana
+            </p>
+        </div>
+
+        <div class="contact-card">
+            <h2>Send Us a Message</h2>
+
+            {% if success %}
+                <p class="success-message">
+                    Your message has been sent successfully. We’ll get back to you soon.
+                </p>
+            {% endif %}
+
+            <form method="POST" class="contact-form">
+                {% csrf_token %}
+
+                {{ form.name }}
+                {{ form.email }}
+                {{ form.subject }}
+                {{ form.message }}
+
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

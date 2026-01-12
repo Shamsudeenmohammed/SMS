@@ -1,0 +1,134 @@
+{% extends "core/base_public.html" %}
+{% block title %}Academics{% endblock %}
+
+{% block content %}
+
+<style>
+    /* ===== ACADEMICS PAGE ===== */
+
+.academics-hero {
+    background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+                url("/static/images/academics-bg.jpg") center/cover no-repeat;
+    padding: 120px 20px;
+    color: #fff;
+    text-align: center;
+}
+
+.academics-hero-content {
+    max-width: 850px;
+    margin: auto;
+}
+
+.academics-hero h1 {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.academics-hero p {
+    font-size: 1.2rem;
+    opacity: 0.95;
+}
+
+/* Main Section */
+.academics-section {
+    padding: 80px 20px;
+    background: #f9fafc;
+}
+
+.academics-container {
+    max-width: 1100px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.academics-card {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.academics-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+}
+
+.academics-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #1f2933;
+}
+
+.academics-card p,
+.academics-card li {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #4b5563;
+}
+
+.academics-card ul {
+    padding-left: 20px;
+}
+
+.academics-card li {
+    margin-bottom: 8px;
+}
+
+</style>
+
+
+<section class="academics-hero">
+    <div class="academics-hero-content">
+        <h1>Academics</h1>
+        <p>
+            Delivering quality education through structured programs,
+            skilled educators, and a supportive learning environment.
+        </p>
+    </div>
+</section>
+
+<section class="academics-section">
+    <div class="academics-container">
+
+        <div class="academics-card">
+            <h2>Our Curriculum</h2>
+            <p>
+                Our curriculum is carefully structured to meet national education standards
+                while encouraging creativity, critical thinking, and lifelong learning.
+            </p>
+        </div>
+
+        <div class="academics-card">
+            <h2>Subjects & Programs</h2>
+            <ul>
+                <li>Mathematics</li>
+                <li>Science & Technology</li>
+                <li>English Language</li>
+                <li>Social Studies</li>
+                <li>Information & Communication Technology (ICT)</li>
+                <li>Creative Arts & Physical Education</li>
+            </ul>
+        </div>
+
+        <div class="academics-card">
+            <h2>Teaching & Assessment</h2>
+            <p>
+                Students are assessed through continuous evaluation, class participation,
+                projects, and formal examinations to ensure balanced academic development.
+            </p>
+        </div>
+
+        <div class="academics-card">
+            <h2>Academic Support</h2>
+            <p>
+                We provide extra lessons, academic counseling, and mentoring programs
+                to support students at all learning levels.
+            </p>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
