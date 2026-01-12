@@ -43,6 +43,7 @@
         color: #fff;
         font-size: 20px;
         font-weight: 700;
+        text-decoration: none;
     }
 
     .nav-links {
@@ -106,16 +107,15 @@
 
 <header class="site-header">
     <nav class="nav-container">
-        <div class="logo">SMS Portal</div>
-
+        <a class="logo" href="{% url 'core:home' %}">SMS Portal</a>
         <div class="menu-toggle" onclick="toggleMenu()">☰</div>
 
         <ul class="nav-links" id="navMenu">
             <li><a href="{% url 'core:home' %}">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Admissions</a></li>
-            <li><a href="#">Academics</a></li>
-            <li><a href="#">Contact</a></li>
+            <li><a href="{% url 'core:about' %}">About</a></li>
+            <li><a href="{% url 'core:admissions' %}">Admissions</a></li>
+            <li><a href="{% url 'core:academics' %}">Academics</a></li>
+            <li><a href="{% url 'core:contact' %}">Contact</a></li>
             <li><a href="{% url 'custom_login' %}">Login</a></li>
         </ul>
     </nav>
