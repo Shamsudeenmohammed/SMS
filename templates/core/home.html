@@ -24,12 +24,12 @@
 <!-- ===== HERO SLIDER ===== -->
 <header class="hero-slider">
     <div class="slides">
-        <div class="slide" style="background-image:url('{% static 'images/CAMPUS-1.jpg' %}')"></div>
+        <div class="slide active" style="background-image:url('{% static 'images/CAMPUS-1.jpg' %}')"></div>
         <div class="slide" style="background-image:url('{% static 'images/sch.webp' %}')"></div>
-        <div class="slide" style="background-image:url('{% static 'images/CAMPUS-1.jpg' %}')"></div>
+        <div class="slide" style="background-image:url('{% static 'images/stud.jpeg' %}')"></div>
     </div>
 
-    <div class="hero-content">
+    <div class="hero-content active">
         <h1>Student Management System</h1>
         <p>Empowering Schools with Smart, Secure & Intelligent Digital Solutions</p>
         <div class="actions">
@@ -111,11 +111,9 @@ body{background:#f6f8fc;color:#1f2937;line-height:1.6}
 
 /* ===== FLOATING UPDATE ===== */
 .floating-update{
-    position:fixed;
-    bottom:25px;right:25px;
+    position:fixed;bottom:25px;right:25px;
     background:linear-gradient(135deg,#2563eb,#1e40af);
-    color:#fff;padding:16px 20px;border-radius:16px;
-    z-index:999;
+    color:#fff;padding:16px 20px;border-radius:16px;z-index:999;
     animation:pulse 3s infinite
 }
 @keyframes pulse{0%{box-shadow:0 0 0}50%{box-shadow:0 0 25px rgba(37,99,235,.8)}100%{box-shadow:0 0 0}}
@@ -128,29 +126,25 @@ body{background:#f6f8fc;color:#1f2937;line-height:1.6}
     background-size:cover;
     background-position:center;
     opacity:0;
-    transition:opacity 1s ease-in-out;
+    transition:opacity 1.2s ease-in-out;
+    z-index:1;
 }
-.slide.active{opacity:1}
+.slide.active{opacity:1;z-index:2}
 
 /* ===== HERO CONTENT ===== */
 .hero-content{
-    position: absolute;
-    top:50%;left:50%;
+    position:absolute;top:50%;left:50%;
     transform:translate(-50%,-50%);
-    z-index:2;
+    z-index:3;
     text-align:center;
     padding:30px 20px;
     color:#fff;
     background:rgba(0,0,0,0.35);
     border-radius:16px;
     opacity:0;
-    transform:translate(-50%, -60%);
     transition: all 1s ease-in-out;
 }
-.hero-content.active{
-    opacity:1;
-    transform:translate(-50%, -50%);
-}
+.hero-content.active{opacity:1}
 .hero-content h1{font-size:3rem;margin-bottom:16px}
 .hero-content p{font-size:1.2rem;margin-bottom:24px}
 .actions{display:flex;gap:18px;justify-content:center}
@@ -188,23 +182,30 @@ footer{background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#e5e7eb;padding:
 
 <script>
 /* ===== HERO SLIDER SCRIPT ===== */
-let slides = document.querySelectorAll('.slide');
-let heroContent = document.querySelector('.hero-content');
-let current = 0;
+const slides = document.querySelectorAll('.slide');
+const heroContent = document.querySelector('.hero-content');
+let currentIndex = 0;
 
 function showSlide(index){
-    slides.forEach((slide,i)=> slide.classList.remove('active'));
+    slides.forEach((slide,i)=>{
+        slide.classList.remove('active');
+        slide.style.zIndex = 1;
+    });
     slides[index].classList.add('active');
+    slides[index].style.zIndex = 2;
 
-    // Animate hero content
+    // Hero content animation
     heroContent.classList.remove('active');
-    setTimeout(()=> heroContent.classList.add('active'), 300);
+    setTimeout(()=> heroContent.classList.add('active'), 400);
 }
 
-showSlide(current);
+// Initial slide
+showSlide(currentIndex);
+
+// Change slide every 5s
 setInterval(()=>{
-    current = (current + 1) % slides.length;
-    showSlide(current);
+    currentIndex = (currentIndex + 1) % slides.length;
+    showSlide(currentIndex);
 }, 5000);
 </script>
 
