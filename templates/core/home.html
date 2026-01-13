@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<!-- ===== IMAGE PRELOAD (NO FLICKER) ===== -->
+<!-- ===== IMAGE PRELOAD ===== -->
 <link rel="preload" as="image" href="{% static 'images/sch.webp' %}">
 <link rel="preload" as="image" href="{% static 'images/stud.jpeg' %}">
 <link rel="preload" as="image" href="{% static 'images/CAMPUS-1.jpg' %}">
@@ -24,15 +24,14 @@
 <!-- ===== HERO SLIDER ===== -->
 <header class="hero-slider">
     <div class="slides">
-        <div class="slide slide1"></div>
-        <div class="slide slide2"></div>
-        <div class="slide slide3"></div>
+        <div class="slide" style="background-image:url('{% static 'images/CAMPUS-1.jpg' %}')"></div>
+        <div class="slide" style="background-image:url('{% static 'images/sch.webp' %}')"></div>
+        <div class="slide" style="background-image:url('{% static 'images/CAMPUS-1.jpg' %}')"></div>
     </div>
 
     <div class="hero-content">
         <h1>Student Management System</h1>
         <p>Empowering Schools with Smart, Secure & Intelligent Digital Solutions</p>
-
         <div class="actions">
             <a href="{% url 'custom_login' %}" class="btn">Access Portal</a>
             <a href="{% url 'core:admissions' %}" class="btn outline">Admissions</a>
@@ -73,7 +72,7 @@
         <img src="{% static 'images/CAMPUS-1.jpg' %}" loading="lazy" class="fade-in">
         <img src="{% static 'images/stud.jpeg' %}" loading="lazy" class="fade-in">
         <img src="{% static 'images/children.webp' %}" loading="lazy" class="fade-in">
-        <img src="{% static 'images/gallery4.jpg' %}" loading="lazy" class="fade-in">
+        <img src="{% static 'images/pyp-2.jpg' %}" loading="lazy" class="fade-in">
     </div>
 </section>
 
@@ -119,47 +118,42 @@ body{background:#f6f8fc;color:#1f2937;line-height:1.6}
     z-index:999;
     animation:pulse 3s infinite
 }
-@keyframes pulse{
-    0%{box-shadow:0 0 0}
-    50%{box-shadow:0 0 25px rgba(37,99,235,.8)}
-    100%{box-shadow:0 0 0}
-}
+@keyframes pulse{0%{box-shadow:0 0 0}50%{box-shadow:0 0 25px rgba(37,99,235,.8)}100%{box-shadow:0 0 0}}
 
 /* ===== HERO SLIDER ===== */
 .hero-slider{position:relative;height:85vh;overflow:hidden}
-.slides,.slide{position:absolute;inset:0}
-.slide{background-size:cover;background-position:center;opacity:0;animation:slider 18s infinite}
-.slide1{background-image:url("{% static 'images/CAMPUS-1.jpg' %}")}
-.slide2{background-image:url("{% static 'images/sch.webp' %}");animation-delay:6s}
-.slide3{background-image:url("{% static 'images/CAMPUS-1.jpg' %}");animation-delay:12s}
-@keyframes slider{
-    0%{opacity:0;transform:scale(1.05)}
-    10%{opacity:1;transform:scale(1)}
-    30%{opacity:1}
-    40%{opacity:0}
-    100%{opacity:0}
+.slides{position:relative;width:100%;height:100%}
+.slide{
+    position:absolute;inset:0;
+    background-size:cover;
+    background-position:center;
+    opacity:0;
+    transition:opacity 1s ease-in-out;
 }
+.slide.active{opacity:1}
 
 /* ===== HERO CONTENT ===== */
 .hero-content{
-    position: relative;
-    z-index: 2;
-    min-height: 50vh;
-    max-height: 70vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 30px 20px;
-    background: linear-gradient(to bottom right, rgba(15,23,42,.75), rgba(30,64,175,.65));
-    transition: all 0.3s ease;
+    position: absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    z-index:2;
+    text-align:center;
+    padding:30px 20px;
+    color:#fff;
+    background:rgba(0,0,0,0.35);
+    border-radius:16px;
+    opacity:0;
+    transform:translate(-50%, -60%);
+    transition: all 1s ease-in-out;
 }
-.hero-content h1{font-size:3rem;color:#fff;margin-bottom:16px}
-.hero-content p{color:#e5e7eb;font-size:1.2rem;margin-bottom:24px}
-
-/* ===== BUTTONS ===== */
-.actions{display:flex;gap:18px}
+.hero-content.active{
+    opacity:1;
+    transform:translate(-50%, -50%);
+}
+.hero-content h1{font-size:3rem;margin-bottom:16px}
+.hero-content p{font-size:1.2rem;margin-bottom:24px}
+.actions{display:flex;gap:18px;justify-content:center}
 .btn{padding:14px 36px;border-radius:999px;background:#fff;color:#1e40af;font-weight:600;text-decoration:none;transition:0.3s}
 .btn:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.15)}
 .btn.outline{background:transparent;border:2px solid #fff;color:#fff}
@@ -167,7 +161,7 @@ body{background:#f6f8fc;color:#1f2937;line-height:1.6}
 
 /* ===== SECTIONS ===== */
 section{padding:60px 22px 80px;max-width:1200px;margin:auto}
-section:first-of-type{padding-top:40px} /* tighter gap after hero */
+section:first-of-type{padding-top:40px}
 section h2{text-align:center;margin-bottom:40px;color:#1e3a8a;font-weight:600}
 
 /* ===== FEATURES ===== */
@@ -182,28 +176,36 @@ section h2{text-align:center;margin-bottom:40px;color:#1e3a8a;font-weight:600}
 .about img{width:100%;border-radius:20px;box-shadow:0 15px 30px rgba(0,0,0,.1)}
 
 /* ===== GALLERY ===== */
-.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px}
-.gallery img{height:220px;object-fit:cover;border-radius:18px;transition:0.3s}
-.gallery img:hover{transform:scale(1.05)}
-
-/* ===== FADE-IN ===== */
-.fade-in{opacity:0;transform:translateY(12px);animation:fade 1s forwards}
-@keyframes fade{to{opacity:1;transform:none}}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
+.gallery img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:16px;transition:transform 0.3s ease, box-shadow 0.3s ease}
+.gallery img:hover{transform:scale(1.05);box-shadow:0 10px 20px rgba(0,0,0,.15)}
+@media (max-width:768px){.gallery img{aspect-ratio:4/3}}
 
 /* ===== FOOTER ===== */
 footer{background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#e5e7eb;padding:40px}
 .footer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:40px;max-width:1200px;margin:auto}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px){
-    .hero-slider{min-height:55vh}
-    .hero-content{padding:24px 16px}
-    .hero-content h1{font-size:2rem}
-    .hero-content p{font-size:1rem}
-    .actions{flex-direction:column;gap:14px}
-    .about{grid-template-columns:1fr;gap:30px}
-    .gallery img{height:180px}
-}
 </style>
+
+<script>
+/* ===== HERO SLIDER SCRIPT ===== */
+let slides = document.querySelectorAll('.slide');
+let heroContent = document.querySelector('.hero-content');
+let current = 0;
+
+function showSlide(index){
+    slides.forEach((slide,i)=> slide.classList.remove('active'));
+    slides[index].classList.add('active');
+
+    // Animate hero content
+    heroContent.classList.remove('active');
+    setTimeout(()=> heroContent.classList.add('active'), 300);
+}
+
+showSlide(current);
+setInterval(()=>{
+    current = (current + 1) % slides.length;
+    showSlide(current);
+}, 5000);
+</script>
 
 {% endblock %}
