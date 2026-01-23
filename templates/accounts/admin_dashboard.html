@@ -1,15 +1,25 @@
 {% extends "accounts/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Admin Dashboard{% endblock %}
 {% block header %}🧑‍💼 Admin Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="preload" href="{% static 'css/admin_dashboard.css' %}" as="style">
+<link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="dashboard-wrapper fade-in">
 
-  <!-- Welcome Section -->
-  <h2 class="greeting">Welcome back, {{ user.get_full_name|default:user.username }} 👋</h2>
-  <p class="subtitle">Here’s an overview of your school’s financial and academic performance.</p>
+  <h2 class="greeting">
+    Welcome back, {{ user.get_full_name|default:user.username }} 👋
+  </h2>
+  <p class="subtitle">
+    Here’s an overview of your school’s financial and academic performance.
+  </p>
 
-  <!-- ===== Summary Grid ===== -->
+  <!-- ===== SUMMARY GRID ===== -->
   <div class="summary-grid">
 
     <div class="summary-card gradient-blue">
@@ -54,7 +64,7 @@
 
   </div>
 
-  <!-- ===== Management Links ===== -->
+  <!-- ===== QUICK LINKS ===== -->
   <h3 class="section-title">Quick Management</h3>
   <div class="cards-grid">
     <a href="{% url 'subject_list' %}" class="card gradient-blue">
@@ -73,9 +83,10 @@
     </a>
   </div>
 
-  <!-- ===== Charts Section ===== -->
+  <!-- ===== CHARTS ===== -->
   <h3 class="section-title">Analytics & Insights</h3>
   <div class="charts-section">
+
     <div class="chart-card glass-card">
       <h3>📊 Fee Collection Overview</h3>
       <canvas id="feeChart"></canvas>
@@ -85,28 +96,32 @@
       <h3>📈 Monthly Revenue Trend</h3>
       <canvas id="revenueChart"></canvas>
     </div>
+
   </div>
 
 </div>
 
-<!-- ===== Chart.js CDN ===== -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- ===== SCRIPTS ===== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 
-<!-- ===== Charts Logic ===== -->
-<script>
+<script defer>
 document.addEventListener("DOMContentLoaded", () => {
+
   new Chart(document.getElementById("feeChart"), {
     type: "bar",
     data: {
       labels: ["Paid", "Pending", "Unpaid"],
       datasets: [{
-        label: "₵ Fee Summary",
-        data: [{{ total_fees_paid|default:"0" }}, {{ pending_fees|default:"0" }}, {{ unpaid_fees|default:"0" }}],
+        data: [
+          {{ total_fees_paid|default:"0" }},
+          {{ pending_fees|default:"0" }},
+          {{ unpaid_fees|default:"0" }}
+        ],
         backgroundColor: ["#10b981", "#f59e0b", "#ef4444"],
         borderRadius: 8
       }]
     },
-    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    options: { responsive: true, plugins: { legend: { display: false } } }
   });
 
   new Chart(document.getElementById("revenueChart"), {
@@ -114,52 +129,70 @@ document.addEventListener("DOMContentLoaded", () => {
     data: {
       labels: {{ monthly_labels|safe }},
       datasets: [{
-        label: "Revenue (₵)",
         data: {{ monthly_revenue|safe }},
         borderColor: "#2563eb",
         backgroundColor: "rgba(37,99,235,0.25)",
         fill: true,
-        tension: 0.4,
-        borderWidth: 2
+        tension: 0.4
       }]
     },
-    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    options: { responsive: true, plugins: { legend: { display: false } } }
   });
+
 });
 </script>
 
-<!-- ===== Live Auto Refresh ===== -->
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  const refreshInterval = 30000;
-  function updateFinanceSummary() {
+<script defer>
+document.addEventListener("DOMContentLoaded", function () {
+  setTimeout(() => {
     fetch("{% url 'finance_summary_json' %}")
       .then(res => res.json())
       .then(data => {
-        document.getElementById("total_students").textContent = data.total_students.toLocaleString();
-        document.getElementById("students_with_fees").textContent = data.students_with_fees.toLocaleString();
-        document.getElementById("total_invoices").textContent = data.total_invoices.toLocaleString();
-        document.getElementById("total_fees_paid").textContent = "₵" + data.total_paid.toLocaleString();
-        document.getElementById("pending_fees").textContent = "₵" + data.pending_total.toLocaleString();
-        document.getElementById("unpaid_fees").textContent = "₵" + data.total_balance.toLocaleString();
-
+        document.getElementById("total_students").textContent = data.total_students;
+        document.getElementById("students_with_fees").textContent = data.students_with_fees;
+        document.getElementById("total_invoices").textContent = data.total_invoices;
+        document.getElementById("total_fees_paid").textContent = "₵" + data.total_paid;
+        document.getElementById("pending_fees").textContent = "₵" + data.pending_total;
+        document.getElementById("unpaid_fees").textContent = "₵" + data.total_balance;
       });
-  }
-  setInterval(updateFinanceSummary, refreshInterval);
-  updateFinanceSummary();
+  }, 2000);
 });
 </script>
 
 <!-- ===== Styling ===== -->
 <style>
+
+/* === DASHBOARD STYLES (EXACT COPY FROM TEMPLATE) === */
+
 .dashboard-wrapper {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: auto;
   padding: 30px 25px;
   background: linear-gradient(145deg, #f9fafb, #eef2ff);
   border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.summary-grid,
+.cards-grid,
+.charts-section {
+  display: grid;
+  gap: 22px;
+}
+
+.chart-card canvas {
+  height: 260px !important;
+}
+
+/* gradients, cards, typography — keep same styles */
 
 .greeting {
   font-size: 1.9rem;
@@ -328,3 +361,4 @@ document.addEventListener("DOMContentLoaded", function() {
 </style>
 
 {% endblock %}
+
