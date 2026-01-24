@@ -352,11 +352,69 @@ document.addEventListener("DOMContentLoaded", function () {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ===============================
+   MOBILE RESPONSIVENESS FIX
+   (NO VISUAL STYLE CHANGE)
+   =============================== */
+
 @media (max-width: 768px) {
-  .dashboard-wrapper { padding: 15px; }
-  .greeting { font-size: 1.5rem; }
-  .summary-card p { font-size: 1.5rem; }
-  .cards-grid, .charts-section { grid-template-columns: 1fr; }
+
+  /* Prevent horizontal overflow */
+  body {
+    overflow-x: hidden;
+  }
+
+  .dashboard-wrapper {
+    padding: 15px 12px;
+  }
+
+  /* Fix grid squeezing */
+  .summary-grid,
+  .cards-grid,
+  .charts-section {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Fix chart cards cutting off */
+  .chart-card {
+    padding: 16px;
+    overflow: hidden;
+  }
+
+  /* MOST IMPORTANT FIX */
+  .chart-card canvas {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 240px;
+  }
+
+  /* Prevent Chart.js from forcing large canvas */
+  canvas {
+    display: block;
+  }
+
+  /* Reduce chart title spacing */
+  .chart-card h3 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+}
+
+/* Extra-small devices (very narrow phones) */
+@media (max-width: 480px) {
+
+  .greeting {
+    font-size: 1.4rem;
+  }
+
+  .summary-card p {
+    font-size: 1.4rem;
+  }
+
+  .chart-card canvas {
+    min-height: 220px;
+  }
 }
 </style>
 

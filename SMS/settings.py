@@ -46,8 +46,6 @@ INSTALLED_APPS = [
     'finance',
     'reportcard',
     'communications',
-    'library',
-    'inventory',
     'results',
     'core',
 ]
