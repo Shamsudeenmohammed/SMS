@@ -4,224 +4,290 @@
 
 {% block content %}
 <style>
+    /* 🛠️ UI Optimization */
+    .alert-container { display: none !important; }
 
-.alert-top {
-  display: none !important;
-}
+    .chat-wrapper {
+        max-width: 1000px;
+        height: calc(100vh - 160px);
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 1.25rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
 
-/* 🌈 Chat Layout */
-.chat-wrapper {
-  max-width: 900px;
-  height: 80vh;
-  margin: 2rem auto;
-  background: #ffffff;
-  border-radius: 1rem;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
+    .chat-header {
+        background: #fff;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 10;
+    }
 
-/* 🔹 Header */
-.chat-header {
-  background: #4a6cf7;
-  color: #fff;
-  padding: 1rem 1.5rem;
-  font-weight: 600;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+    .chat-header .convo-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
 
-/* 💬 Messages Area */
-.chat-body {
-  flex: 1;
-  background: #f3f6fb;
-  overflow-y: auto;
-  padding: 1.2rem;
-  display: flex;
-  flex-direction: column;
-}
+    .status-indicator {
+        width: 10px;
+        height: 10px;
+        background: #10b981;
+        border-radius: 50%;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
 
-/* 🗨️ Bubbles */
-.message {
-  display: inline-block;
-  padding: 0.8rem 1rem;
-  border-radius: 1rem;
-  max-width: 70%;
-  word-wrap: break-word;
-  margin: 0.5rem 0;
-  position: relative;
-  animation: fadeIn 0.3s ease;
-}
+    /* 💬 Chat Surface */
+    .chat-body {
+        flex: 1;
+        background: #f8fafc;
+        overflow-y: auto;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        scroll-behavior: smooth;
+    }
 
-.message.self {
-  align-self: flex-end;
-  background: #d7e4ff;
-  color: #222;
-  margin-right: 0.8rem;
-  border-bottom-right-radius: 0;
-}
+    .message {
+        padding: 12px 16px;
+        border-radius: 1.2rem;
+        max-width: 70%;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        position: relative;
+        animation: messageFadeIn 0.3s ease;
+    }
 
-.message.other {
-  align-self: flex-start;
-  background: #f1f1f1;
-  color: #222;
-  margin-left: 0.8rem;
-  border-bottom-left-radius: 0;
-}
+    .message.self {
+        align-self: flex-end;
+        background: #1a73e8;
+        color: #ffffff;
+        border-bottom-right-radius: 4px;
+        box-shadow: 0 4px 12px rgba(26, 115, 232, 0.15);
+    }
 
-.message strong {
-  display: block;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.25rem;
-}
+    .message.other {
+        align-self: flex-start;
+        background: #ffffff;
+        color: #1e293b;
+        border: 1px solid #e2e8f0;
+        border-bottom-left-radius: 4px;
+    }
 
-.message small {
-  display: block;
-  text-align: right;
-  font-size: 0.75rem;
-  color: #888;
-  margin-top: 0.25rem;
-}
+    .message strong {
+        display: block;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+        letter-spacing: 0.05em;
+    }
 
-/* ✏️ Input Area */
-.chat-footer {
-  display: flex;
-  align-items: center;
-  padding: 0.8rem 1rem;
-  background: #fafafa;
-  border-top: 1px solid #ddd;
-}
+    .message.self strong { color: rgba(255,255,255,0.8); text-align: right; }
+    .message.other strong { color: #1a73e8; }
 
-.chat-footer input[type="text"] {
-  flex: 1;
-  border: 1px solid #ccc;
-  border-radius: 1.5rem;
-  padding: 0.7rem 1rem;
-  font-size: 0.95rem;
-  outline: none;
-  transition: all 0.3s;
-  background: #fff;
-}
+    .message small {
+        display: block;
+        font-size: 0.65rem;
+        margin-top: 6px;
+        opacity: 0.7;
+    }
+    .message.self small { text-align: right; }
 
-.chat-footer input[type="text"]:focus {
-  border-color: #4a6cf7;
-  box-shadow: 0 0 0 2px rgba(74,108,247,0.15);
-}
+    /* ⌨️ Input Bar */
+    .chat-footer {
+        padding: 1rem 1.5rem;
+        background: #fff;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
 
-.chat-footer button {
-  background: #4a6cf7;
-  color: white;
-  border: none;
-  border-radius: 1.5rem;
-  padding: 0.7rem 1.3rem;
-  margin-left: 0.6rem;
-  cursor: pointer;
-  transition: background 0.3s ease;
-  font-size: 0.95rem;
-}
+    .input-group {
+        flex: 1;
+        background: #f1f5f9;
+        border-radius: 12px;
+        padding: 4px 12px;
+        display: flex;
+        align-items: center;
+        border: 1.5px solid transparent;
+        transition: 0.2s;
+    }
 
-.chat-footer button:hover {
-  background: #3953c6;
-}
+    .input-group:focus-within {
+        background: #fff;
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1);
+    }
 
-/* ✨ Animation */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+    #messageInput {
+        flex: 1;
+        border: none;
+        background: transparent;
+        padding: 10px 0;
+        outline: none;
+        font-size: 0.95rem;
+    }
 
-/* Hide scrollbars but allow scroll */
-.chat-body::-webkit-scrollbar {
-  width: 0px;
-}
+    #sendBtn {
+        background: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        width: 42px;
+        height: 42px;
+        cursor: pointer;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #sendBtn:hover { transform: translateY(-1px); background: #1557b0; }
+
+    @keyframes messageFadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 </style>
 
-<div class="chat-wrapper" data-conversation-id="{{ conversation.pk }}">
-  <div class="chat-header">
-    <span>{{ conversation.name|default:"Chat Room" }}</span>
-  </div>
+<div class="chat-wrapper">
+    <div class="chat-header">
+        <div class="convo-info">
+            <div class="status-indicator"></div>
+            <div>
+                <h4 style="margin:0; font-size: 1rem; color: #1e293b;">{{ conversation.name|default:"Message Thread" }}</h4>
+                <small style="color: #64748b;">Active now</small>
+            </div>
+        </div>
+        <div class="actions">
+            <button class="btn-icon" style="background:none; border:none; color: #94a3b8;"><i class="fas fa-info-circle"></i></button>
+        </div>
+    </div>
 
-  <div id="chatBody" class="chat-body">
-    {% for m in messages %}
-      <div class="message {% if m.sender == request.user %}self{% else %}other{% endif %}">
-        <strong>{{ m.sender.get_full_name|default:m.sender.username }}</strong>
-        <div>{{ m.content|linebreaksbr }}</div>
-        <small>{{ m.created_at|date:"M d, Y H:i" }}</small>
-      </div>
-    {% empty %}
-      <p style="text-align:center; color:#888;">No messages yet — start the conversation!</p>
-    {% endfor %}
-  </div>
+    <div id="chatBody" class="chat-body">
+        {% for m in messages %}
+            <div class="message {% if m.sender == request.user %}self{% else %}other{% endif %}" id="msg-{{ m.id }}">
+                <strong>{{ m.sender.get_full_name|default:m.sender.username }}</strong>
+                <div class="msg-content">{{ m.content|linebreaksbr }}</div>
+                <small>{{ m.created_at|date:"h:i A" }}</small>
+            </div>
+        {% empty %}
+            <div id="empty-state" style="margin: auto; text-align: center; color: #94a3b8;">
+                <i class="fas fa-comment-dots" style="font-size: 2.5rem; margin-bottom: 10px;"></i>
+                <p>No messages yet. Start the conversation!</p>
+            </div>
+        {% endfor %}
+    </div>
 
-  <div class="chat-footer">
-    <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off">
-    <button id="sendBtn">Send</button>
-  </div>
+    <form id="chatForm" class="chat-footer">
+        <div class="input-group">
+            <input type="text" id="messageInput" placeholder="Write a message..." autocomplete="off">
+        </div>
+        <button type="submit" id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+    </form>
 </div>
 
 <script>
-const chatBody = document.getElementById("chatBody");
-const input = document.getElementById("messageInput");
-const sendBtn = document.getElementById("sendBtn");
-const convoId = "{{ conversation.pk }}";
-const csrftoken = "{{ csrf_token }}";
+    const chatBody = document.getElementById("chatBody");
+    const chatForm = document.getElementById("chatForm");
+    const input = document.getElementById("messageInput");
+    const convoId = "{{ conversation.pk }}";
+    
+    // ✅ BUG FIX: Uses the variable passed from the view, not a QuerySet call
+    let lastMessageId = {{ last_message_id|default:0 }};
 
-let lastMessageId = {{ messages.last.id|default:0 }};
-chatBody.scrollTop = chatBody.scrollHeight;
-
-// 📨 Send message
-sendBtn.addEventListener("click", sendMessage);
-input.addEventListener("keypress", e => {
-  if (e.key === "Enter") sendMessage();
-});
-
-function sendMessage() {
-  const text = input.value.trim();
-  if (!text) return;
-
-  // Add instantly
-  const msgDiv = document.createElement("div");
-  msgDiv.classList.add("message", "self");
-  msgDiv.innerHTML = `<strong>You</strong><div>${text}</div><small>Just now</small>`;
-  chatBody.appendChild(msgDiv);
-  chatBody.scrollTop = chatBody.scrollHeight;
-  input.value = "";
-
-  fetch("{% url 'upload_attachment' conversation.pk %}", {
-    method: "POST",
-    headers: { "X-CSRFToken": csrftoken },
-    body: new URLSearchParams({ text })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success && data.id) lastMessageId = data.id;
-  })
-  .catch(err => console.error(err));
-}
-
-// ⚡ Poll for new messages every 3 seconds
-setInterval(fetchNewMessages, 3000);
-
-function fetchNewMessages() {
-  fetch(`/conversation/{{ conversation.pk }}/new_messages/?after=${lastMessageId}`)
-    .then(res => res.json())
-    .then(data => {
-      if (data.messages && data.messages.length > 0) {
-        data.messages.forEach(m => {
-          const div = document.createElement("div");
-          div.classList.add("message", m.is_self ? "self" : "other");
-          div.innerHTML = `<strong>${m.sender}</strong><div>${m.content}</div><small>${m.timestamp}</small>`;
-          chatBody.appendChild(div);
-        });
-        lastMessageId = data.messages[data.messages.length - 1].id;
+    const scrollToBottom = () => {
         chatBody.scrollTop = chatBody.scrollHeight;
-      }
-    })
-    .catch(err => console.error("Fetch new messages error:", err));
-}
-</script>
+    };
 
+    const getFormattedTime = () => {
+        return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
+    // 🚀 Optimistic AJAX Send
+    chatForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const text = input.value.trim();
+        if (!text) return;
+
+        const emptyState = document.getElementById('empty-state');
+        if (emptyState) emptyState.remove();
+
+        const tempId = 'temp-' + Date.now();
+        const msgHtml = `
+            <div class="message self" id="${tempId}">
+                <strong>You</strong>
+                <div class="msg-content">${text.replace(/\n/g, '<br>')}</div>
+                <small>${getFormattedTime()} • Sending...</small>
+            </div>`;
+        chatBody.insertAdjacentHTML('beforeend', msgHtml);
+        scrollToBottom();
+        input.value = "";
+
+        const formData = new URLSearchParams();
+        formData.append('content', text); // Ensure this matches your view's expected key
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+        fetch("{% url 'conversation_detail' conversation.pk %}", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-Requested-With": "XMLHttpRequest"
+            },
+            body: formData
+        })
+        .then(res => res.json().catch(() => res.text())) // Handle both JSON and HTML partials
+        .then(data => {
+            // Logic to update the temp message with real data if your view returns JSON
+            if (data.id) {
+                const tempMsg = document.getElementById(tempId);
+                if (tempMsg) {
+                    tempMsg.id = `msg-${data.id}`;
+                    tempMsg.querySelector('small').innerText = getFormattedTime();
+                    lastMessageId = data.id;
+                }
+            }
+        })
+        .catch(err => console.error("Send Error:", err));
+    });
+
+    // 🔄 Sync Polling
+    const pollMessages = () => {
+        fetch(`/conversation/${convoId}/new_messages/?after=${lastMessageId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.messages && data.messages.length > 0) {
+                    data.messages.forEach(m => {
+                        if (document.getElementById(`msg-${m.id}`)) return;
+
+                        const msgClass = m.is_self ? 'self' : 'other';
+                        const name = m.is_self ? 'You' : m.sender;
+                        
+                        const msgHtml = `
+                            <div class="message ${msgClass}" id="msg-${m.id}">
+                                <strong>${name}</strong>
+                                <div class="msg-content">${m.content}</div>
+                                <small>${m.timestamp}</small>
+                            </div>`;
+                        chatBody.insertAdjacentHTML('beforeend', msgHtml);
+                        lastMessageId = m.id;
+                    });
+                    scrollToBottom();
+                }
+            })
+            .catch(err => console.error("Polling Error:", err));
+    };
+
+    setInterval(pollMessages, 4000);
+    window.onload = scrollToBottom;
+</script>
 {% endblock %}

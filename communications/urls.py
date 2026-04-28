@@ -14,5 +14,5 @@ urlpatterns = [
 
    
     path("conversation/<int:conversation_id>/new_messages/", views.fetch_new_messages, name="fetch_new_messages"),
-
+    path('api/unread-count/', views.unread_message_count_api, name='unread_count_api'),
 ]

@@ -1,299 +1,308 @@
 {% extends "accounts/base_dashboard.html" %}
-{% block header %}🧾 Manage Invoices{% endblock %}
+{% load static %}
+
+{% block title %}Manage Invoices{% endblock %}
+{% block header %}🧾 Invoice Ledger{% endblock %}
 
 {% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="manage-wrapper">
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <span class="m-label">Total Receivables</span>
+            <h3 class="m-value" id="summary-due">₵{{ total_due }}</h3>
+            <div class="m-bar"><div class="bar-inner blue"></div></div>
+        </div>
+        <div class="metric-card">
+            <span class="m-label">Revenue Collected</span>
+            <h3 class="m-value" id="summary-paid">₵{{ total_paid }}</h3>
+            <div class="m-bar"><div class="bar-inner green"></div></div>
+        </div>
+        <div class="metric-card">
+            <span class="m-label">Outstanding Balance</span>
+            <h3 class="m-value" id="summary-balance">₵{{ total_balance }}</h3>
+            <div class="m-bar"><div class="bar-inner orange"></div></div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div class="card-header">
+            <h3>Invoice History</h3>
+            <div class="header-actions">
+                <button onclick="fetchInvoicesAndRender()" class="btn-refresh" title="Refresh Data">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Invoice Details</th>
+                        <th>Student</th>
+                        <th>Period</th>
+                        <th>Amount</th>
+                        <th>Balance</th>
+                        <th>Status</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="invoice-tbody">
+                    {% for inv in invoices %}
+                    <tr>
+                        <td>
+                            <div class="inv-id">
+                                <span class="id-tag">#{{ inv.invoice_number }}</span>
+                            </div>
+                        </td>
+                        <td class="student-cell">
+                            <span class="s-name">{{ inv.student.full_name }}</span>
+                        </td>
+                        <td>
+                            <div class="period-info">
+                                <span class="p-session">{{ inv.session }}</span>
+                                <span class="p-term">{{ inv.term }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="amount-stack">
+                                <span class="amt-due">₵{{ inv.total_due }}</span>
+                                <small class="amt-paid">Paid: ₵{{ inv.total_paid }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="balance-text {% if inv.balance > 0 %}debt{% endif %}">
+                                ₵{{ inv.balance }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if inv.is_paid %}
+                                <span class="badge b-paid">Fully Paid</span>
+                            {% else %}
+                                <span class="badge b-pending">Outstanding</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-flex">
+                                <a href="{% url 'download_invoice_pdf' inv.id %}" class="act-btn download" title="PDF">
+                                    <i class="fas fa-file-pdf"></i>
+                                </a>
+                                <a href="{% url 'edit_invoice' inv.id %}" class="act-btn edit" title="Edit">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                <a href="{% url 'delete_invoice' inv.id %}" class="act-btn delete" 
+                                   onclick="return confirm('Permanently delete this invoice?');">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="empty-state">No invoices recorded in this session.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <style>
-/* ====== Invoice Management Styling ====== */
+:root {
+    --primary: #4f46e5;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+}
+
+.manage-wrapper {
+    font-family: 'Inter', sans-serif;
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 1rem;
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Metrics Dashboard */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.metric-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+}
+
+.m-label { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
+.m-value { font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin: 0.5rem 0; }
+.m-bar { height: 6px; background: #f1f5f9; border-radius: 10px; overflow: hidden; }
+.bar-inner { height: 100%; border-radius: 10px; }
+.bar-inner.blue { background: var(--primary); width: 70%; }
+.bar-inner.green { background: var(--success); width: 40%; }
+.bar-inner.orange { background: var(--warning); width: 30%; }
+
+/* Table Section */
 .content-card {
-  background: #ffffff;
-  padding: 25px 30px;
-  border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  margin-top: 20px;
-  animation: fadeIn 0.5s ease-in-out;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
 }
 
-/* Card Title */
-.content-card h2 {
-  margin-bottom: 20px;
-  color: #333;
-  font-size: 1.5rem;
+.card-header {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
 }
 
-/* Summary Box */
-.summary {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  background: #f7faff;
-  padding: 15px 20px;
-  border-radius: 10px;
-  margin-bottom: 25px;
-  border: 1px solid #e0e6f1;
+.card-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+
+.btn-refresh {
+    background: var(--primary-soft);
+    border: none;
+    color: var(--primary);
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn-refresh:hover { transform: rotate(180deg); }
+
+.modern-table { width: 100%; border-collapse: collapse; }
+.modern-table th {
+    background: #f8fafc;
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
 }
 
-.summary p {
-  font-size: 1rem;
-  font-weight: 500;
-  margin: 8px 0;
-  color: #222;
-  flex: 1 1 150px;
-}
+.modern-table td { padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
 
-/* Table Wrapper: Scrollable */
-.table-wrapper {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  border-radius: 10px;
-  box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
-  margin-bottom: 20px;
-}
+/* Cell Details */
+.id-tag { font-weight: 700; color: var(--primary); font-family: 'JetBrains Mono', monospace; }
+.s-name { font-weight: 600; color: var(--text-main); }
+.period-info { display: flex; flex-direction: column; }
+.p-term { font-size: 0.75rem; color: var(--text-muted); }
 
-.table-wrapper::-webkit-scrollbar {
-  height: 8px;
-}
-
-.table-wrapper::-webkit-scrollbar-thumb {
-  background: #004aad;
-  border-radius: 8px;
-}
-
-/* Table Styles */
-.table {
-  width: 100%;
-  min-width: 900px; /* Ensures horizontal scroll on small screens */
-  border-collapse: collapse;
-  background: #fff;
-}
-
-.table th, .table td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #eee;
-  white-space: nowrap;
-}
-
-.table th {
-  background: #f0f4ff;
-  color: #333;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.9rem;
-}
-
-.table tr:hover {
-  background: #f9fbff;
-  transition: background 0.3s ease;
-}
+.amount-stack { display: flex; flex-direction: column; }
+.amt-due { font-weight: 700; color: var(--text-main); }
+.amt-paid { font-size: 0.75rem; color: var(--success); }
+.balance-text.debt { color: var(--danger); font-weight: 700; }
 
 /* Badges */
 .badge {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: white;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
 }
+.b-paid { background: #dcfce7; color: #15803d; }
+.b-pending { background: #fef3c7; color: #92400e; }
 
-.badge.success { background: #28a745; }
-.badge.warning { background: #ffc107; color: #222; }
-
-/* No Data Row */
-.no-data {
-  text-align: center;
-  padding: 25px;
-  font-style: italic;
-  color: #888;
-}
-
-/* Buttons */
-.btn {
-  display: inline-block;
-  padding: 6px 10px;
-  font-size: 0.85rem;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: 600;
-  margin-right: 4px;
-  transition: background 0.2s ease;
-}
-
-.btn-primary { background: #007bff; color: #fff; }
-.btn-warning { background: #ffc107; color: #222; }
-.btn-danger  { background: #dc3545; color: #fff; }
-
-.btn:hover { opacity: 0.85; cursor: pointer; }
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ====== Responsive Design ====== */
-
-/* Tablets */
-@media (max-width: 992px) {
-  .summary {
-    flex-direction: column;
-    gap: 10px;
-  }
-  .table {
-    min-width: 700px;
-  }
-}
-
-/* Mobile Phones */
-@media (max-width: 600px) {
-  .content-card {
-    padding: 18px 15px;
-  }
-
-  .summary p {
-    font-size: 0.95rem;
-  }
-
-  .table {
-    min-width: 600px;
+/* Actions */
+.action-flex { display: flex; gap: 8px; justify-content: flex-end; }
+.act-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    text-decoration: none;
     font-size: 0.85rem;
-  }
+    transition: 0.2s;
+}
+.act-btn.download { background: #eef2ff; color: var(--primary); }
+.act-btn.edit { background: #fff7ed; color: var(--warning); }
+.act-btn.delete { background: #fef2f2; color: var(--danger); }
+.act-btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
 
-  .btn {
-    padding: 5px 8px;
-    font-size: 0.8rem;
-  }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 768px) {
+    .metrics-grid { grid-template-columns: 1fr; }
+    .modern-table thead { display: none; }
+    .modern-table tr { display: block; border-bottom: 8px solid #f8fafc; padding: 1rem; }
+    .modern-table td { display: flex; justify-content: space-between; border: none; padding: 0.5rem 0; }
+    .modern-table td::before { content: attr(data-label); font-weight: 700; color: var(--text-muted); font-size: 0.7rem; }
 }
 </style>
 
-<div class="content-card">
-  <h2>All Invoices</h2>
-
-  <div class="summary">
-    <p><strong>Total Due:</strong> ₵{{ total_due }}</p>
-    <p><strong>Total Paid:</strong> ₵{{ total_paid }}</p>
-    <p><strong>Total Balance:</strong> ₵{{ total_balance }}</p>
-  </div>
-
-  <div class="table-wrapper">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Invoice No.</th>
-          <th>Student</th>
-          <th>Session</th>
-          <th>Term</th>
-          <th>Total Due</th>
-          <th>Paid</th>
-          <th>Balance</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for inv in invoices %}
-        <tr>
-          <td>{{ forloop.counter }}</td>
-          <td>{{ inv.invoice_number }}</td>
-          <td>{{ inv.student.full_name }}</td>
-          <td>{{ inv.session }}</td>
-          <td>{{ inv.term }}</td>
-          <td>₵{{ inv.total_due }}</td>
-          <td>₵{{ inv.total_paid }}</td>
-          <td>₵{{ inv.balance }}</td>
-          <td>
-            {% if inv.is_paid %}
-              <span class="badge success">Paid</span>
-            {% else %}
-              <span class="badge warning">Pending</span>
-            {% endif %}
-          </td>
-          <td>
-            <a href="{% url 'edit_invoice' inv.id %}" class="btn btn-warning">✏️ Edit</a>
-            <a href="{% url 'delete_invoice' inv.id %}" class="btn btn-danger"
-               onclick="return confirm('Are you sure you want to delete this invoice?');">🗑️ Delete</a>
-            {% if inv.id %}
-              <a href="{% url 'download_invoice_pdf' inv.id %}" class="btn btn-primary">⬇ Download</a>
-            {% else %}
-              <span class="btn btn-primary" style="opacity:0.6;cursor:not-allowed;">No PDF</span>
-            {% endif %}
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="10" class="no-data">No invoices found.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-
 <script>
-// Auto-refresh invoices
 async function fetchInvoicesAndRender() {
-  try {
-    const res = await fetch("{% url 'invoices_json' %}");
-    if (!res.ok) throw new Error("Network response not ok");
-    const data = await res.json();
+    try {
+        const res = await fetch("{% url 'invoices_json' %}");
+        if (!res.ok) throw new Error("Network response not ok");
+        const data = await res.json();
 
-    // Update summary
-    const summaryEl = document.querySelector(".summary");
-    if (summaryEl) {
-      summaryEl.innerHTML = `
-        <p><strong>Total Due:</strong> ₵${Number(data.summary.total_due).toFixed(2)}</p>
-        <p><strong>Total Paid:</strong> ₵${Number(data.summary.total_paid).toFixed(2)}</p>
-        <p><strong>Total Balance:</strong> ₵${Number(data.summary.total_balance).toFixed(2)}</p>
-      `;
-    }
+        // Update Summary Bar
+        document.getElementById("summary-due").innerText = `₵${Number(data.summary.total_due).toFixed(2)}`;
+        document.getElementById("summary-paid").innerText = `₵${Number(data.summary.total_paid).toFixed(2)}`;
+        document.getElementById("summary-balance").innerText = `₵${Number(data.summary.total_balance).toFixed(2)}`;
 
-    // Update table
-    const tbody = document.querySelector("table.table tbody");
-    if (!tbody) return;
+        const tbody = document.getElementById("invoice-tbody");
+        if (!tbody) return;
 
-    if (!data.invoices || data.invoices.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="10" class="no-data">No invoices found.</td></tr>`;
-      return;
-    }
+        if (!data.invoices || data.invoices.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No records found.</td></tr>`;
+            return;
+        }
 
-    tbody.innerHTML = data.invoices.map((inv, idx) => {
-      const statusBadge = inv.is_paid
-        ? '<span class="badge success">Paid</span>'
-        : '<span class="badge warning">Pending</span>';
+        tbody.innerHTML = data.invoices.map((inv) => {
+            const statusClass = inv.is_paid ? 'b-paid' : 'b-pending';
+            const statusText = inv.is_paid ? 'Fully Paid' : 'Outstanding';
+            const balanceClass = inv.balance > 0 ? 'debt' : '';
 
-      const downloadBtn = inv.id
-        ? `<a href="/finance/invoice/${inv.id}/download/" class="btn btn-primary">⬇ Download</a>`
-        : `<span class="btn btn-primary" style="opacity:0.6;cursor:not-allowed;">No PDF</span>`;
-
-      return `
-        <tr>
-          <td>${idx + 1}</td>
-          <td>${inv.invoice_number || ""}</td>
-          <td>${inv.student_name || ""}</td>
-          <td>${inv.session || ""}</td>
-          <td>${inv.term || ""}</td>
-          <td>₵${Number(inv.total_due || 0).toFixed(2)}</td>
-          <td>₵${Number(inv.total_paid || 0).toFixed(2)}</td>
-          <td>₵${Number(inv.balance || 0).toFixed(2)}</td>
-          <td>${statusBadge}</td>
-          <td>
-            <a href="/finance/invoice/${inv.id}/edit/" class="btn btn-warning">✏️ Edit</a>
-            <a href="/finance/invoice/${inv.id}/delete/" class="btn btn-danger" onclick="return confirm('Are you sure?');">🗑️ Delete</a>
-            ${downloadBtn}
-          </td>
-        </tr>
-      `;
-    }).join("");
-
-  } catch (err) {
-    console.error("fetchInvoicesAndRender error:", err);
-  }
+            return `
+                <tr>
+                    <td><span class="id-tag">#${inv.invoice_number || ""}</span></td>
+                    <td><span class="s-name">${inv.student_name || ""}</span></td>
+                    <td>
+                        <div class="period-info">
+                            <span class="p-session">${inv.session || ""}</span>
+                            <span class="p-term">${inv.term || ""}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="amount-stack">
+                            <span class="amt-due">₵${Number(inv.total_due || 0).toFixed(2)}</span>
+                            <small class="amt-paid">Paid: ₵${Number(inv.total_paid || 0).toFixed(2)}</small>
+                        </div>
+                    </td>
+                    <td><span class="balance-text ${balanceClass}">₵${Number(inv.balance || 0).toFixed(2)}</span></td>
+                    <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <div class="action-flex">
+                            <a href="/finance/invoice/${inv.id}/download/" class="act-btn download"><i class="fas fa-file-pdf"></i></a>
+                            <a href="/finance/invoice/${inv.id}/edit/" class="act-btn edit"><i class="fas fa-pen"></i></a>
+                            <a href="/finance/invoice/${inv.id}/delete/" class="act-btn delete" onclick="return confirm('Sure?');"><i class="fas fa-trash"></i></a>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+    } catch (err) { console.error("Poll Error:", err); }
 }
 
-fetchInvoicesAndRender();
 setInterval(fetchInvoicesAndRender, 30000);
-window.addEventListener("focus", fetchInvoicesAndRender);
 </script>
 {% endblock %}

@@ -6,7 +6,6 @@ from django.utils.timezone import now
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-
 # ============================================================
 # 1️⃣ Custom User Model (Main Entry for All Users)
 # ============================================================
@@ -32,28 +31,38 @@ class CustomUser(AbstractUser):
 
     USERNAME_FIELD = "username"
 
-
     def __str__(self):
         return f"{self.username} ({self.role})"
 
-@property
-def profile_photo(self):
-    """Return user profile picture URL or default."""
-    try:
-        for profile_attr in [
-            "admin_profile",
-            "teacher_profile",
-            "accountant_profile",
-            "parent_profile",
-            "student_profile",
-        ]:
-            profile = getattr(self, profile_attr, None)
-            if profile and getattr(profile, "photo", None):
-                return profile.photo.url
-    except:
-        pass
+    @property
+    def profile_photo(self):
+        """
+        Dynamically fetches the photo URL from the associated profile.
+        If no profile or photo exists, returns the static default path.
+        """
+        # Dictionary mapping roles to their related profile names
+        profile_map = {
+            self.Roles.ADMIN: 'admin_profile',
+            self.Roles.TEACHER: 'teacher_profile',
+            self.Roles.ACCOUNTANT: 'accountant_profile',
+            self.Roles.PARENT: 'parent_profile',
+            self.Roles.STUDENT: 'student_profile',
+        }
 
-    return "/media/profiles/default.png"
+        try:
+            # Get the correct profile attribute based on user role
+            profile_attr = profile_map.get(self.role)
+            if profile_attr:
+                profile = getattr(self, profile_attr, None)
+                # Check if profile exists and has a photo with a valid file
+                if profile and profile.photo and hasattr(profile.photo, 'url'):
+                    return profile.photo.url
+        except Exception:
+            pass
+
+        # Return the URL via settings.MEDIA_URL + default path
+        from django.conf import settings
+        return f"{settings.MEDIA_URL}profiles/default.png"
 
 
 # ============================================================

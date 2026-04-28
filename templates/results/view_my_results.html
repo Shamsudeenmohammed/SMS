@@ -1,209 +1,323 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
 
-{% block title %}My Results{% endblock %}
+{% block title %}My Academic Results{% endblock %}
+{% block header %}📊 My Results{% endblock %}
 
 {% block content %}
-<style>
-/* 🔹 Page Title */
-.page-title {
-  font-size: 1.7rem;
-  font-weight: 600;
-  color: #1e3a8a;
-  margin-bottom: 0.8rem;
-}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-/* 🔹 Description */
-.page-subtitle {
-  color: #4b5563;
-  font-size: 0.95rem;
-  margin-bottom: 1.2rem;
-}
+<div class="results-wrapper">
+    <div class="results-header">
+        <p class="subtitle">Review your academic progress. Select a specific academic session and term to view your detailed performance report.</p>
+    </div>
 
-/* 🔹 Filter Section */
-.filter-form {
-  background: #f9fafb;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-  margin-bottom: 1.5rem;
-}
-.filter-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  align-items: center;
-}
-.filter-form select {
-  padding: 0.65rem 0.9rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  background: #fff;
-  width: 180px;
-  transition: all 0.3s ease;
-}
-.filter-form select:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
-  outline: none;
-}
-.btn-primary {
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 0.65rem 1.4rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-.btn-primary:hover {
-  background: #1d4ed8;
-}
+    <div class="filter-card">
+        <form method="GET" class="filter-form">
+            <div class="filter-controls">
+                <div class="control-group">
+                    <label><i class="fas fa-calendar-alt"></i> Academic Session</label>
+                    <select name="session" required>
+                        <option value="">Select Session</option>
+                        {% for s in sessions %}
+                            <option value="{{ s.id }}" {% if s.id|stringformat:'s' == selected_session_id %}selected{% endif %}>{{ s.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-/* 🔹 Table */
-.table-container {
-  overflow-x: auto;
-  margin-top: 1rem;
-}
-.styled-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-.styled-table thead {
-  background: #1e3a8a;
-  color: #fff;
-}
-.styled-table th, .styled-table td {
-  padding: 0.85rem 1rem;
-  text-align: left;
-}
-.styled-table tr:nth-child(even) { background: #f9fafb; }
+                <div class="control-group">
+                    <label><i class="fas fa-layer-group"></i> Term</label>
+                    <select name="term" required>
+                        <option value="">Select Term</option>
+                        <option value="1st" {% if selected_term == "1st" %}selected{% endif %}>1st Term</option>
+                        <option value="2nd" {% if selected_term == "2nd" %}selected{% endif %}>2nd Term</option>
+                        <option value="3rd" {% if selected_term == "3rd" %}selected{% endif %}>3rd Term</option>
+                    </select>
+                </div>
 
-/* 🔹 Summary */
-.summary-box {
-  margin-top: 1.5rem;
-  background: linear-gradient(135deg, #f3f4f6, #e0e7ff);
-  border-radius: 12px;
-  padding: 1.2rem 1.8rem;
-  display: flex;
-  gap: 2.5rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.summary-box p {
-  margin: 0;
-  color: #1f2937;
-  font-weight: 500;
-}
+                <div class="action-group">
+                    <button type="submit" class="btn-fetch">
+                        <i class="fas fa-search"></i> Generate Report
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
 
-/* 🔹 No Data */
-.no-data {
-  color: #9ca3af;
-  font-style: italic;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-/* 🔹 Responsive */
-@media (max-width: 768px) {
-  .filter-grid { flex-direction: column; }
-  .filter-form select, .btn-primary { width: 100%; }
-  .summary-box { flex-direction: column; text-align: center; }
-}
-</style>
-
-<h2 class="page-title">📊 My Results</h2>
-<p class="page-subtitle">Select a session and term to view your academic performance. Each session’s results are kept separate for accuracy.</p>
-
-<!-- 🔹 Filter Section -->
-<form method="GET" class="filter-form">
-  <div class="filter-grid">
-    <select name="session" required>
-      <option value="">Select Session</option>
-      {% for s in sessions %}
-        <option value="{{ s.id }}" {% if s.id|stringformat:'s' == selected_session_id %}selected{% endif %}>{{ s.name }}</option>
-      {% endfor %}
-    </select>
-
-    <select name="term" required>
-      <option value="">Select Term</option>
-      <option value="1st" {% if selected_term == "1st" %}selected{% endif %}>1st Term</option>
-      <option value="2nd" {% if selected_term == "2nd" %}selected{% endif %}>2nd Term</option>
-      <option value="3rd" {% if selected_term == "3rd" %}selected{% endif %}>3rd Term</option>
-    </select>
-
-    <button type="submit" class="btn-primary">View Results</button>
-  </div>
-</form>
-
-{% if results %}
-<hr>
-
-<div class="results-summary">
-  <div class="summary-header">
-    <h3>📅 Session: {{ results.0.session.name }} | 🏫 Term: {{ results.0.term }}</h3>
-  </div>
-
-  <div class="table-container">
-    <table class="styled-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Subject</th>
-          <th>Test (40)</th>
-          <th>Exam (60)</th>
-          <th>Total</th>
-          <th>Grade</th>
-          <th>Remark</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for r in results %}
-        <tr>
-          <td>{{ forloop.counter }}</td>
-          <td>{{ r.subject.name }}</td>
-          <td>{{ r.test_score }}</td>
-          <td>{{ r.exam_score }}</td>
-          <td><strong>{{ r.total_score }}</strong></td>
-          <td>{{ r.grade }}</td>
-          <td>{{ r.remark }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
     {% if results %}
-  <div style="margin-top: 20px;">
-      <!-- Download for selected session -->
-      <a href="{% url 'download_result' %}?session={{ selected_session_id }}" class="back-btn">
-          📥 Download Session Result
-      </a>
+    <div class="report-container animate-fade-in">
+        <div class="report-meta">
+            <div class="meta-item">
+                <span class="label">Academic Session</span>
+                <span class="value">{{ results.0.session.name }}</span>
+            </div>
+            <div class="meta-item">
+                <span class="label">Term</span>
+                <span class="value">{{ results.0.term }}</span>
+            </div>
+        </div>
 
-      <!-- Download full result -->
-      <a href="{% url 'download_result' %}" class="back-btn">
-          📥 Download Full Result
-      </a>
-  </div>
-  {% endif %}
+        <div class="table-card">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th width="50">#</th>
+                        <th>Subject Name</th>
+                        <th class="text-center">Test (40)</th>
+                        <th class="text-center">Exam (60)</th>
+                        <th class="text-center">Total</th>
+                        <th class="text-center">Grade</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in results %}
+                    <tr>
+                        <td class="text-muted">{{ forloop.counter }}</td>
+                        <td class="subject-name">{{ r.subject.name }}</td>
+                        <td class="text-center">{{ r.test_score }}</td>
+                        <td class="text-center">{{ r.exam_score }}</td>
+                        <td class="text-center">
+                            <span class="total-badge">{{ r.total_score }}</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="grade-indicator grade-{{ r.grade|slice:":1" }}">
+                                {{ r.grade }}
+                            </span>
+                        </td>
+                        <td class="remark-text">{{ r.remark }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
+        <div class="report-footer">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-label">Cumulative Score</span>
+                    <span class="stat-value">{{ total_score }}</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Average Percentage</span>
+                    <span class="stat-value">{{ average }}%</span>
+                </div>
+            </div>
 
-  </div>
+            <div class="download-actions">
+                <a href="{% url 'download_result' %}?session={{ selected_session_id }}" class="btn-download secondary">
+                    <i class="fas fa-file-download"></i> Download Termly PDF
+                </a>
+                <a href="{% url 'download_result' %}" class="btn-download primary">
+                    <i class="fas fa-file-invoice"></i> Full Transcript
+                </a>
+            </div>
+        </div>
+    </div>
 
-  <div class="summary-box">
-    <p><strong>Total Score:</strong> {{ total_score }}</p>
-    <p><strong>Average:</strong> {{ average }}</p>
-  </div>
+    {% else %}
+        {% if selected_session_id and selected_term %}
+        <div class="empty-state">
+            <i class="fas fa-folder-open"></i>
+            <p>No results have been uploaded yet for the selected criteria.</p>
+        </div>
+        {% endif %}
+    {% endif %}
 </div>
 
-{% else %}
-  {% if selected_session_id and selected_term %}
-    <p class="no-data">⚠️ No results available for the selected session and term.</p>
-  {% endif %}
-{% endif %}
+<style>
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #3730a3;
+    --bg-card: #ffffff;
+    --border: #e2e8f0;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --success: #10b981;
+}
+
+.results-wrapper {
+    font-family: 'Inter', sans-serif;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.results-header .subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+}
+
+/* Filter Section */
+.filter-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.filter-controls {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-end;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.control-group label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.control-group select {
+    padding: 0.75rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    background: #fff;
+    cursor: pointer;
+}
+
+.btn-fetch {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    height: 45px;
+}
+
+.btn-fetch:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+/* Table Styling */
+.report-container { animation: fadeIn 0.5s ease-in-out; }
+
+.report-meta {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1rem;
+    padding: 0 0.5rem;
+}
+
+.meta-item .label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; }
+.meta-item .value { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+
+.table-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+}
+
+.modern-table { width: 100%; border-collapse: collapse; }
+.modern-table th {
+    background: #f8fafc;
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.modern-table td {
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.95rem;
+    color: var(--text-main);
+}
+
+.subject-name { font-weight: 600; }
+.text-center { text-align: center; }
+
+.total-badge {
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+}
+
+.grade-indicator {
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+/* Grade Colors */
+.grade-A { background: #dcfce7; color: #15803d; }
+.grade-B { background: #dbeafe; color: #1d4ed8; }
+.grade-C { background: #fef9c3; color: #a16207; }
+.grade-D { background: #ffedd5; color: #c2410c; }
+.grade-F { background: #fee2e2; color: #b91c1c; }
+
+/* Summary & Footer */
+.report-footer {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.stats-grid { display: flex; gap: 1.5rem; }
+.stat-card {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    text-align: center;
+}
+.stat-label { font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px; }
+.stat-value { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+
+.download-actions { display: flex; gap: 1rem; }
+.btn-download {
+    text-decoration: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.2s;
+}
+
+.btn-download.primary { background: #1e293b; color: white; }
+.btn-download.secondary { background: white; border: 1px solid var(--border); color: var(--text-main); }
+.btn-download:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+
+.empty-state {
+    text-align: center;
+    padding: 4rem;
+    color: var(--text-muted);
+}
+.empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.3; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 768px) {
+    .filter-controls { flex-direction: column; align-items: stretch; }
+    .report-footer { flex-direction: column; align-items: stretch; gap: 2rem; }
+    .stats-grid { flex-direction: column; }
+    .download-actions { flex-direction: column; }
+}
+</style>
 {% endblock %}

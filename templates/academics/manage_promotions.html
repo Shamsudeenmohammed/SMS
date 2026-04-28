@@ -1,233 +1,209 @@
 {% extends "accounts/base_dashboard.html" %}
-{% block title %}🎓 Manage Promotions{% endblock %}
-{% block header %}🎓 Manage Student Promotions{% endblock %}
+{% block title %}Manage Promotions{% endblock %}
+{% block header %}Student Promotions{% endblock %}
 
 {% block content %}
-<style>
-/* ==== Base Section ==== */
-.page-section {
-  background: #0f172a;
-  color: #f1f5f9;
-  border-radius: 1rem;
-  padding: 2rem;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-  animation: fadeIn 0.4s ease-in-out;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-/* ==== Headings ==== */
-.page-section h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #38bdf8;
-  margin-bottom: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  text-align: center;
-}
-
-/* ==== Top Bar ==== */
-.promotion-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-}
-
-/* ==== Search Input ==== */
-.search-box {
-  flex: 1;
-  min-width: 180px;
-  position: relative;
-}
-
-.search-box input {
-  width: 100%;
-  padding: 0.8rem 1rem;
-  border: 1px solid #334155;
-  border-radius: 0.5rem;
-  background: #1e293b;
-  color: #e2e8f0;
-  font-size: 0.95rem;
-}
-
-.search-box input:focus {
-  border-color: #38bdf8;
-  outline: none;
-}
-
-/* ==== Buttons ==== */
-button {
-  padding: 0.8rem 1.5rem;
-  border: none;
-  border-radius: 0.5rem;
-  background: linear-gradient(90deg,#38bdf8,#2563eb);
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.3s;
-  white-space: nowrap;
-}
-
-button:hover {
-  transform: scale(1.03);
-  box-shadow: 0 0 15px #38bdf8aa;
-}
-
-button.danger-btn {
-  background: linear-gradient(90deg,#ef4444,#b91c1c);
-}
-
-/* ==== Table Wrapper ==== */
-.table-responsive {
-  width: 100%;
-  overflow-x: auto;
-  border-radius: 0.75rem;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* ==== Table ==== */
-.data-table {
-  width: 100%;
-  min-width: 680px;
-  border-collapse: collapse;
-  background: #1e293b;
-  border-radius: 0.75rem;
-  overflow: hidden;
-}
-
-.data-table thead {
-  background: #334155;
-  color: #f1f5f9;
-  text-transform: uppercase;
-}
-
-.data-table th, .data-table td {
-  padding: 0.9rem 1rem;
-  border-bottom: 1px solid #334155;
-  font-size: 0.95rem;
-}
-
-.data-table tbody tr:hover {
-  background: #0f172a;
-}
-
-.data-table input[type="checkbox"] {
-  width: 1.1rem;
-  height: 1.1rem;
-  cursor: pointer;
-}
-
-/* ==== Responsive Design ==== */
-@media (max-width: 1024px) {
-  .page-section {
-    padding: 1.5rem;
-  }
-  .promotion-bar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .promotion-bar button {
-    width: 100%;
-    text-align: center;
-  }
-  .search-box {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .page-section {
-    padding: 1rem;
-    border-radius: 0.75rem;
-  }
-  .page-section h2 {
-    font-size: 1.2rem;
-  }
-  .data-table th, .data-table td {
-    padding: 0.7rem 0.8rem;
-    font-size: 0.85rem;
-  }
-}
-
-/* ==== Animation ==== */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-</style>
-
-<div class="page-section">
-  <form method="post">
-    {% csrf_token %}
-    <h2>🎓 Manage Student Promotions</h2>
-
-    <div class="promotion-bar">
-      <div class="search-box">
-        <input type="text" id="searchInput" placeholder="🔍 Search student by name, ID, or class...">
+<div class="promotion-manager">
+  
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
+      <div class="stat-content">
+        <span class="stat-label">Total Students</span>
+        <span class="stat-value">{{ students.count }}</span>
       </div>
-      <button type="submit" name="action" value="promote">🚀 Promote Selected</button>
-      <button type="submit" name="action" value="demote" class="danger-btn">⬇️ Demote Selected</button>
+    </div>
+    <div class="stat-card accent">
+      <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
+      <div class="stat-content">
+        <span class="stat-label">Batch Actions</span>
+        <span class="stat-value">Promotion</span>
+      </div>
+    </div>
+  </div>
+
+  <form method="post" id="promotionForm">
+    {% csrf_token %}
+    
+    <div class="toolbar">
+      <div class="search-group">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search by name, ID, or class...">
+      </div>
+      
+      <div class="bulk-actions">
+        <button type="submit" name="action" value="promote" class="btn btn-promote">
+          <i class="fas fa-rocket"></i> Promote Selected
+        </button>
+        <button type="submit" name="action" value="demote" class="btn btn-demote" 
+                onclick="return confirm('Warning: You are about to demote selected students. Proceed?')">
+          <i class="fas fa-arrow-down"></i> Demote
+        </button>
+      </div>
     </div>
 
-    <div class="table-responsive">
-      <table class="data-table" id="studentTable">
-        <thead>
-          <tr>
-            <th><input type="checkbox" id="select-all"></th>
-            <th>#</th>
-            <th>Student ID</th>
-            <th>Full Name</th>
-            <th>Current Class</th>
-            <th>Section</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for student in students %}
-          <tr>
-            <td><input type="checkbox" name="selected_students" value="{{ student.id }}"></td>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ student.student_id }}</td>
-            <td>{{ student.user.get_full_name }}</td>
-            <td>{{ student.current_class }}</td>
-            <td>{{ student.section }}</td>
-          </tr>
-          {% empty %}
-          <tr><td colspan="6" style="text-align:center;color:#94a3b8;">No students found.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="data-card">
+      <div class="table-responsive">
+        <table class="modern-table" id="studentTable">
+          <thead>
+            <tr>
+              <th width="40"><input type="checkbox" id="select-all" class="custom-check"></th>
+              <th width="60">#</th>
+              <th>Student ID</th>
+              <th>Full Name</th>
+              <th>Current Class</th>
+              <th>Section</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for student in students %}
+            <tr>
+              <td>
+                <input type="checkbox" name="selected_students" value="{{ student.id }}" class="custom-check student-check">
+              </td>
+              <td class="text-muted">{{ forloop.counter }}</td>
+              <td><span class="id-badge">{{ student.student_id }}</span></td>
+              <td class="font-bold">{{ student.user.get_full_name }}</td>
+              <td><span class="class-label">{{ student.current_class }}</span></td>
+              <td><span class="section-label">{{ student.section }}</span></td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="empty-state">
+                <i class="fas fa-users-slash"></i>
+                <p>No student records available for promotion.</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </form>
 </div>
 
+<style>
+:root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --danger: #ef4444;
+  --border: #e2e8f0;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --bg-card: #ffffff;
+}
+
+.promotion-manager {
+  font-family: 'Inter', sans-serif;
+  padding: 1.5rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Stats Row */
+.stats-row { display: flex; gap: 1rem; margin-bottom: 2rem; }
+.stat-card {
+  background: var(--bg-card);
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 1rem; flex: 1; max-width: 280px;
+}
+.stat-card.accent { border-left: 4px solid var(--primary); }
+.stat-icon {
+  width: 44px; height: 44px; background: #f5f3ff;
+  color: var(--primary); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+}
+.stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; display: block; }
+.stat-value { font-size: 1.4rem; font-weight: 700; color: var(--text-main); }
+
+/* Toolbar */
+.toolbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;
+}
+
+.search-group { position: relative; flex: 1; max-width: 400px; }
+.search-group i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.search-group input {
+  width: 100%; padding: 0.75rem 1rem 0.75rem 2.8rem;
+  border: 1px solid var(--border); border-radius: 10px; font-size: 0.9rem;
+  transition: 0.2s;
+}
+.search-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+
+.bulk-actions { display: flex; gap: 0.75rem; }
+
+.btn {
+  padding: 0.75rem 1.25rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem;
+  border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s;
+}
+.btn-promote { background: var(--primary); color: white; }
+.btn-promote:hover { background: var(--primary-hover); transform: translateY(-1px); }
+.btn-demote { background: #fff1f2; color: var(--danger); border: 1px solid #fecaca; }
+.btn-demote:hover { background: var(--danger); color: white; }
+
+/* Table Section */
+.data-card {
+  background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border);
+  overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.modern-table { width: 100%; border-collapse: collapse; }
+.modern-table th {
+  background: #f8fafc; padding: 1rem; text-align: left;
+  font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+.modern-table td { padding: 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 0.9rem; }
+
+.custom-check {
+  width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);
+}
+
+.id-badge { background: #f1f5f9; padding: 2px 8px; border-radius: 4px; font-family: monospace; font-weight: 600; color: #475569; }
+.class-label { font-weight: 500; color: var(--text-main); }
+.section-label { color: var(--text-muted); font-weight: 500; }
+
+.empty-state { text-align: center; padding: 4rem !important; color: var(--text-muted); }
+.empty-state i { font-size: 2rem; opacity: 0.3; margin-bottom: 1rem; display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .bulk-actions { flex-direction: column; }
+  .btn { justify-content: center; }
+}
+</style>
+
 <script>
-/* ========= Select/Deselect All (Only visible rows) ========= */
+/* ========= Select/Deselect All (Visible Rows Only) ========= */
 document.getElementById("select-all").addEventListener("change", function(e) {
-  document
-    .querySelectorAll("#studentTable tbody input[name='selected_students']")
-    .forEach(cb => {
-      if (!cb.disabled) cb.checked = e.target.checked; // affect visible only
-    });
+  const visibleCheckboxes = document.querySelectorAll("#studentTable tbody tr:not([style*='display: none']) .student-check");
+  visibleCheckboxes.forEach(cb => cb.checked = e.target.checked);
 });
 
-/* ========= Search Filter + disable hidden checkboxes ========= */
-document.getElementById("searchInput").addEventListener("keyup", function() {
+/* ========= Real-time Search Filter ========= */
+document.getElementById("searchInput").addEventListener("input", function() {
   const filter = this.value.toLowerCase();
+  const rows = document.querySelectorAll("#studentTable tbody tr:not(.empty-row)");
 
-  document.querySelectorAll("#studentTable tbody tr").forEach(row => {
+  rows.forEach(row => {
     const text = row.textContent.toLowerCase();
-    const match = text.includes(filter);
-
-    row.style.display = match ? "" : "none";
-
-    const checkbox = row.querySelector("input[type='checkbox']");
-    if (checkbox) {
-      checkbox.disabled = !match; // hidden rows disabled
-      if (!match) checkbox.checked = false; // uncheck hidden rows
+    const isMatch = text.includes(filter);
+    row.style.display = isMatch ? "" : "none";
+    
+    // Disable hidden checkboxes so they aren't submitted
+    const cb = row.querySelector(".student-check");
+    if (cb) {
+      cb.disabled = !isMatch;
+      if (!isMatch) cb.checked = false;
     }
   });
 });

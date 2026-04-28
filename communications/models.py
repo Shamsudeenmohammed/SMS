@@ -43,6 +43,8 @@ class Conversation(models.Model):
 # ======================================================
 # 🔹 Message Model (with Email Notifications)
 # ======================================================
+# communications/models.py
+
 class Message(models.Model):
     conversation = models.ForeignKey(
         Conversation, on_delete=models.CASCADE, related_name="messages"
@@ -54,13 +56,18 @@ class Message(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     edited = models.BooleanField(default=False)
     is_system = models.BooleanField(default=False)
+    
+    # ✅ For 1:1 chats, this is highly efficient
+    # For group chats, we'll use the MessageSeen table below
+    is_read = models.BooleanField(default=False)
 
-    # full-text field for quick searching
     search_vector = SearchVectorField(null=True, editable=False)
 
     class Meta:
         indexes = [
             GinIndex(fields=["search_vector"]),
+            # makes unread count queries lightning fast.
+            models.Index(fields=['conversation', 'is_read']), 
         ]
         ordering = ["created_at"]
 
@@ -99,6 +106,23 @@ class Message(models.Model):
                 recipient_list=list(recipients),
                 fail_silently=True,
             )
+
+
+
+# ======================================================
+# 🔹 Message Read Tracking (For Group/Scalable Chats)
+# ======================================================
+class MessageSeen(models.Model):
+    """Tracks which user has read which message in group conversations."""
+    message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="seen_by")
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="viewed_messages")
+    seen_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('message', 'user')
+        indexes = [
+            models.Index(fields=['user', 'message']),
+        ]
 
 
 # ======================================================

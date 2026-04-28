@@ -1,138 +1,213 @@
 {% extends "accounts/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}{{ action }}{% endblock %}
+{% block header %}{{ action }}{% endblock %}
 
 {% block content %}
-<style>
-  .subject-form-container {
-    max-width: 600px;
-    margin: 40px auto;
-    background: #fff;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-  .subject-form-container h2 {
-    text-align: center;
-    color: #2b3a67;
-    margin-bottom: 20px;
-  }
+<div class="form-wrapper">
+    <div class="form-container">
+        <div class="form-intro">
+            <p>Define the subject name, unique identifier code, and assign it to a classroom and instructor.</p>
+        </div>
 
-  .subject-form {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+        <form method="POST" class="modern-form">
+            {% csrf_token %}
 
-  .subject-form label {
-    font-weight: 600;
-    color: #333;
-  }
+            <div class="form-grid">
+                <div class="form-field-group">
+                    <label for="id_name">Subject Name <span class="required">*</span></label>
+                    <div class="input-wrapper">
+                        <input type="text" name="name" id="id_name" value="{{ subject.name|default:'' }}" placeholder="e.g. Advanced Mathematics" required>
+                    </div>
+                </div>
 
-  .subject-form input,
-  .subject-form select {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 15px;
-    outline: none;
-    transition: border-color 0.3s ease;
-  }
+                <div class="form-field-group">
+                    <label for="id_code">Subject Code <span class="required">*</span></label>
+                    <div class="input-wrapper">
+                        <input type="text" name="code" id="id_code" value="{{ subject.code|default:'' }}" placeholder="e.g. MATH-101" required>
+                    </div>
+                </div>
 
-  .subject-form input:focus,
-  .subject-form select:focus {
-    border-color: #2b7de9;
-  }
+                <div class="form-field-group">
+                    <label for="id_classroom">Classroom Assignment <span class="required">*</span></label>
+                    <div class="input-wrapper">
+                        <select name="classroom" id="id_classroom" required>
+                            <option value="" disabled {% if not subject.classroom %}selected{% endif %}>Select a classroom...</option>
+                            {% for cls in classes %}
+                            <option value="{{ cls.id }}" {% if subject.classroom.id == cls.id %}selected{% endif %}>
+                                {{ cls.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
 
-  .form-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-  }
+                <div class="form-field-group">
+                    <label for="id_teacher">Subject Instructor (Optional)</label>
+                    <div class="input-wrapper">
+                        <select name="teacher" id="id_teacher">
+                            <option value="">-- No Instructor Assigned --</option>
+                            {% for teacher in teachers %}
+                            <option value="{{ teacher.id }}" {% if subject.teacher.id == teacher.id %}selected{% endif %}>
+                                {{ teacher.get_full_name }} ({{ teacher.username }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <small class="help-text">Teachers must have an active staff account to appear here.</small>
+                </div>
+            </div>
 
-  .btn-primary {
-    background: #2b7de9;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 15px;
-    transition: background 0.3s ease;
-  }
-
-  .btn-primary:hover {
-    background: #1e63c8;
-  }
-
-  .btn-secondary {
-    background: #777;
-    color: #fff;
-    text-decoration: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 15px;
-    transition: background 0.3s ease;
-  }
-
-  .btn-secondary:hover {
-    background: #555;
-  }
-</style>
-
-<div class="subject-form-container">
-  <h2>{{ action }}</h2>
-
-  <form method="POST" class="subject-form">
-    {% csrf_token %}
-
-    <label>Subject Name:</label>
-    <input type="text" name="name" value="{{ subject.name|default:'' }}" required>
-
-    <label>Code:</label>
-    <input type="text" name="code" value="{{ subject.code|default:'' }}" required>
-
-    <label>Classroom:</label>
-    <select name="classroom" required>
-      {% for cls in classes %}
-      <option value="{{ cls.id }}" {% if subject.classroom.id == cls.id %}selected{% endif %}>
-        {{ cls.name }}
-      </option>
-      {% endfor %}
-    </select>
-
-    <label>Teacher (optional):</label>
-    <select name="teacher" id="id_teacher">
-      <option value="">-- None --</option>
-      {% for teacher in teachers %}
-      <option value="{{ teacher.id }}" 
-              {% if subject.teacher.id == teacher.id %}selected{% endif %}>
-        {{ teacher.get_full_name }} ({{ teacher.username }})
-      </option>
-      {% endfor %}
-    </select>
-
-    <div class="form-actions">
-      <button type="submit" class="btn-primary">💾 Save</button>
-      <a href="{% url 'subject_list' %}" class="btn-secondary">⬅ Back</a>
+            <div class="form-actions">
+                <a href="{% url 'subject_list' %}" class="btn-cancel">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save"></i> {{ action }}
+                </button>
+            </div>
+        </form>
     </div>
-  </form>
 </div>
 
-<!-- Select2 CDN -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --error: #ef4444;
+}
+
+.form-wrapper {
+    font-family: 'Inter', sans-serif;
+    padding: 1.5rem;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 650px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    margin: 0 auto;
+}
+
+.form-intro {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.form-intro p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
+
+.form-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+
+.form-field-group { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.form-field-group label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.required { color: var(--error); }
+
+.modern-form input, 
+.modern-form select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: #fff;
+    transition: all 0.2s;
+}
+
+.modern-form input:focus, 
+.modern-form select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.help-text { font-size: 0.8rem; color: var(--text-muted); }
+
+/* Form Actions */
+.form-actions {
+    margin-top: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.btn-save {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.8rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.2s;
+}
+
+.btn-save:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+.btn-cancel {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: 0.2s;
+}
+
+.btn-cancel:hover { color: var(--text-main); }
+
+/* Custom Select2 Overrides */
+.select2-container--default .select2-selection--single {
+    border: 1.5px solid var(--border) !important;
+    height: 45px !important;
+    border-radius: 10px !important;
+    padding: 8px 10px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 43px !important;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
 $(document).ready(function() {
-  $('#id_teacher').select2({
-    placeholder: "Search and select a teacher...",
-    allowClear: true,
-    width: '100%',
-    theme: 'classic'
-  });
+    $('#id_teacher').select2({
+        placeholder: "Search for a teacher...",
+        allowClear: true,
+        width: '100%'
+    });
+
+    $('#id_classroom').select2({
+        width: '100%'
+    });
 });
 </script>
-
 {% endblock %}

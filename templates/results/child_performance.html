@@ -5,105 +5,187 @@
 
 {% block content %}
 <style>
-/* ===== Page Title ===== */
-.page-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #004aad;
-    margin-bottom: 20px;
-}
+    :root {
+        --primary-blue: #004aad;
+        --accent-blue: #eef4ff;
+        --text-main: #1f2937;
+        --text-muted: #6b7280;
+        --white: #ffffff;
+        --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
 
-/* ===== Children List ===== */
-.children-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+    .page-header {
+        margin-bottom: 2rem;
+    }
 
-.child-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: transform 0.2s, box-shadow 0.2s;
-}
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
 
-.child-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-}
+    /* ===== Performance Grid ===== */
+    .children-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+    }
 
-.child-name {
-    font-weight: 500;
-    color: #004aad;
-    font-size: 1rem;
-}
-
-.child-level {
-    font-size: 0.9rem;
-    color: #6b7280;
-    margin-left: 8px;
-}
-
-/* ===== View Results Button ===== */
-.view-results-btn {
-    padding: 6px 12px;
-    background: linear-gradient(135deg, #004aad, #1565c0);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.9rem;
-    transition: 0.3s;
-}
-
-.view-results-btn:hover {
-    background: linear-gradient(135deg, #1565c0, #004aad);
-    transform: translateY(-2px);
-}
-
-/* ===== No Children Text ===== */
-.text-muted {
-    font-size: 0.95rem;
-    color: #6b7280;
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
     .child-card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: var(--shadow);
+        border: 1px solid #f0f0f0;
+        display: flex;
         flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .child-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0, 74, 173, 0.1);
+        border-color: var(--primary-blue);
+    }
+
+    .child-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--primary-blue);
+    }
+
+    /* ===== Avatar & Info ===== */
+    .child-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .avatar-circle {
+        width: 50px;
+        height: 50px;
+        background: var(--accent-blue);
+        color: var(--primary-blue);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.2rem;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .child-info-meta {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .child-name {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--text-main);
+        line-height: 1.2;
+    }
+
+    .level-badge {
+        display: inline-block;
+        margin-top: 4px;
+        padding: 2px 10px;
+        background: var(--accent-blue);
+        color: var(--primary-blue);
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        width: fit-content;
+    }
+
+    /* ===== Footer Actions ===== */
+    .card-footer {
+        margin-top: auto;
+        padding-top: 15px;
+        border-top: 1px dashed #eee;
+        display: flex;
+        justify-content: flex-end;
     }
 
     .view-results-btn {
-        width: 100%;
-        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: var(--primary-blue);
+        color: #fff;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: 0.2s;
     }
-}
+
+    .view-results-btn:hover {
+        background: #003a8a;
+        gap: 12px; /* Subtle "arrow push" effect */
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: #f9fafb;
+        border-radius: 16px;
+        color: var(--text-muted);
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 480px) {
+        .children-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 
-<h2 class="page-title">📚 Child Performance</h2>
+<div class="page-header">
+    <h2 class="page-title"><span>📚</span> Child Performance</h2>
+</div>
 
-<div class="children-list">
+<div class="children-grid">
     {% if children %}
         {% for child in children %}
             <div class="child-card">
-                <div>
-                    <span class="child-name">{{ child.user.get_full_name }}</span>
-                    {% if child.level %}
-                        <span class="child-level">({{ child.level }})</span>
-                    {% endif %}
+                <div class="child-header">
+                    <div class="avatar-circle">
+                        {{ child.user.first_name|slice:":1" }}{{ child.user.last_name|slice:":1" }}
+                    </div>
+                    <div class="child-info-meta">
+                        <span class="child-name">{{ child.user.get_full_name }}</span>
+                        {% if child.level %}
+                            <span class="level-badge">{{ child.level }}</span>
+                        {% endif %}
+                    </div>
                 </div>
-                <a href="{% url 'child_result' child.id %}" class="view-results-btn">View Results</a>
+
+                <div class="card-footer">
+                    <a href="{% url 'child_result' child.id %}" class="view-results-btn">
+                        View Results Analysis <span>&rarr;</span>
+                    </a>
+                </div>
             </div>
         {% endfor %}
     {% else %}
-        <p class="text-muted">No children assigned to your account.</p>
+        <div class="empty-state" style="grid-column: 1 / -1;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">👤</div>
+            <p>No children assigned to your account. Please contact the school administrator.</p>
+        </div>
     {% endif %}
 </div>
 {% endblock %}

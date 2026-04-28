@@ -1,144 +1,213 @@
 {% extends "accounts/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Edit Classroom{% endblock %}
 {% block header %}✏️ Edit Classroom{% endblock %}
 
 {% block content %}
-<div class="edit-classroom-container">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <div class="form-card">
-    <h2>Edit Classroom Details</h2>
-    <p class="subtitle">Update classroom information and click save when done.</p>
+<div class="form-wrapper">
+    <div class="form-container">
+        <div class="form-intro">
+            <p>Modify classroom properties and display order within the institutional hierarchy.</p>
+        </div>
 
-    <form method="post" class="edit-form">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <div class="btn-row">
-        <a href="{% url 'manage_classrooms' %}" class="cancel-btn">← Cancel</a>
-        <button type="submit" class="save-btn">💾 Update Classroom</button>
-      </div>
-    </form>
-  </div>
+        <form method="post" class="modern-form">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="form-field-group {% if field.errors %}has-error{% endif %}">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="required">*</span>{% endif %}
+                    </label>
+                    
+                    <div class="input-wrapper">
+                        {% if field.name == 'order' %}
+                            <div class="input-with-icon">
+                                <i class="fas fa-sort-numeric-down icon-addon"></i>
+                                {{ field }}
+                            </div>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
 
+                        {% if field.errors %}
+                            <div class="error-message">
+                                {% for error in field.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'manage_classrooms' %}" class="btn-cancel">
+                    <i class="fas fa-times"></i> Discard
+                </a>
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-check-circle"></i> Update Classroom
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <style>
-/* ===== Container ===== */
-.edit-classroom-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --error: #ef4444;
 }
 
-.form-card {
-  background: #ffffff;
-  padding: 2rem 2.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  max-width: 600px;
-  width: 100%;
-  transition: all 0.2s ease;
+.form-wrapper {
+    font-family: 'Inter', sans-serif;
+    padding: 2rem;
+    animation: fadeIn 0.4s ease-out;
 }
 
-.form-card:hover {
-  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-}
-
-.form-card h2 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.3rem;
-}
-
-.subtitle {
-  color: #6b7280;
-  font-size: 0.95rem;
-  margin-bottom: 1.5rem;
-}
-
-/* ===== Form Styling ===== */
-.edit-form p {
-  margin-bottom: 1rem;
-}
-
-.edit-form label {
-  display: block;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 4px;
-}
-
-.edit-form input[type="text"],
-.edit-form input[type="number"],
-.edit-form textarea,
-.edit-form select {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  transition: border-color 0.2s ease;
-  background-color: #f9fafb;
-}
-
-.edit-form input:focus,
-.edit-form textarea:focus,
-.edit-form select:focus {
-  border-color: #2563eb;
-  outline: none;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
-}
-
-/* ===== Buttons ===== */
-.btn-row {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.save-btn {
-  background: #2563eb;
-  color: #fff;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background 0.2s ease;
-}
-.save-btn:hover { background: #1e40af; }
-
-.cancel-btn {
-  background: #e5e7eb;
-  color: #374151;
-  padding: 10px 16px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 500;
-  transition: background 0.2s ease;
-}
-.cancel-btn:hover { background: #d1d5db; }
-
-/* ===== Responsive ===== */
-@media (max-width: 600px) {
-  .form-card {
-    padding: 1.5rem;
-  }
-
-  .btn-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .save-btn, .cancel-btn {
+.form-container {
     width: 100%;
-    text-align: center;
-  }
+    max-width: 650px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    margin: 0 auto;
+}
+
+.form-intro {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.form-intro p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Form Layout */
+.form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-field-group label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.required { color: var(--error); }
+
+/* Input Styling */
+.modern-form input, 
+.modern-form textarea, 
+.modern-form select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: #fff;
+    transition: all 0.2s;
+}
+
+.modern-form input:focus, 
+.modern-form textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+/* Icon Adornment */
+.input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.icon-addon {
+    position: absolute;
+    left: 14px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    pointer-events: none;
+}
+
+.input-with-icon input {
+    padding-left: 40px !important;
+}
+
+/* Form Actions */
+.form-actions {
+    margin-top: 2.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.btn-save {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.8rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.2s;
+}
+
+.btn-save:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+.btn-cancel {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.8rem 1.2rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.2s;
+}
+
+.btn-cancel:hover { background: #f1f5f9; color: var(--text-main); }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 600px) {
+    .form-container { padding: 1.5rem; }
+    .form-actions { flex-direction: column; }
+    .btn-save, .btn-cancel { width: 100%; justify-content: center; }
 }
 </style>
-
 {% endblock %}

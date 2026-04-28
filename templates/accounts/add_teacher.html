@@ -1,131 +1,181 @@
 {% extends "accounts/base_dashboard.html" %}
-{% block title %}Add Teacher{% endblock %}
-{% block header %}➕ Add Teacher{% endblock %}
+
+{% block title %}Add New Teacher{% endblock %}
+{% block header %}Faculty Registration{% endblock %}
 
 {% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="registration-wrapper">
+    <div class="form-card">
+        <div class="card-header">
+            <h2>New Faculty Account</h2>
+            <p>Onboarding a new teacher will create their system login and profile.</p>
+        </div>
+
+        <form method="POST" class="modern-form" novalidate>
+            {% csrf_token %}
+
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-lock"></i> Account Credentials</h3>
+                <div class="form-grid">
+                    {% for field in user_form %}
+                        <div class="form-group {% if field.name == 'email' %}full-width{% endif %}">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small class="field-help">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}<span class="error-text">{{ error }}</span>{% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <hr class="section-divider">
+
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-briefcase"></i> Professional Profile</h3>
+                <div class="form-grid">
+                    {% for field in teacher_form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}<span class="error-text">{{ error }}</span>{% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'manage_teachers' %}" class="btn-secondary">Back to List</a>
+                <button type="submit" class="btn-primary">Create Faculty Account</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <style>
-/* 🎨 ===== Add Teacher Form Styling ===== */
-
-.form-container {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 2rem 2.5rem;
-  max-width: 720px;
-  margin: 2rem auto;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-  animation: fadeIn 0.5s ease-in-out;
+:root {
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --border: #e2e8f0;
+    --bg-faded: #f8fafc;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
 }
 
-.form-container h2 {
-  text-align: center;
-  color: #2d3748;
-  margin-bottom: 1.8rem;
-  font-weight: 700;
+.registration-wrapper {
+    font-family: 'Inter', sans-serif;
+    padding: 2.5rem 1rem;
+    max-width: 850px;
+    margin: 0 auto;
 }
 
-/* 🧩 Form Fields */
-form p {
-  margin-bottom: 1rem;
+.form-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 15px 35px -5px rgba(0,0,0,0.05);
+    overflow: hidden;
+    animation: fadeIn 0.4s ease-out;
 }
 
-label {
-  display: block;
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 6px;
+.card-header {
+    padding: 2.5rem;
+    background: linear-gradient(to right, #fcfcfd, #fff);
+    border-bottom: 1px solid var(--border);
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"],
-select,
-textarea {
-  width: 100%;
-  padding: 0.7rem 1rem;
-  border: 1.5px solid #cbd5e0;
-  border-radius: 8px;
-  outline: none;
-  transition: 0.25s ease;
-  font-size: 0.95rem;
-  background: #f9fafb;
+.card-header h2 { margin: 0; color: var(--text-main); font-size: 1.6rem; font-weight: 700; }
+.card-header p { margin: 0.5rem 0 0; color: var(--text-muted); font-size: 0.9rem; }
+
+.modern-form { padding: 2.5rem; }
+
+.form-section { margin-bottom: 2rem; }
+
+.section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: #3182ce;
-  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
-  background: #fff;
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
 }
 
-/* 💾 Action Buttons */
-.form-actions {
-  display: flex;
-  justify-content: center;
-  gap: 1.2rem;
-  margin-top: 2rem;
-}
+.full-width { grid-column: span 2; }
 
-.btn {
-  padding: 0.8rem 1.4rem;
-  border-radius: 10px;
-  color: #fff;
-  font-weight: 600;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background 0.3s ease-in-out;
-}
+.form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+.form-group label { font-size: 0.875rem; font-weight: 600; color: var(--text-main); }
 
-.btn.save {
-  background: #38a169;
-}
-
-.btn.save:hover {
-  background: #2f855a;
-}
-
-.btn.cancel {
-  background: #e53e3e;
-}
-
-.btn.cancel:hover {
-  background: #c53030;
-}
-
-/* 🌀 Subtle animation */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* 📱 Responsive */
-@media (max-width: 600px) {
-  .form-container {
-    padding: 1.5rem;
-  }
-  .form-actions {
-    flex-direction: column;
-  }
-  .btn {
+/* Customizing Django-rendered inputs */
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+    padding: 0.8rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: var(--bg-faded);
+    transition: all 0.2s;
     width: 100%;
-    text-align: center;
-  }
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.section-divider { border: 0; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+.field-help { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+.error-text { font-size: 0.75rem; color: #dc2626; font-weight: 500; }
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.btn-secondary { text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 0.95rem; }
+.btn-secondary:hover { color: var(--primary); }
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.85rem 2.2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .full-width { grid-column: 1; }
+    .modern-form { padding: 1.5rem; }
+    .form-actions { flex-direction: column-reverse; gap: 1.5rem; align-items: stretch; text-align: center; }
 }
 </style>
-
-<div class="form-container">
-  <h2>➕ Add New Teacher</h2>
-  <form method="POST">
-    {% csrf_token %}
-    {{ user_form.as_p }}
-    {{ teacher_form.as_p }}
-
-    <div class="form-actions">
-      <button type="submit" class="btn save">💾 Save</button>
-      <a href="{% url 'manage_teachers' %}" class="btn cancel">❌ Cancel</a>
-    </div>
-  </form>
-</div>
 {% endblock %}

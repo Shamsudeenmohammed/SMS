@@ -2,147 +2,201 @@
 {% load static %}
 
 {% block title %}Add New Student{% endblock %}
+{% block header %}Add Student{% endblock %}
 
 {% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="form-wrapper">
+    <div class="form-card">
+        <div class="card-header">
+            <h2>Enroll New Student</h2>
+            <p>Create a user account and student profile simultaneously.</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="modern-form">
+            {% csrf_token %}
+
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-user-circle"></i> Account Information</h3>
+                <div class="form-grid">
+                    {% for field in user_form %}
+                        <div class="form-group {% if field.name == 'email' %}full-width{% endif %}">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small class="help-text">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <span class="error-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-graduation-cap"></i> Academic Profile</h3>
+                
+                <div class="info-banner">
+                    <i class="fas fa-magic"></i>
+                    <span>Student ID will be auto-generated (e.g., <strong>20250001</strong>).</span>
+                </div>
+
+                <div class="form-grid">
+                    {% for field in student_form %}
+                        <div class="form-group {% if forloop.last and not forloop.counter|divisibleby:2 %}full-width{% endif %}">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small class="help-text">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <span class="error-text">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'manage_students' %}" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-submit">Register Student</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <style>
-/* 🎨 Add Student Page Styling */
-.add-student-container {
-  max-width: 850px;
-  margin: 2rem auto;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  padding: 2.5rem;
-  font-family: "Segoe UI", sans-serif;
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --border: #e2e8f0;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --bg-field: #f8fafc;
 }
 
-.add-student-header {
-  text-align: center;
-  margin-bottom: 1.5rem;
+.form-wrapper {
+    font-family: 'Inter', sans-serif;
+    padding: 2rem 1rem;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
-.add-student-header h2 {
-  font-size: 1.8rem;
-  color: #1e3a8a; /* Deep blue tone */
-  margin-bottom: 0.5rem;
+.form-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+    overflow: hidden;
 }
 
-.add-student-header p {
-  color: #555;
-  font-size: 0.95rem;
+.card-header {
+    padding: 2rem;
+    background: #fcfcfd;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
 }
 
-.add-student-form h3 {
-  color: #1f2937;
-  font-size: 1.2rem;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-  border-left: 4px solid #2563eb;
-  padding-left: 8px;
+.card-header h2 { margin: 0; color: var(--text-main); font-size: 1.5rem; font-weight: 700; }
+.card-header p { margin: 0.5rem 0 0; color: var(--text-muted); font-size: 0.9rem; }
+
+.modern-form { padding: 2.5rem; }
+
+.form-section { margin-bottom: 2.5rem; }
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.add-student-form hr {
-  border: none;
-  border-top: 1px solid #e5e7eb;
-  margin: 1.5rem 0;
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem 1.5rem;
 }
 
-.add-student-form form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
+.full-width { grid-column: span 2; }
+
+.form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+.form-group label { font-size: 0.875rem; font-weight: 600; color: var(--text-main); }
+
+/* Customizing Django-rendered inputs */
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    background: var(--bg-field);
+    width: 100%;
 }
 
-.add-student-form label {
-  font-weight: 600;
-  color: #374151;
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
 
-.add-student-form input,
-.add-student-form select,
-.add-student-form textarea {
-  width: 100%;
-  padding: 0.7rem 0.9rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  transition: 0.2s ease;
-  background-color: #f9fafb;
+.info-banner {
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    padding: 1rem;
+    border-radius: 10px;
+    color: #4338ca;
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.add-student-form input:focus,
-.add-student-form select:focus,
-.add-student-form textarea:focus {
-  border-color: #2563eb;
-  background-color: #fff;
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(37,99,235,0.2);
+.divider { border: 0; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+.help-text { font-size: 0.75rem; color: var(--text-muted); }
+.error-text { font-size: 0.75rem; color: #dc2626; font-weight: 500; }
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
 }
+
+.btn-cancel { text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 0.95rem; }
+.btn-cancel:hover { color: #dc2626; }
 
 .btn-submit {
-  background: linear-gradient(90deg, #2563eb, #1d4ed8);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  padding: 0.9rem 1.2rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  width: 100%;
-  margin-top: 1rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.btn-submit:hover {
-  background: linear-gradient(90deg, #1e40af, #1d4ed8);
-  transform: translateY(-1px);
-}
+.btn-submit:hover { background: var(--primary-dark); transform: translateY(-1px); }
 
-/* 📱 Responsive */
-@media (max-width: 768px) {
-  .add-student-container {
-    padding: 1.5rem;
-  }
-  .add-student-header h2 {
-    font-size: 1.5rem;
-  }
-}
-
-.info-box {
-  background: #e0f2fe;
-  border-left: 4px solid #3b82f6;
-  padding: 10px 15px;
-  margin-bottom: 1rem;
-  border-radius: 6px;
-  color: #1e40af;
-  font-size: 0.95rem;
+@media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .full-width { grid-column: 1; }
+    .modern-form { padding: 1.5rem; }
 }
 </style>
-
-<div class="add-student-container">
-  <div class="add-student-header">
-    <h2>🧑‍🎓 Add New Student</h2>
-    <p>Fill in the student and user details below to create a new record.</p>
-  </div>
-
-  <div class="add-student-form">
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-
-      <h3>👤 User Account</h3>
-      {{ user_form.as_p }}
-
-      <hr>
-
-      <h3>🏫 Student Profile</h3>
-            <div class="info-box">
-        ⚙️ Student ID will be auto-generated based on admission year
-        (e.g., <b>20250001</b>).
-      </div>
-
-      {{ student_form.as_p }}
-    </fieldset>
-      <button type="submit" class="btn-submit">➕ Add Student</button>
-    </form>
-  </div>
-</div>
 {% endblock %}

@@ -9,6 +9,9 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 import json
 
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from .models import Message, Conversation  # adjust if your app name differs
 # ✅ Local imports
 from .models import Conversation, Message, Attachment
 from accounts.models import CustomUser
@@ -21,16 +24,39 @@ from accounts.models import CustomUser
 def conversation_detail(request, pk):
     convo = get_object_or_404(Conversation, pk=pk)
 
-    # 🚫 Restrict access to participants only
-    if not convo.participants.filter(pk=request.user.pk).exists():
-        return HttpResponseForbidden("Not allowed")
+    if request.method == "POST":
+        content = request.POST.get("content")
+        files = request.FILES.getlist("attachments")
+        
+        msg = Message.objects.create(
+            conversation=convo,
+            sender=request.user,
+            content=content
+        )
+        
+        for f in files:
+            Attachment.objects.create(message=msg, file=f, original_name=f.name)
 
-    # 📨 Load recent 100 messages (oldest to newest)
-    messages = convo.messages.select_related("sender").order_by("-created_at")[:100][::-1]
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return render(request, "communications/partials/chat_message.html", {"m": msg})
+        
+        return redirect("conversation_detail", pk=pk)
+
+    # 1. Fetch messages and convert to a list IMMEDIATELY to avoid the slicing error in templates
+    # Added .order_by('-created_at') then reversed in Python so you get the LATEST 100 in chronological order
+    messages_qs = convo.messages.select_related("sender").prefetch_related("attachments").order_by('-created_at')[:100]
+    messages_list = list(messages_qs)[::-1]  # Reverse to chronological order
+    
+    # 2. Safely get the last message ID for your JS polling logic
+    last_message_id = messages_list[-1].id if messages_list else 0
+
+    # 3. Mark as read logic
+    convo.messages.exclude(sender=request.user).update(is_read=True)
 
     return render(request, "communications/conversation_detail.html", {
         "conversation": convo,
-        "messages": messages,
+        "messages": messages_list,
+        "last_message_id": last_message_id,
     })
 
 
@@ -218,9 +244,6 @@ def send_message(request, convo_id):
 # ================================================================
 # 🔹 VIEW: Fetch new messages (for auto-refresh / live chat)
 # ================================================================
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from .models import Message, Conversation  # adjust if your app name differs
 
 @login_required
 def fetch_new_messages(request, conversation_id):
@@ -245,3 +268,23 @@ def fetch_new_messages(request, conversation_id):
 
     return JsonResponse({"messages": data})
 
+
+def mark_as_read(request, convo):
+    convo.messages.exclude(sender=request.user).filter(is_read=False).update(is_read=True)
+
+from django.http import JsonResponse
+from .models import Message
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def unread_message_count_api(request):
+    """
+    Returns the total count of unread messages for the logged-in user.
+    Optimized to use the database index we created.
+    """
+    count = Message.objects.filter(
+        conversation__participants=request.user,
+        is_read=False
+    ).exclude(sender=request.user).count()
+    
+    return JsonResponse({'count': count})

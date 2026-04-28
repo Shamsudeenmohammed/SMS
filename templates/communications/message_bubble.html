@@ -1,115 +1,171 @@
 {% load static %}
 
-{% comment %}
-This template renders a single chat message bubble — used both:
-- In real-time via WebSocket broadcast
-- On file upload (inserted via AJAX)
-It expects context variable: `m` (the Message instance)
-{% endcomment %}
 <style>
+/* 💬 Individual Message Bubble Styles */
 .chat-message {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 0.75rem;
+    display: flex;
+    align-items: flex-end; /* Align to bottom for a more natural chat look */
+    margin-bottom: 1.25rem;
+    gap: 8px;
+    animation: slideUp 0.3s ease-out;
 }
+
 .chat-message.self {
-  flex-direction: row-reverse;
-  text-align: right;
+    flex-direction: row-reverse;
 }
+
+/* 👤 Avatar */
 .chat-message .avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #bbb;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  margin: 0 0.6rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px; /* Squircle style */
+    background: #e2e8f0;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    margin-bottom: 4px;
 }
+
 .chat-message.self .avatar {
-  background: #0078ff;
+    background: #1a73e8;
+    color: #fff;
 }
+
+/* 💭 Message Bubble */
 .chat-message .bubble {
-  background: #f1f1f1;
-  border-radius: 12px;
-  padding: 0.6rem 0.9rem;
-  max-width: 70%;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    padding: 12px 16px;
+    max-width: 75%;
+    border-radius: 18px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
+
+.chat-message.other .bubble {
+    background: #ffffff;
+    color: #1e293b;
+    border: 1px solid #e2e8f0;
+    border-bottom-left-radius: 4px;
+}
+
 .chat-message.self .bubble {
-  background: #d0e7ff;
+    background: #1a73e8;
+    color: #ffffff;
+    border-bottom-right-radius: 4px;
 }
+
+/* 🏷️ Meta Information */
 .chat-message .meta {
-  font-size: 0.8rem;
-  color: #777;
-  margin-bottom: 0.3rem;
-  display: flex;
-  justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 15px;
+    margin-bottom: 4px;
 }
-.chat-message .text {
-  color: #222;
-  white-space: pre-wrap;
-  word-wrap: break-word;
+
+.chat-message .meta strong {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
 }
+
+.chat-message.other .meta strong { color: #1a73e8; }
+.chat-message.self .meta strong { color: rgba(255, 255, 255, 0.9); }
+
+.chat-message .meta small {
+    font-size: 0.7rem;
+    opacity: 0.7;
+}
+
+.chat-message.self .meta small { color: #e2e8f0; }
+
+/* 📎 Attachments */
 .attachments {
-  margin-top: 0.5rem;
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
+
 .attachment-image {
-  max-width: 180px;
-  border-radius: 8px;
-  margin-right: 5px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    max-width: 220px;
+    max-height: 300px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 2px solid rgba(0,0,0,0.05);
+    transition: transform 0.2s;
 }
+
+.attachment-image:hover {
+    transform: scale(1.02);
+}
+
 .attachment-file {
-  display: inline-block;
-  background: #f9f9f9;
-  padding: 0.3rem 0.6rem;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  text-decoration: none;
-  color: #333;
-  margin-right: 5px;
-  font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid rgba(0, 0, 0, 0.1);
 }
+
+.chat-message.self .attachment-file {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
 .attachment-file:hover {
-  background: #eee;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 </style>
 
-<div class="chat-message {% if m.sender == request.user %}self{% else %}other{% endif %}">
-  <div class="avatar">
-    {{ m.sender.get_full_name|default:m.sender.username|first|upper }}
-  </div>
-
-  <div class="bubble">
-    <div class="meta">
-      <strong>{{ m.sender.get_full_name|default:m.sender.username }}</strong>
-      <small>{{ m.created_at|date:"H:i" }}</small>
+<div class="chat-message {% if m.sender == request.user %}self{% else %}other{% endif %}" id="msg-{{ m.pk }}">
+    <div class="avatar">
+        {{ m.sender.get_full_name|default:m.sender.username|first|upper }}
     </div>
 
-    {% if m.content %}
-      <div class="text">{{ m.content|linebreaksbr }}</div>
-    {% endif %}
+    <div class="bubble">
+        <div class="meta">
+            <strong>{{ m.sender.get_full_name|default:m.sender.username }}</strong>
+            <small>{{ m.created_at|date:"H:i" }}</small>
+        </div>
 
-    {% if m.attachments.exists %}
-    <div class="attachments">
-        {% for a in m.attachments.all %}
-        {% with file_url=a.file.url|lower %}
-            {% if ".jpg" in file_url or ".png" in file_url or ".jpeg" in file_url %}
-            <a href="{{ a.file.url }}" target="_blank">
-                <img src="{{ a.file.url }}" alt="{{ a.original_name }}" class="attachment-image">
-            </a>
-            {% else %}
-            <a href="{{ a.file.url }}" target="_blank" class="attachment-file">
-                📎 {{ a.original_name }}
-            </a>
-            {% endif %}
-        {% endwith %}
-        {% endfor %}
+        {% if m.content %}
+            <div class="text">{{ m.content|linebreaksbr }}</div>
+        {% endif %}
+
+        {% if m.attachments.exists %}
+        <div class="attachments">
+            {% for a in m.attachments.all %}
+                {% with file_url=a.file.url|lower %}
+                    {% if ".jpg" in file_url or ".png" in file_url or ".jpeg" in file_url or ".gif" in file_url %}
+                    <a href="{{ a.file.url }}" target="_blank">
+                        <img src="{{ a.file.url }}" alt="{{ a.original_name }}" class="attachment-image">
+                    </a>
+                    {% else %}
+                    <a href="{{ a.file.url }}" target="_blank" class="attachment-file">
+                        <i class="fas fa-paperclip"></i> {{ a.original_name|truncatechars:20 }}
+                    </a>
+                    {% endif %}
+                {% endwith %}
+            {% endfor %}
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
-  </div>
 </div>
-

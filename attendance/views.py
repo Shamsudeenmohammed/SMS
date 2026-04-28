@@ -7,6 +7,11 @@ from .models import AttendanceSession, AttendanceRecord
 from accounts.models import Teacher, Student
 import logging
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
+from accounts.models import Parent, Student
+from .models import AttendanceRecord
+
 logger = logging.getLogger(__name__)
 
 # =========================================
@@ -93,10 +98,6 @@ def take_attendance(request, session_id):
         )
 
 
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404
-from accounts.models import Parent, Student
-from .models import AttendanceRecord
 
 
 @login_required

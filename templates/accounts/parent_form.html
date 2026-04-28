@@ -2,353 +2,347 @@
 {% load static %}
 
 {% block title %}{{ title }}{% endblock %}
+{% block header %}{{ title }}{% endblock %}
 
 {% block content %}
-<div class="form-wrapper">
-  <div class="form-card animate-fadein">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-    <h2 class="form-title">{{ title }}</h2>
-    {% if editing %}
-      <p class="form-subtitle">Update the parent information below. You can also reset their password if needed.</p>
-    {% else %}
-      <p class="form-subtitle">Fill in the required details below to register a new parent profile.</p>
-    {% endif %}
-
-    <form method="POST" enctype="multipart/form-data" class="styled-form">
-      {% csrf_token %}
-
-      {% if messages %}
-      <div class="message-container">
-        {% for message in messages %}
-        <div class="alert {{ message.tags }}">{{ message|linebreaksbr }}</div>
-
-          {% if "added successfully" in message %}
-          <div class="login-info-box">
-            <h4>👤 Parent Account Created</h4>
-            <p><strong>Username:</strong> (shown above)</p>
-            <p><strong>Password:</strong> <code>parent123</code></p>
-            <small>Advise the parent to change their password after first login.</small>
-          </div>
-          {% endif %}
-
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      <div class="form-grid">
-
-        <div class="form-group">
-          <label for="id_username">Username</label>
-          <input type="text" name="username" id="id_username" class="form-control"
-                 placeholder="Enter username"
-                 value="{{ form.username.value|default_if_none:'' }}" required>
+<div class="edit-container">
+    <div class="form-card">
+        <div class="card-header">
+            <div class="header-info">
+                <h2>{% if editing %}<i class="fas fa-user-edit"></i>{% else %}<i class="fas fa-user-plus"></i>{% endif %} {{ title }}</h2>
+                <p class="section-hint">
+                    {% if editing %}Update the parent information and account status below.{% else %}Complete the details below to create a new parent/guardian profile.{% endif %}
+                </p>
+            </div>
         </div>
 
-        <div class="form-group">
-          <label for="id_email">Email</label>
-          <input type="email" name="email" id="id_email" class="form-control"
-                 placeholder="Enter email address"
-                 value="{{ form.email.value|default_if_none:'' }}">
-        </div>
+        <form method="POST" enctype="multipart/form-data" class="modern-form" novalidate>
+            {% csrf_token %}
 
-        <div class="form-group full-width">
-          <label for="id_fullname">Full Name</label>
-          <input type="text" name="fullname" id="id_fullname" class="form-control"
-                 placeholder="Enter full name"
-                 value="{{ form.fullname.value|default_if_none:'' }}">
-        </div>
+            {% if messages %}
+            <div class="message-container">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                    <div>{{ message|linebreaksbr }}</div>
+                </div>
 
-        <div class="form-group">
-          <label for="id_gender">Gender</label>
-          {{ form.gender }}
-        </div>
+                {% if "added successfully" in message %}
+                <div class="login-info-box">
+                    <h4><i class="fas fa-key"></i> Initial Login Credentials</h4>
+                    <p><strong>Username:</strong> <code>(As entered below)</code></p>
+                    <p><strong>Password:</strong> <code>parent123</code></p>
+                    <small>Parents are required to change this password upon their first login.</small>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
 
-        <div class="form-group full-width">
-          <label for="id_address">Address</label>
-          {{ form.address }}
-        </div>
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-lock"></i> Account Credentials</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="id_username">Username</label>
+                        <input type="text" name="username" id="id_username" placeholder="e.g. john_doe"
+                               value="{{ form.username.value|default_if_none:'' }}" required>
+                        {% for error in form.username.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
+                    </div>
 
-        <div class="form-group">
-          <label for="id_photo">Photo</label>
-          {{ form.photo }}
-          {% if form.instance.photo %}
-          <div class="current-photo">
-            <small>Current:</small><br>
-            <img src="{{ form.instance.photo.url }}" alt="Parent photo" class="photo-preview">
-          </div>
-          {% endif %}
-        </div>
+                    <div class="form-group">
+                        <label for="id_email">Email Address</label>
+                        <input type="email" name="email" id="id_email" placeholder="email@example.com"
+                               value="{{ form.email.value|default_if_none:'' }}">
+                        {% for error in form.email.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
+                    </div>
+                </div>
+            </div>
 
-        <div class="form-group">
-          <label for="id_occupation">Occupation</label>
-          {{ form.occupation }}
-        </div>
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-id-card"></i> Personal Information</h3>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="id_fullname">Full Name</label>
+                        <input type="text" name="fullname" id="id_fullname" placeholder="Enter parent's full legal name"
+                               value="{{ form.fullname.value|default_if_none:'' }}">
+                        {% for error in form.fullname.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
+                    </div>
 
-        <div class="form-group">
-          <label for="id_relationship">Relationship</label>
-          {{ form.relationship }}
-        </div>
+                    <div class="form-group">
+                        <label for="id_gender">Gender</label>
+                        {{ form.gender }}
+                        {% for error in form.gender.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
+                    </div>
 
-        <div class="form-group full-width">
-          <label for="id_children">Assign Children</label>
-          {{ form.children }}
-        </div>
+                    <div class="form-group">
+                        <label for="id_relationship">Relationship to Student</label>
+                        {{ form.relationship }}
+                        {% for error in form.relationship.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
+                    </div>
 
-        {% if editing %}
-        <div class="form-group full-width">
-          <label for="id_new_password">🔐 Reset Password (Optional)</label>
-          <input type="password" name="new_password" id="id_new_password" class="form-control"
-                 placeholder="Enter new password (leave blank to keep current)">
-          <small class="note-text">Leave empty if you don’t want to reset the password.</small>
-        </div>
-        {% endif %}
-      </div>
-      
-      <div class="form-actions">
-  
-          <a href="{% url 'manage_parents' %}" class="btn-secondary">
-            <i class="fas fa-times"></i> Cancel
-          </a>
-        <button type="submit" class="btn-primary">
-          <i class="fas fa-save"></i>
-          {% if editing %}Update Parent{% else %}Save Parent{% endif %}
-        </button>
-      </div>
+                    <div class="form-group">
+                        <label for="id_occupation">Occupation</label>
+                        {{ form.occupation }}
+                    </div>
 
-    </form>
-  </div>
+                    <div class="form-group">
+                        <label for="id_photo">Profile Photo</label>
+                        <div class="photo-upload-wrapper">
+                            {{ form.photo }}
+                            {% if form.instance.photo %}
+                            <div class="current-photo-badge">
+                                <img src="{{ form.instance.photo.url }}" alt="Current Photo">
+                                <span>Current</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="id_address">Residential Address</label>
+                        {{ form.address }}
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="id_children">Assign Children (Students)</label>
+                        {{ form.children }}
+                        <small class="helper-text">Search and select one or more students to link to this parent.</small>
+                    </div>
+                </div>
+            </div>
+
+            {% if editing %}
+            <div class="form-section security-bg">
+                <h3 class="section-title"><i class="fas fa-shield-alt"></i> Administrative Security</h3>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="id_new_password">Force Password Reset</label>
+                        <input type="password" name="new_password" id="id_new_password" 
+                               placeholder="Leave blank to keep current password">
+                        <small class="note-text">Enter a new password if the parent has forgotten theirs.</small>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="form-footer">
+                <a href="{% url 'manage_parents' %}" class="btn-cancel">Discard Changes</a>
+                <button type="submit" class="btn-save">
+                    {% if editing %}Update Profile{% else %}Register Parent{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
-<!-- Select2 CDN -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --bg-light: #f8fafc;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --success: #10b981;
+    --danger: #ef4444;
+}
+
+.edit-container {
+    font-family: 'Inter', sans-serif;
+    padding: 2rem 1rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.form-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.04);
+    overflow: hidden;
+    animation: slideUp 0.4s ease-out;
+}
+
+.card-header {
+    padding: 2.5rem;
+    background: #fcfcfd;
+    border-bottom: 1px solid var(--border);
+}
+
+.header-info h2 { margin: 0; color: var(--text-main); font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+.header-info h2 i { color: var(--primary); }
+.section-hint { margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem; }
+
+.modern-form { padding: 2.5rem; }
+.form-section { margin-bottom: 3rem; }
+
+.security-bg { 
+    background: #f9fafb; 
+    padding: 2rem; 
+    border-radius: 16px; 
+    border: 1px solid var(--border);
+}
+
+.section-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-main);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.full-width { grid-column: span 2; }
+
+.form-group { display: flex; flex-direction: column; gap: 0.6rem; }
+.form-group label { font-size: 0.875rem; font-weight: 600; color: var(--text-main); }
+
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+    padding: 0.8rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: #fff;
+    transition: all 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+/* Photo Upload Styling */
+.photo-upload-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.current-photo-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f1f5f9;
+    padding: 4px 10px 4px 4px;
+    border-radius: 30px;
+}
+
+.current-photo-badge img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.current-photo-badge span {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+/* Helper Texts */
+.helper-text, .note-text { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+.error-msg { color: var(--danger); font-size: 0.8rem; font-weight: 500; margin-top: 4px; }
+
+/* Alert Box */
+.message-container { margin-bottom: 2rem; }
+.alert {
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+.alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+.alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+.login-info-box {
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    padding: 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+.login-info-box h4 { margin: 0 0 0.5rem 0; font-size: 0.95rem; color: var(--primary-dark); }
+.login-info-box p { margin: 0.25rem 0; font-size: 0.9rem; }
+
+/* Select2 Customization to match UI */
+.select2-container--classic .select2-selection--multiple {
+    border: 1.5px solid var(--border) !important;
+    border-radius: 10px !important;
+    padding: 5px !important;
+    background-image: none !important;
+}
+
+/* Footer Actions */
+.form-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 2.5rem;
+    margin-top: 1rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+}
+
+.btn-cancel { text-decoration: none; color: var(--text-muted); font-size: 0.95rem; font-weight: 500; }
+.btn-cancel:hover { color: var(--danger); }
+
+.btn-save {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.9rem 2.5rem;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.btn-save:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .full-width { grid-column: 1; }
+    .form-footer { flex-direction: column-reverse; gap: 1.5rem; align-items: stretch; }
+    .btn-save { width: 100%; }
+    .btn-cancel { text-align: center; }
+}
+</style>
+
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
 $(document).ready(function() {
-  $('#id_children').select2({
-    placeholder: "Search and select children...",
-    allowClear: true,
-    width: '100%',
-    theme: 'classic'
-  });
+    $('#id_children').select2({
+        placeholder: "Search and select students...",
+        allowClear: true,
+        width: '100%',
+        theme: 'classic'
+    });
 });
 </script>
-
-<style>
-/* --------------------
-   Layout Wrapper
--------------------- */
-.form-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 3rem 1rem;
-  background: linear-gradient(135deg, #eef2f7, #f9fbfd);
-  min-height: 100vh;
-}
-
-/* --------------------
-   Card Container
--------------------- */
-.form-card {
-  background: #ffffff;
-  max-width: 850px;
-  width: 100%;
-  padding: 2.2rem 2.7rem;
-  border-radius: 20px;
-  box-shadow: 0 10px 35px rgba(0, 0, 40, 0.12);
-  animation: fadeIn 0.6s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* --------------------
-   Titles
--------------------- */
-.form-title {
-  font-size: 1.9rem;
-  font-weight: 700;
-  color: #283593;
-  text-align: center;
-  margin-bottom: .5rem;
-}
-
-.form-subtitle {
-  text-align: center;
-  font-size: 1rem;
-  color: #666;
-  margin-bottom: 1.8rem;
-}
-
-/* --------------------
-   Form Grid
--------------------- */
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.4rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.full-width {
-  grid-column: 1 / -1;
-}
-
-/* --------------------
-   Labels & Inputs
--------------------- */
-label {
-  font-weight: 600;
-  color: #333;
-  margin-bottom: .4rem;
-  font-size: .93rem;
-}
-
-.form-control,
-select,
-textarea,
-input[type="file"] {
-  width: 100%;
-  padding: .75rem 1rem;
-  border: 1px solid #d4d7dc;
-  border-radius: 12px;
-  font-size: .96rem;
-  background-color: #f9fafc;
-  transition: 0.3s ease;
-}
-
-.form-control:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-  background: #fff;
-  border-color: #3949ab;
-  box-shadow: 0 0 8px rgba(57, 73, 171, 0.25);
-}
-
-/* ----------- FIX ADDRESS & OCCUPATION STYLE ----------- */
-#id_address,
-#id_occupation {
-  width: 100%;
-  padding: .75rem 1rem;
-  background: #f9fafc;
-  border: 1px solid #d4d7dc;
-  border-radius: 12px;
-  font-size: .96rem;
-  transition: 0.3s ease;
-}
-
-/* Match input focus style */
-#id_address:focus,
-#id_occupation:focus {
-  outline: none;
-  background: #fff;
-  border-color: #3949ab;
-  box-shadow: 0 0 8px rgba(57, 73, 171, 0.25);
-}
-
-
-/* --------------------
-   Messages
--------------------- */
-.alert {
-  padding: 1rem;
-  border-radius: 10px;
-  font-weight: 500;
-  margin-bottom: 1rem;
-}
-
-.alert.success { background: #eaf7ed; color: #2e7d32; }
-.alert.error { background: #fdecea; color: #c62828; }
-.alert.info { background: #e8f2ff; color: #1565c0; }
-
-.login-info-box {
-  background: #eef0ff;
-  border-left: 5px solid #3f51b5;
-  padding: 1rem;
-  border-radius: 12px;
-}
-
-/* --------------------
-   Photo Preview
--------------------- */
-.photo-preview {
-  border-radius: 12px;
-  margin-top: 6px;
-  height: 90px;
-  object-fit: cover;
-  border: 1px solid #dcdcdc;
-}
-
-/* --------------------
-   Buttons
--------------------- */
-.form-actions {
-  margin-top: 2.4rem;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.btn-primary,
-.btn-secondary {
-  padding: .85rem 2rem;
-  border-radius: 10px;
-  font-size: 1rem;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.25s ease;
-}
-
-.btn-primary {
-  background: #3949ab;
-  color: #fff;
-}
-
-.btn-primary:hover {
-  background: #2c388c;
-  transform: translateY(-2px);
-}
-
-.btn-secondary {
-  background: #ececec;
-  color: #333;
-}
-
-.btn-secondary:hover {
-  background: #dbdbdb;
-  transform: translateY(-2px);
-}
-
-/* --------------------
-   Responsive
--------------------- */
-@media (max-width: 768px) {
-  .form-card { padding: 1.6rem; }
-  .form-title { font-size: 1.6rem; }
-  .btn-primary, .btn-secondary { width: 100%; }
-}
-
-@media (max-width: 480px) {
-  .form-wrapper { padding: 1rem .6rem; }
-  .form-title { font-size: 1.4rem; }
-  .form-subtitle { font-size: .92rem; }
-}
-
-.note-text {
-  font-size: .85rem;
-  color: #777;
-}
-</style>
 {% endblock %}

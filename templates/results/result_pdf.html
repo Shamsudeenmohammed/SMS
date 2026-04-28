@@ -2,51 +2,258 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>{{ student.user.get_full_name }} - Result</title>
+    <title>{{ student.user.get_full_name }} - Result Statement</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 14px; color: #333; margin: 30px; }
-        h2 { text-align: center; color: #004aad; }
-        h4 { color: #1565c0; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background-color: #004aad; color: #fff; }
-        .session-title { font-weight: bold; font-size: 16px; margin-top: 30px; }
-        .totals { margin-top: 5px; font-weight: bold; }
+        @page {
+            size: a4 portrait;
+            margin: 1.5cm;
+        }
+
+        body { 
+            font-family: 'Helvetica', 'Arial', sans-serif; 
+            font-size: 11px; /* Slightly smaller for professional density */
+            color: #2c3e50; 
+            line-height: 1.5;
+        }
+
+        .full-width { width: 100%; }
+        
+        /* 🏛️ Header Section */
+        .header-table {
+            border-bottom: 3px solid #004aad;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .school-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #004aad;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .motto {
+            font-style: italic;
+            font-size: 11px;
+            color: #7f8c8d;
+            margin-top: 2px;
+        }
+
+        /* 📄 Document Title */
+        .transcript-title {
+            text-align: center;
+            background-color: #004aad;
+            color: white;
+            padding: 8px;
+            border-radius: 2px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* 👤 Student Info */
+        .student-info-table {
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+        }
+
+        /* 📊 Table Improvements */
+        .session-block { margin-top: 25px; page-break-inside: avoid; }
+        
+        .term-badge {
+            background-color: #f8f9fa;
+            padding: 6px 12px;
+            border-left: 5px solid #004aad;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        table.result-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #dee2e6;
+        }
+
+        table.result-table th {
+            background-color: #f1f4f9;
+            color: #334155;
+            padding: 10px 8px;
+            font-size: 10px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #004aad;
+            text-align: center;
+        }
+
+        table.result-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #edf2f7;
+            vertical-align: middle;
+        }
+
+        /* Highlight Scores and Grades */
+        .score-cell { font-weight: bold; color: #1e293b; text-align: center; }
+        .grade-cell { 
+            font-weight: 800; 
+            text-align: center; 
+            color: #004aad; 
+            font-size: 12px;
+        }
+
+        /* Zebra Striping */
+        .even { background-color: #ffffff; }
+        .odd { background-color: #fcfdfe; }
+
+        .term-footer {
+            text-align: right;
+            padding: 8px 12px;
+            background-color: #f8fafc;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            font-size: 11px;
+        }
+
+        .session-summary {
+            margin-top: 8px;
+            text-align: right;
+            font-size: 13px;
+            font-weight: bold;
+            color: #004aad;
+        }
+
+        /* 🛡️ Signature Section */
+        .signature-table {
+            margin-top: 60px;
+        }
+
+        .sig-box {
+            border-top: 1.5px solid #2c3e50;
+            width: 200px;
+            margin: 0 auto;
+            padding-top: 5px;
+        }
+
+        #footer {
+            position: fixed;
+            bottom: -0.5cm;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 8px;
+            color: #94a3b8;
+        }
     </style>
 </head>
 <body>
 
-<h2>📄 Result Statement: {{ student.user.get_full_name }}</h2>
+    <table class="full-width header-table">
+        <tr>
+            <td style="width: 85px;">
+                <img src="{{ school_logo_url|default:'https://via.placeholder.com/80' }}" width="80" height="80">
+            </td>
+            <td style="vertical-align: middle; padding-left: 15px;">
+                <h1 class="school-name">Center For Glory Islamic School</h1>
+                <div class="motto">"Excellence through Knowledge and Integrity"</div>
+                <div style="font-size: 10px; color: #475569; margin-top: 5px;">
+                    Tamale, Northern Region, Ghana | Tel: +233 24 000 0000<br>
+                    Email: info@centerforglory.edu.gh
+                </div>
+            </td>
+            <td style="text-align: right; vertical-align: bottom;">
+                <div style="font-size: 10px; color: #64748b;">
+                    <strong>Report Date:</strong> {% now "d M, Y" %}<br>
+                    <strong>Student Ref:</strong> #{{ student.id|stringformat:"05d" }}
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="transcript-title">Official Academic Transcript</div>
+
+    <table class="full-width student-info-table">
+        <tr>
+            <td style="width: 33%;">
+                <span style="color: #64748b; font-size: 9px;">STUDENT NAME</span><br>
+                <strong>{{ student.user.get_full_name|upper }}</strong>
+            </td>
+            <td style="width: 33%; text-align: center;">
+                <span style="color: #64748b; font-size: 9px;">STUDENT ID</span><br>
+                <strong>{{ student.registration_number|default:"N/A" }}</strong>
+            </td>
+            <td style="width: 33%; text-align: right;">
+                <span style="color: #64748b; font-size: 9px;">CLASS / LEVEL</span><br>
+                <strong>{{ student.current_class|default:"Primary" }}</strong>
+            </td>
+        </tr>
+    </table>
 
     {% for session_data in results_data %}
-        <h3>Session: {{ session_data.session.name }}</h3>
+        <div class="session-block">
+            <h3 style="color: #0f172a; margin-bottom: 10px; font-size: 14px;">
+                Academic Year: {{ session_data.session.name }}
+            </h3>
 
-        {% for term in session_data.terms %}
-            <h4>Term: {{ term.term_name }}</h4>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Subject</th>
-                        <th>Score</th>
-                        <th>Grade</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for result in term.results %}
+            {% for term in session_data.terms %}
+                <div class="term-badge">{{ term.term_name }} Term</div>
+                
+                <table class="result-table">
+                    <thead>
                         <tr>
-                            <td>{{ result.subject.name }}</td>
-                            <td>{{ result.total_score }}</td>
-                            <td>{{ result.grade }}</td>
+                            <th style="text-align: left; width: 45%;">Subject</th>
+                            <th style="width: 15%;">Score (%)</th>
+                            <th style="width: 15%;">Grade</th>
+                            <th style="width: 25%;">Remarks</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <p>Total: {{ term.total }} | Average: {{ term.average }}</p>
-        {% endfor %}
+                    </thead>
+                    <tbody>
+                        {% for result in term.results %}
+                            <tr class="{% cycle 'odd' 'even' %}">
+                                <td style="color: #334155;">{{ result.subject.name }}</td>
+                                <td class="score-cell">{{ result.total_score }}</td>
+                                <td class="grade-cell">{{ result.grade }}</td>
+                                <td style="text-align: center; font-size: 10px; color: #64748b;">
+                                    {{ result.remark|default:"Satisfactory" }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <div class="term-footer">
+                    TERM TOTAL: <strong>{{ term.total }}</strong> &nbsp;&nbsp; | &nbsp;&nbsp; 
+                    TERM AVERAGE: <strong style="color: #004aad;">{{ term.average }}%</strong>
+                </div>
+            {% endfor %}
 
-        <p><strong>Session Total: {{ session_data.session_total }} | Session Average: {{ session_data.session_average }}</strong></p>
+            <div class="session-summary">
+                YEARLY CUMULATIVE AVERAGE: {{ session_data.session_average }}%
+            </div>
+        </div>
     {% endfor %}
 
+    <table class="full-width signature-table">
+        <tr>
+            <td style="text-align: center;">
+                <div class="sig-box">
+                    <strong>Academic Registrar</strong><br>
+                    <span style="font-size: 8px; color: #94a3b8;">Signature & Date</span>
+                </div>
+            </td>
+            <td style="text-align: center;">
+                <div class="sig-box">
+                    <strong>School Principal</strong><br>
+                    <span style="font-size: 8px; color: #94a3b8;">Stamp & Date</span>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div id="footer">
+        Center For Glory Islamic School Management System • Tamale, Ghana • Verified Document
+    </div>
 
 </body>
 </html>

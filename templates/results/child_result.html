@@ -6,191 +6,271 @@
 {% block content %}
 
 <style>
-/* ===== Page Title ===== */
-.page-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #004aad;
-    margin-bottom: 20px;
-}
+    :root {
+        --primary: #004aad;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --bg-slate: #f8fafc;
+        --border-slate: #e2e8f0;
+    }
 
-/* ===== Form Styling ===== */
-.filter-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 25px;
-}
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
 
-.filter-form select {
-    padding: 8px 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    transition: 0.2s;
-}
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin: 0;
+    }
 
-.filter-form select:focus {
-    outline: none;
-    border-color: #004aad;
-    box-shadow: 0 0 0 2px rgba(0, 74, 173, 0.2);
-}
+    /* ===== Filter Bar Card ===== */
+    .filter-card {
+        background: white;
+        padding: 1.25rem;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid var(--border-slate);
+        margin-bottom: 2rem;
+    }
 
-/* ===== Scrollable Table Wrapper ===== */
-.table-responsive {
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
-
-/* ===== Table Styling ===== */
-.results-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    min-width: 600px; /* Ensures scroll on small screens */
-}
-
-.results-table th,
-.results-table td {
-    padding: 12px 15px;
-    text-align: left;
-    font-size: 0.95rem;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.results-table th {
-    background: #004aad;
-    color: #fff;
-    font-weight: 600;
-}
-
-.results-table tbody tr:hover {
-    background: rgba(0, 74, 173, 0.05);
-}
-
-/* ===== No Results Text ===== */
-.text-muted {
-    font-size: 0.95rem;
-    color: #6b7280;
-    margin-top: 15px;
-}
-
-/* ===== Back Button ===== */
-.back-btn {
-    display: inline-block;
-    padding: 8px 16px;
-    margin-top: 20px;
-    background: linear-gradient(135deg, #004aad, #1565c0);
-    color: #fff;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: 0.3s;
-}
-
-.back-btn:hover {
-    background: linear-gradient(135deg, #1565c0, #004aad);
-    transform: translateY(-2px);
-}
-
-/* ===== Mobile Responsive ===== */
-@media (max-width: 768px) {
     .filter-form {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .filter-group {
+        display: flex;
         flex-direction: column;
+        gap: 5px;
     }
 
-    .page-title {
-        font-size: 1.3rem;
-    }
-
-    .results-table th,
-    .results-table td {
-        font-size: 0.9rem;
-        padding: 10px;
-    }
-}
-
-@media (max-width: 480px) {
-    .page-title {
-        font-size: 1.2rem;
-        text-align: center;
+    .filter-group label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #64748b;
     }
 
     .filter-form select {
-        font-size: 0.85rem;
-        padding: 7px 10px;
+        padding: 10px 16px;
+        border: 1px solid var(--border-slate);
+        border-radius: 8px;
+        font-size: 0.95rem;
+        background-color: #fff;
+        min-width: 180px;
+        cursor: pointer;
     }
 
-    .back-btn {
-        width: 100%;
-        text-align: center;
-        padding: 10px;
+    /* ===== Table Modernization ===== */
+    .results-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid var(--border-slate);
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
-}
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 800px; /* Ensures alignment doesn't collapse on small screens */
+    }
+
+    .results-table th {
+        background: #f8fafc;
+        color: #475569;
+        font-weight: 600;
+        text-align: left;
+        padding: 1rem 1.5rem;
+        border-bottom: 2px solid var(--border-slate);
+        white-space: nowrap;
+    }
+
+    .results-table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f1f5f9;
+        color: #1e293b;
+        vertical-align: middle;
+    }
+
+    /* ===== Grade Badges ===== */
+    .grade-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-align: center;
+        min-width: 40px;
+    }
+
+    .grade-a { background: #dcfce7; color: #15803d; }
+    .grade-b { background: #dbeafe; color: #1d4ed8; }
+    .grade-c { background: #fef9c3; color: #a16207; }
+    .grade-f { background: #fee2e2; color: #b91c1c; }
+
+    .score-text {
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .remark-text {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    /* ===== Empty State ===== */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #94a3b8;
+    }
+
+    /* ===== Action Buttons ===== */
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: #fff;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.2s;
+        margin-top: 1.5rem;
+    }
+
+    .back-btn:hover {
+        background: var(--primary);
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .filter-form select { width: 100%; }
+        .page-title { font-size: 1.4rem; }
+    }
 </style>
 
-<h2 class="page-title">📄 Results for {{ child.user.get_full_name }}</h2>
+<div class="page-header">
+    <h2 class="page-title">📄 Academic Results</h2>
+    <div style="color: #64748b; font-weight: 500;">{{ child.user.get_full_name }}</div>
+</div>
 
-<form method="GET" class="filter-form">
-    <select name="session" onchange="this.form.submit()">
-        <option value="">Select Session</option>
-        {% for session in sessions %}
-            <option value="{{ session.id }}" {% if session.id|stringformat:"s" == selected_session_id %}selected{% endif %}>
-                {{ session.name }}
-            </option>
-        {% endfor %}
-    </select>
-
-    {% if terms %}
-        <select name="term" onchange="this.form.submit()">
-            <option value="">Select Term</option>
-            {% for term in terms %}
-                <option value="{{ term }}" {% if term == selected_term %}selected{% endif %}>{{ term }}</option>
-            {% endfor %}
-        </select>
-    {% endif %}
-</form>
-
-{% if selected_session_id and selected_term %}
-
-    {% if results %}
-        <div class="table-responsive">
-            <table class="results-table">
-                <thead>
-                    <tr>
-                        <th>Subject</th>
-                        <th>Term</th>
-                        <th>Session</th>
-                        <th>Score</th>
-                        <th>Grade</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for result in results %}
-                    <tr>
-                        <td>{{ result.subject.name }}</td>
-                        <td>{{ result.term }}</td>
-                        <td>{{ result.session.name }}</td>
-                        <td>{{ result.total_score }}</td>
-                        <td>{{ result.grade }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<div class="filter-card">
+    <form method="GET" class="filter-form">
+        <div class="filter-group">
+            <label>Academic Session</label>
+            <select name="session" onchange="this.form.submit()">
+                <option value="">Select Session</option>
+                {% for session in sessions %}
+                    <option value="{{ session.id }}" {% if session.id|stringformat:"s" == selected_session_id %}selected{% endif %}>
+                        {{ session.name }}
+                    </option>
+                {% endfor %}
+            </select>
         </div>
 
-    {% else %}
-        <p class="text-muted">No results found for the selected session and term.</p>
-    {% endif %}
+        {% if terms %}
+        <div class="filter-group">
+            <label>Term</label>
+            <select name="term" onchange="this.form.submit()">
+                <option value="">Select Term</option>
+                {% for term in terms %}
+                    <option value="{{ term }}" {% if term == selected_term %}selected{% endif %}>{{ term }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+    </form>
+</div>
 
+{% if selected_session_id and selected_term %}
+    {% if results %}
+        <div class="results-card">
+            <div class="table-responsive">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Assessment</th>
+                            <th>Exam</th>
+                            <th style="text-align: center;">Total Score</th>
+                            <th style="text-align: center;">Grade</th>
+                            <th>Teacher's Remark</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for result in results %}
+                        <tr>
+                            <td><strong>{{ result.subject.name }}</strong></td>
+                            <td>{{ result.test_score|default:"-" }}</td>
+                            <td>{{ result.exam_score|default:"-" }}</td>
+                            <td align="center" class="score-text">{{ result.total_score }}</td>
+                            <td align="center">
+                                <span class="grade-badge 
+                                    {% if result.grade == 'A' %}grade-a
+                                    {% elif result.grade == 'B' %}grade-b
+                                    {% elif result.grade == 'C' %}grade-c
+                                    {% else %}grade-f{% endif %}">
+                                    {{ result.grade }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="remark-text">
+                                    {% if result.total_score >= 80 %}
+                                        <span style="color: var(--success);">Excellent Performance</span>
+                                    {% elif result.total_score >= 70 %}
+                                        <span style="color: #059669;">Very Good</span>
+                                    {% elif result.total_score >= 60 %}
+                                        <span style="color: var(--primary);">Good Effort</span>
+                                    {% elif result.total_score >= 50 %}
+                                        <span style="color: var(--warning);">Average</span>
+                                    {% else %}
+                                        <span style="color: var(--danger);">Needs Improvement</span>
+                                    {% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="results-card empty-state">
+            <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔍</div>
+            <p>No results found for the selected criteria.</p>
+        </div>
+    {% endif %}
 {% else %}
-    <p class="text-muted">Please select a session and term to view results.</p>
+    <div class="results-card empty-state">
+        <div style="font-size: 2.5rem; margin-bottom: 1rem;">📅</div>
+        <p>Please select an Academic Session and Term to view performance data.</p>
+    </div>
 {% endif %}
 
-<a href="{% url 'child_performance' %}" class="back-btn">← Back</a>
+<a href="{% url 'child_performance' %}" class="back-btn">
+    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+    </svg>
+    Back to Children
+</a>
 
 {% endblock %}

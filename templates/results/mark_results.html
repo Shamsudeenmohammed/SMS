@@ -6,150 +6,234 @@
 {% block content %}
 
 <style>
-.page-title { font-size: 1.6rem; font-weight: 600; margin-bottom: 1rem; color: #1a237e; }
-.filter-form, .upload-form { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-bottom: 1.5rem; }
-.filter-form select, .upload-form select, .upload-form input, .filter-form button, .upload-form button {
-  padding: 0.6rem 1rem; font-size: 0.95rem; border-radius: 8px; border: 1px solid #ccc;
-}
-.btn { cursor: pointer; border: none; font-weight: 600; border-radius: 8px; padding: 0.6rem 1.2rem;
-  font-size: 0.95rem; text-transform: uppercase; transition: all 0.3s ease-in-out;
-}
-.btn-primary { background: linear-gradient(135deg, #3949ab, #5c6bc0); color: white; }
-.btn-primary:hover { background: linear-gradient(135deg, #283593, #3949ab); transform: translateY(-2px); }
-.btn-success { background: linear-gradient(135deg, #2e7d32, #4caf50); color: white; }
-.btn-success:hover { background: linear-gradient(135deg, #1b5e20, #2e7d32); transform: translateY(-2px); }
+    /* --- Modern Variables & Reset --- */
+    :root {
+        --primary: #1a237e;
+        --primary-light: #5c6bc0;
+        --success: #2e7d32;
+        --bg-light: #f8f9fa;
+        --border-color: #e0e0e0;
+        --shadow: 0 4px 6px rgba(0,0,0,0.07);
+    }
 
-.styled-table { width: 100%; border-collapse: collapse; margin-top: 1rem; background: white;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden;
+    /* Styling the Name and ID together */
+.student-info { line-height: 1.4; }
+.full-name { 
+    font-size: 1rem; 
+    font-weight: 700; 
+    color: #2c3e50; 
+    letter-spacing: 0.3px;
 }
-.styled-table th, .styled-table td { text-align: center; padding: 10px; }
-.styled-table th { background: #1e88e5; color: white; font-weight: 600; }
-.styled-table tr:nth-child(even) { background: #f9f9f9; }
+.id-badge { 
+    font-size: 0.8rem; 
+    color: #7f8c8d; 
+    background: #f1f3f9; 
+    display: inline-block; 
+    padding: 2px 8px; 
+    border-radius: 4px; 
+    margin-top: 3px;
+}
 
-.score-input { width: 80px; padding: 5px; border-radius: 6px; border: 1px solid #bbb; text-align: center; }
-.no-data { text-align: center; color: #888; font-style: italic; margin-top: 1.5rem; }
-.form-actions { text-align: right; margin-top: 1.5rem; }
+/* Helper for visual tracking across long rows */
+.student-row:hover { 
+    background-color: #f0f3ff !important; 
+    outline: 1px solid var(--primary-light);
+}
+
+/* Make the total score stand out */
+.badge-total {
+    background: var(--primary);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+/* Optional: Subtle focus effect for the active score input */
+.score-input:focus {
+    background-color: #fff9c4; /* Subtle yellow to show which box is active */
+    transform: scale(1.1);
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+}
+
+    .page-container { padding: 1.5rem; max-width: 1200px; margin: auto; }
+    .page-title { font-size: 1.8rem; font-weight: 700; color: var(--primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px; }
+
+    /* --- Layout Cards --- */
+    .card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+    }
+    .card-header { font-weight: 600; color: var(--primary-light); margin-bottom: 1.2rem; font-size: 1.1rem; border-bottom: 2px solid var(--bg-light); padding-bottom: 0.5rem; }
+
+    /* --- Forms & Inputs --- */
+    .action-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: flex-end; }
+    
+    select, input[type="file"], .score-input {
+        width: 100%;
+        padding: 0.7rem;
+        border-radius: 8px;
+        border: 1.5px solid var(--border-color);
+        font-size: 0.95rem;
+        background-color: #fff;
+        transition: border-color 0.2s;
+    }
+    select:focus, .score-input:focus { border-color: var(--primary-light); outline: none; }
+
+    /* --- Buttons --- */
+    .btn { 
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        cursor: pointer; border: none; font-weight: 600; border-radius: 8px; 
+        padding: 0.7rem 1.4rem; font-size: 0.9rem; transition: all 0.2s ease;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: #0d1440; transform: translateY(-1px); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #1b5e20; transform: translateY(-1px); }
+    .btn-outline { background: transparent; border: 1.5px solid var(--primary); color: var(--primary); }
+    .btn-outline:hover { background: var(--primary); color: white; }
+
+    /* --- Table Styling --- */
+    .table-container { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border-color); }
+    .styled-table { width: 100%; border-collapse: collapse; background: white; }
+    .styled-table th { background: #f1f3f9; color: var(--primary); font-weight: 600; text-align: left; padding: 12px 15px; }
+    .styled-table td { padding: 12px 15px; border-bottom: 1px solid var(--bg-light); }
+    .styled-table tr:hover { background-color: #fcfcfc; }
+    
+    .score-input { width: 70px; text-align: center; font-weight: 600; color: var(--primary); }
+    .total-cell { font-weight: 700; color: var(--primary); text-align: center; }
+
+    .no-data { text-align: center; padding: 3rem; color: #6c757d; background: var(--bg-light); border-radius: 12px; }
 </style>
 
-<h2 class="page-title">🧮 Mark Student Results</h2>
+<div class="page-container">
+    <h2 class="page-title"><span>🧮</span> Mark Student Results</h2>
 
-<!-- 🔹 Filter Section -->
-<form method="GET" class="filter-form">
-  <select name="session" required>
-    <option value="">Select Session</option>
-    {% for s in sessions %}
-      <option value="{{ s.id }}" {% if s.id|stringformat:'s' == selected_session %}selected{% endif %}>{{ s.name }}</option>
-    {% endfor %}
-  </select>
+    <div class="card">
+        <div class="card-header">🔍 Filter & Search</div>
+        <form method="GET" class="action-row">
+            <div>
+                <label><small>Session</small></label>
+                <select name="session" required>
+                    <option value="">Select Session</option>
+                    {% for s in sessions %}
+                    <option value="{{ s.id }}" {% if s.id|stringformat:'s' == selected_session %}selected{% endif %}>{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label><small>Term</small></label>
+                <select name="term" required>
+                    <option value="">Select Term</option>
+                    <option value="1st" {% if selected_term == "1st" %}selected{% endif %}>1st Term</option>
+                    <option value="2nd" {% if selected_term == "2nd" %}selected{% endif %}>2nd Term</option>
+                    <option value="3rd" {% if selected_term == "3rd" %}selected{% endif %}>3rd Term</option>
+                </select>
+            </div>
+            <div>
+                <label><small>Subject</small></label>
+                <select name="subject" required>
+                    <option value="">Select Subject</option>
+                    {% for sub in subjects %}
+                    <option value="{{ sub.id }}" {% if selected_subject and sub.id == selected_subject.id %}selected{% endif %}>
+                        {{ sub.name }} ({{ sub.classroom.name }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Load Class List</button>
+        </form>
+    </div>
 
-  <select name="term" required>
-    <option value="">Select Term</option>
-    <option value="1st" {% if selected_term == "1st" %}selected{% endif %}>1st Term</option>
-    <option value="2nd" {% if selected_term == "2nd" %}selected{% endif %}>2nd Term</option>
-    <option value="3rd" {% if selected_term == "3rd" %}selected{% endif %}>3rd Term</option>
-  </select>
+    <div class="card">
+        <div class="card-header">📤 Bulk Import (CSV)</div>
+        <form method="POST" enctype="multipart/form-data" class="action-row" action="{% url 'upload_results' %}">
+            {% csrf_token %}
+            <input type="hidden" name="session" value="{{ selected_session }}">
+            <input type="hidden" name="term" value="{{ selected_term }}">
+            <input type="hidden" name="subject" value="{{ selected_subject.id }}">
 
-  <select name="subject" required>
-    <option value="">Select Subject</option>
-    {% for sub in subjects %}
-      <option value="{{ sub.id }}" {% if selected_subject and sub.id == selected_subject.id %}selected{% endif %}>
-        {{ sub.name }} ({{ sub.classroom.name }})
-      </option>
-    {% endfor %}
-  </select>
+            <div style="grid-column: span 2;">
+                <input type="file" name="file" accept=".csv" required>
+            </div>
+            <button type="submit" class="btn btn-success">Upload CSV</button>
+            
+            {% if selected_subject %}
+            <a href="{% url 'download_results_template' %}?session={{ selected_session }}&subject={{ selected_subject.id }}" class="btn btn-outline">
+                📥 Download Template
+            </a>
+            {% endif %}
+        </form>
+    </div>
 
-  <button type="submit" class="btn btn-primary">Load Students</button>
-</form>
+    {% if selected_session and selected_term and selected_subject %}
+        {% if combined %}
+        <div class="card">
+            <div class="card-header">📘 {{ selected_subject.name }} | {{ selected_term }} Term | {{ combined|length }} Students</div>
+            
+            <form method="POST">
+                {% csrf_token %}
+                <div class="table-container">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th width="50">#</th>
+                                <th>Student Name / ID</th>
+                                <th style="text-align: center;">Test (40)</th>
+                                <th style="text-align: center;">Exam (60)</th>
+                                <th style="text-align: center;">Total (100)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                          {% for student, result in combined %}
+                          <tr class="student-row">
+                              <td>{{ forloop.counter }}</td>
+                              <td class="student-info">
+                                  <div class="full-name">{{ student.user.get_full_name|upper }}</div>
+                                  <div class="id-badge">{{ student.student_id }}</div>
+                              </td>
+                              <td align="center">
+                                  <input type="number" name="test_{{ student.id }}" min="0" max="40"
+                                        value="{{ result.test_score|default_if_none:'' }}" 
+                                        class="score-input" placeholder="0">
+                              </td>
+                              <td align="center">
+                                  <input type="number" name="exam_{{ student.id }}" min="0" max="60"
+                                        value="{{ result.exam_score|default_if_none:'' }}" 
+                                        class="score-input" placeholder="0">
+                              </td>
+                              <td class="total-cell">
+                                  {% if result.test_score is not None and result.exam_score is not None %}
+                                      <span class="badge-total">{{ result.test_score|add:result.exam_score }}</span>
+                                  {% else %}
+                                      <span style="color:#ccc">--</span>
+                                  {% endif %}
+                              </td>
+                          </tr>
+                          {% endfor %}                        </tbody>
+                    </table>
+                </div>
 
-<!-- 🔹 Upload Section -->
-<form method="POST" enctype="multipart/form-data" class="upload-form" action="{% url 'upload_results' %}">
-  {% csrf_token %}
-  <select name="session" required>
-    <option value="">Select Session</option>
-    {% for s in sessions %}
-      <option value="{{ s.id }}" {% if selected_session and s.id|stringformat:'s' == selected_session %}selected{% endif %}>{{ s.name }}</option>
-    {% endfor %}
-  </select>
-
-  <select name="term" required>
-    <option value="">Select Term</option>
-    <option value="1st" {% if selected_term == "1st" %}selected{% endif %}>1st Term</option>
-    <option value="2nd" {% if selected_term == "2nd" %}selected{% endif %}>2nd Term</option>
-    <option value="3rd" {% if selected_term == "3rd" %}selected{% endif %}>3rd Term</option>
-  </select>
-
-  <select name="subject" required>
-    <option value="">Select Subject</option>
-    {% for sub in subjects %}
-      <option value="{{ sub.id }}" {% if selected_subject and sub.id == selected_subject.id %}selected{% endif %}>
-        {{ sub.name }} ({{ sub.classroom.name }})
-      </option>
-    {% endfor %}
-  </select>
-
-  <input type="file" name="file" accept=".csv" required>
-  <button type="submit" class="btn btn-success">Upload Results</button>
-
-  {% if selected_subject %}
-  <a href="{% url 'download_results_template' %}?session={{ selected_session }}&subject={{ selected_subject.id }}" class="btn btn-primary">
-    📥 Download Template
-  </a>
-  {% endif %}
-</form>
-
-<!-- 🔹 Result Table (only show when session + term + subject selected) -->
-{% if selected_session and selected_term and selected_subject %}
-  {% if combined %}
-    <hr>
-    <h3 class="section-title">📘 {{ selected_subject.name }} | {{ selected_term }} Term | {{ combined|length }} Students</h3>
-
-    <form method="POST">
-      {% csrf_token %}
-      <table class="styled-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Student ID</th>
-            <th>Test (40)</th>
-            <th>Exam (60)</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-        {% for student, result in combined %}
-          <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ student.student_id }}</td>
-            <td>
-              <input type="number" name="test_{{ student.id }}" min="0" max="40"
-                     value="{{ result.test_score|default_if_none:'' }}" class="score-input">
-            </td>
-            <td>
-              <input type="number" name="exam_{{ student.id }}" min="0" max="60"
-                     value="{{ result.exam_score|default_if_none:'' }}" class="score-input">
-            </td>
-            <td class="total-cell">
-              {% if result.test_score is not None and result.exam_score is not None %}
-                {{ result.test_score|add:result.exam_score }}
-              {% else %}
-                -
-              {% endif %}
-            </td>
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-
-      <div class="form-actions">
-        <button type="submit" class="btn btn-success">💾 Save Results</button>
-      </div>
-    </form>
-
-  {% else %}
-    <p class="no-data">No results found for {{ selected_subject.name }} in {{ selected_term }} term ({{ selected_session_name }}).</p>
-  {% endif %}
-{% else %}
-  <p class="no-data">Please select a session, term, and subject to begin marking results.</p>
-{% endif %}
+                <div style="text-align: right; margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-success" style="padding: 1rem 3rem;">💾 Save All Marks</button>
+                </div>
+            </form>
+        </div>
+        {% else %}
+            <div class="no-data">
+                <p>No students found for this selection.</p>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="no-data">
+            <h3>Ready to grade?</h3>
+            <p>Please select a <strong>Session, Term, and Subject</strong> from the filters above to load the student list.</p>
+        </div>
+    {% endif %}
+</div>
 
 {% endblock %}
