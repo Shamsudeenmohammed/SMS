@@ -100,7 +100,7 @@ def redirect_user_based_on_role(user, request=None):
         return redirect("custom_login")
 
     if user.is_superuser:
-        return redirect("/admin/")
+        return redirect("/getout/")
 
     role = getattr(user, "role", "").lower()
     dashboard_map = {
