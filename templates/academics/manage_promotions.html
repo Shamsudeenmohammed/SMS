@@ -3,209 +3,376 @@
 {% block header %}Student Promotions{% endblock %}
 
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<div class="promotion-manager">
-  
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
-      <div class="stat-content">
-        <span class="stat-label">Total Students</span>
-        <span class="stat-value">{{ students.count }}</span>
-      </div>
-    </div>
-    <div class="stat-card accent">
-      <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
-      <div class="stat-content">
-        <span class="stat-label">Batch Actions</span>
-        <span class="stat-value">Promotion</span>
-      </div>
-    </div>
-  </div>
-
-  <form method="post" id="promotionForm">
-    {% csrf_token %}
+<div class="promotion-container">
     
-    <div class="toolbar">
-      <div class="search-group">
-        <i class="fas fa-search"></i>
-        <input type="text" id="searchInput" placeholder="Search by name, ID, or class...">
-      </div>
-      
-      <div class="bulk-actions">
-        <button type="submit" name="action" value="promote" class="btn btn-promote">
-          <i class="fas fa-rocket"></i> Promote Selected
-        </button>
-        <button type="submit" name="action" value="demote" class="btn btn-demote" 
-                onclick="return confirm('Warning: You are about to demote selected students. Proceed?')">
-          <i class="fas fa-arrow-down"></i> Demote
-        </button>
-      </div>
+    <div class="dashboard-stats">
+        <div class="stat-tile">
+            <div class="icon-box"><i class="fas fa-graduation-cap"></i></div>
+            <div class="stat-info">
+                <p class="label">Total Students</p>
+                <h3 class="value">{{ students.count }}</h3>
+            </div>
+        </div>
+        <div class="stat-tile accent">
+            <div class="icon-box"><i class="fas fa-layer-group"></i></div>
+            <div class="stat-info">
+                <p class="label">Batch Mode</p>
+                <h3 class="value">Promotion</h3>
+            </div>
+        </div>
     </div>
 
-    <div class="data-card">
-      <div class="table-responsive">
-        <table class="modern-table" id="studentTable">
-          <thead>
-            <tr>
-              <th width="40"><input type="checkbox" id="select-all" class="custom-check"></th>
-              <th width="60">#</th>
-              <th>Student ID</th>
-              <th>Full Name</th>
-              <th>Current Class</th>
-              <th>Section</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for student in students %}
-            <tr>
-              <td>
-                <input type="checkbox" name="selected_students" value="{{ student.id }}" class="custom-check student-check">
-              </td>
-              <td class="text-muted">{{ forloop.counter }}</td>
-              <td><span class="id-badge">{{ student.student_id }}</span></td>
-              <td class="font-bold">{{ student.user.get_full_name }}</td>
-              <td><span class="class-label">{{ student.current_class }}</span></td>
-              <td><span class="section-label">{{ student.section }}</span></td>
-            </tr>
-            {% empty %}
-            <tr>
-              <td colspan="6" class="empty-state">
-                <i class="fas fa-users-slash"></i>
-                <p>No student records available for promotion.</p>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </form>
+    <form method="post" id="promotionForm">
+        {% csrf_token %}
+        
+        <div class="sticky-toolbar">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search students...">
+            </div>
+            
+            <div class="action-buttons">
+                <button type="submit" name="action" value="promote" class="btn-primary">
+                    <i class="fas fa-rocket"></i> <span>Promote</span>
+                </button>
+                <button type="submit" name="action" value="demote" class="btn-outline-danger" 
+                        onclick="return confirm('Demote selected students?')">
+                    <i class="fas fa-arrow-down"></i> <span>Demote</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="responsive-table" id="studentTable">
+                <thead>
+                    <tr>
+                        <th class="col-check">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="select-all">
+                                <span class="checkmark"></span>
+                            </label>
+                        </th>
+                        <th>Student Info</th>
+                        <th class="desktop-only">Current Class</th>
+                        <th class="desktop-only">Section</th>
+                        <th class="desktop-only">ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr class="student-row">
+                        <td class="col-check">
+                            <label class="checkbox-container">
+                                <input type="checkbox" name="selected_students" value="{{ student.id }}" class="student-check">
+                                <span class="checkmark"></span>
+                            </label>
+                        </td>
+                        <td class="col-student-main">
+                            <div class="student-meta">
+                                <span class="student-name">{{ student.user.get_full_name }}</span>
+                                <span class="student-sub">ID: {{ student.student_id }}</span>
+                                <div class="mobile-badges">
+                                    <span class="badge">{{ student.current_class }}</span>
+                                    <span class="badge outline">{{ student.section }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="desktop-only"><strong>{{ student.current_class }}</strong></td>
+                        <td class="desktop-only">{{ student.section }}</td>
+                        <td class="desktop-only"><code class="id-tag">{{ student.student_id }}</code></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" width="80" alt="empty" style="opacity: 0.5; margin-bottom: 1rem;">
+                            <p>No student records found.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </form>
 </div>
 
 <style>
 :root {
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --danger: #ef4444;
-  --border: #e2e8f0;
-  --text-main: #1e293b;
-  --text-muted: #64748b;
-  --bg-card: #ffffff;
+    --brand: #4f46e5;
+    --brand-dark: #3730a3;
+    --danger: #ef4444;
+    --surface: #ffffff;
+    --background: #f8fafc;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --radius: 12px;
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
-.promotion-manager {
-  font-family: 'Inter', sans-serif;
-  padding: 1.5rem;
-  animation: fadeIn 0.4s ease-out;
+body { background-color: var(--background); }
+
+.promotion-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+    font-family: 'Inter', sans-serif;
 }
 
-/* Stats Row */
-.stats-row { display: flex; gap: 1rem; margin-bottom: 2rem; }
-.stat-card {
-  background: var(--bg-card);
-  padding: 1.25rem;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  display: flex; align-items: center; gap: 1rem; flex: 1; max-width: 280px;
-}
-.stat-card.accent { border-left: 4px solid var(--primary); }
-.stat-icon {
-  width: 44px; height: 44px; background: #f5f3ff;
-  color: var(--primary); border-radius: 10px;
-  display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
-}
-.stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; display: block; }
-.stat-value { font-size: 1.4rem; font-weight: 700; color: var(--text-main); }
-
-/* Toolbar */
-.toolbar {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;
+/* Stats Grid */
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
 }
 
-.search-group { position: relative; flex: 1; max-width: 400px; }
-.search-group i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-.search-group input {
-  width: 100%; padding: 0.75rem 1rem 0.75rem 2.8rem;
-  border: 1px solid var(--border); border-radius: 10px; font-size: 0.9rem;
-  transition: 0.2s;
-}
-.search-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
-
-.bulk-actions { display: flex; gap: 0.75rem; }
-
-.btn {
-  padding: 0.75rem 1.25rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem;
-  border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s;
-}
-.btn-promote { background: var(--primary); color: white; }
-.btn-promote:hover { background: var(--primary-hover); transform: translateY(-1px); }
-.btn-demote { background: #fff1f2; color: var(--danger); border: 1px solid #fecaca; }
-.btn-demote:hover { background: var(--danger); color: white; }
-
-/* Table Section */
-.data-card {
-  background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border);
-  overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-.modern-table { width: 100%; border-collapse: collapse; }
-.modern-table th {
-  background: #f8fafc; padding: 1rem; text-align: left;
-  font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted);
-  border-bottom: 1px solid var(--border);
-}
-.modern-table td { padding: 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; font-size: 0.9rem; }
-
-.custom-check {
-  width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);
+.stat-tile {
+    background: var(--surface);
+    padding: 1.25rem;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--shadow);
 }
 
-.id-badge { background: #f1f5f9; padding: 2px 8px; border-radius: 4px; font-family: monospace; font-weight: 600; color: #475569; }
-.class-label { font-weight: 500; color: var(--text-main); }
-.section-label { color: var(--text-muted); font-weight: 500; }
+.stat-tile.accent { border-top: 4px solid var(--brand); }
 
-.empty-state { text-align: center; padding: 4rem !important; color: var(--text-muted); }
-.empty-state i { font-size: 2rem; opacity: 0.3; margin-bottom: 1rem; display: block; }
+.icon-box {
+    width: 48px;
+    height: 48px;
+    background: #eef2ff;
+    color: var(--brand);
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-size: 1.25rem;
+}
+
+.label { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin: 0; }
+.value { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+
+/* Sticky Toolbar */
+.sticky-toolbar {
+    position: sticky;
+    top: 1rem;
+    z-index: 100;
+    background: var(--surface);
+    padding: 1rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+}
+
+.search-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 250px;
+}
+
+.search-wrapper i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
+
+.search-wrapper input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.search-wrapper input:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Button Styling */
+[class^="btn-"] {
+    padding: 0.75rem 1.25rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: 0.2s;
+    border: 1px solid transparent;
+}
+
+.btn-primary { background: var(--brand); color: white; }
+.btn-primary:hover { background: var(--brand-dark); }
+.btn-outline-danger { background: #fff; border-color: #fee2e2; color: var(--danger); }
+.btn-outline-danger:hover { background: var(--danger); color: white; }
+
+/* Table System */
+.table-wrapper {
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.responsive-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.responsive-table th {
+    background: #f1f5f9;
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.responsive-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.student-name { display: block; font-weight: 600; color: var(--text-primary); }
+.student-sub { font-size: 0.8rem; color: var(--text-secondary); }
+
+.id-tag { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+
+.mobile-badges { display: none; gap: 0.5rem; margin-top: 0.5rem; }
+.badge {
+    background: #e0e7ff;
+    color: var(--brand);
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-weight: 600;
+}
+.badge.outline { background: transparent; border: 1px solid #e2e8f0; color: var(--text-secondary); }
+
+/* Custom Checkbox */
+.checkbox-container {
+    display: block;
+    position: relative;
+    width: 20px;
+    height: 20px;
+}
+
+.checkbox-container input { display: none; }
+.checkmark {
+    position: absolute;
+    top: 0; left: 0;
+    height: 20px; width: 20px;
+    background-color: #eee;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.checkbox-container input:checked ~ .checkmark { background-color: var(--brand); }
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 7px; top: 3px;
+    width: 5px; height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+.checkbox-container input:checked ~ .checkmark:after { display: block; }
+
+/* Mobile Adaptations */
+@media (max-width: 768px) {
+    .desktop-only { display: none; }
+    .mobile-badges { display: flex; }
+    
+    .sticky-toolbar { padding: 0.75rem; }
+    .action-buttons { width: 100%; }
+    .action-buttons button { flex: 1; justify-content: center; }
+
+    .responsive-table thead { display: none; } /* Hide headers on mobile */
+    
+    .student-row {
+        display: flex;
+        align-items: flex-start;
+        padding: 1rem;
+        border-bottom: 8px solid var(--background); /* Separation cards */
+    }
+    
+    .col-check { padding: 0 1rem 0 0 !important; }
+    .col-student-main { padding: 0 !important; flex: 1; }
+    
+    .student-name { font-size: 1rem; }
+}
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 768px) {
-  .toolbar { flex-direction: column; align-items: stretch; }
-  .bulk-actions { flex-direction: column; }
-  .btn { justify-content: center; }
-}
+.student-row { animation: fadeIn 0.3s ease forwards; }
 </style>
 
 <script>
-/* ========= Select/Deselect All (Visible Rows Only) ========= */
-document.getElementById("select-all").addEventListener("change", function(e) {
-  const visibleCheckboxes = document.querySelectorAll("#studentTable tbody tr:not([style*='display: none']) .student-check");
-  visibleCheckboxes.forEach(cb => cb.checked = e.target.checked);
-});
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAll = document.getElementById("select-all");
+    const checkboxes = document.querySelectorAll(".student-check");
+    const searchInput = document.getElementById("searchInput");
+    const rows = document.querySelectorAll(".student-row");
 
-/* ========= Real-time Search Filter ========= */
-document.getElementById("searchInput").addEventListener("input", function() {
-  const filter = this.value.toLowerCase();
-  const rows = document.querySelectorAll("#studentTable tbody tr:not(.empty-row)");
+    // Bulk Select
+    selectAll.addEventListener("change", (e) => {
+        rows.forEach(row => {
+            if (row.style.display !== 'none') {
+                const cb = row.querySelector(".student-check");
+                cb.checked = e.target.checked;
+                row.classList.toggle('selected', e.target.checked);
+            }
+        });
+    });
 
-  rows.forEach(row => {
-    const text = row.textContent.toLowerCase();
-    const isMatch = text.includes(filter);
-    row.style.display = isMatch ? "" : "none";
-    
-    // Disable hidden checkboxes so they aren't submitted
-    const cb = row.querySelector(".student-check");
-    if (cb) {
-      cb.disabled = !isMatch;
-      if (!isMatch) cb.checked = false;
-    }
-  });
+    // Real-time Search
+    searchInput.addEventListener("input", function() {
+        const term = this.value.toLowerCase();
+        
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            const isMatch = text.includes(term);
+            row.style.display = isMatch ? "flex" : "none";
+            
+            // Uncheck and disable hidden ones
+            const cb = row.querySelector(".student-check");
+            if (!isMatch) {
+                cb.checked = false;
+                cb.disabled = true;
+            } else {
+                cb.disabled = false;
+            }
+        });
+    });
+
+    // Individual Row Click Highlighting
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            this.closest('.student-row').classList.toggle('selected', this.checked);
+        });
+    });
 });
 </script>
 {% endblock %}
