@@ -5,287 +5,271 @@
 {% block header %}👨‍👩‍👧 Parent Directory{% endblock %}
 
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<div class="manage-wrapper">
-    <div class="action-bar">
-        <div class="search-container">
-            <form method="get" class="modern-search">
-                <i class="fas fa-search"></i>
-                <input type="text" name="q" placeholder="Search by name, email, or occupation..." value="{{ request.GET.q }}">
-                {% if request.GET.q %}
-                    <a href="{% url 'manage_parents' %}" class="clear-search"><i class="fas fa-times-circle"></i></a>
-                {% endif %}
-            </form>
-        </div>
-        <a href="{% url 'add_parent' %}" class="btn-add">
-            <i class="fas fa-plus"></i> Register New Parent
+<div class="directory-container">
+    
+    <div class="top-bar">
+        <form method="get" class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" name="q" placeholder="Search parents..." value="{{ request.GET.q }}">
+            {% if request.GET.q %}
+                <a href="{% url 'manage_parents' %}" class="clear-btn"><i class="fas fa-times-circle"></i></a>
+            {% endif %}
+        </form>
+        <a href="{% url 'add_parent' %}" class="btn-primary">
+            <i class="fas fa-plus"></i> <span>Register Parent</span>
         </a>
     </div>
 
-    <div class="table-meta">
-        <p>Total Registered Parents: <strong>{{ parents.count }}</strong></p>
+    <div class="meta-info">
+        Total Registered Parents: <span class="count-badge">{{ parents.count }}</span>
     </div>
 
-    <div class="data-card">
-        <div class="table-responsive">
-            <table class="modern-table">
-                <thead>
-                    <tr>
-                        <th>Parent Details</th>
-                        <th>Professional info</th>
-                        <th>Relationship</th>
-                        <th>Linked Students</th>
-                        <th class="text-right">Manage</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for parent in parents %}
-                    <tr>
-                        <td class="user-cell">
-                            <div class="avatar-group">
+    <div class="content-surface">
+        <table class="responsive-table">
+            <thead>
+                <tr>
+                    <th>Parent Details</th>
+                    <th class="hide-mobile">Professional Info</th>
+                    <th class="hide-mobile">Relationship</th>
+                    <th class="hide-mobile">Linked Students</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for parent in parents %}
+                <tr class="data-row">
+                    <td class="identity-cell">
+                        <div class="profile-card">
+                            <div class="avatar-wrapper">
                                 {% if parent.photo %}
-                                    <img src="{{ parent.photo.url }}" alt="" class="table-avatar">
+                                    <img src="{{ parent.photo.url }}" alt="Avatar" class="avatar-img">
                                 {% else %}
-                                    <div class="table-avatar-placeholder">
-                                        <i class="fas fa-user"></i>
-                                    </div>
+                                    <div class="avatar-placeholder">{{ parent.user.first_name|first|default:"P" }}</div>
                                 {% endif %}
-                                <div class="user-info">
-                                    <span class="name">{{ parent.user.get_full_name|default:parent.user.username }}</span>
-                                    <span class="email"><i class="far fa-envelope"></i> {{ parent.user.email|default:"No email provided" }}</span>
+                            </div>
+                            <div class="profile-details">
+                                <span class="full-name">{{ parent.user.get_full_name|default:parent.user.username }}</span>
+                                <span class="email-text"><i class="far fa-envelope"></i> {{ parent.user.email|default:"No email" }}</span>
+                                
+                                <div class="mobile-only-details">
+                                    <span class="m-tag"><i class="fas fa-briefcase"></i> {{ parent.occupation|default:"Not specified" }}</span>
+                                    <span class="m-relationship-badge">{{ parent.relationship }}</span>
                                 </div>
                             </div>
-                        </td>
-                        <td>
-                            <span class="occupation-text">
-                                <i class="fas fa-briefcase"></i> {{ parent.occupation|default:"Not specified" }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="badge-relationship">
-                                {{ parent.relationship }}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="children-stack">
-                                {% for child in parent.children.all %}
-                                    <span class="child-tag">
-                                        <i class="fas fa-graduation-cap"></i> {{ child.user.get_full_name|default:child.user.username }}
-                                    </span>
-                                {% empty %}
-                                    <span class="empty-text">No children linked</span>
-                                {% endfor %}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <a href="{% url 'edit_parent' parent.pk %}" class="btn-icon edit" title="Edit Profile">
-                                    <i class="fas fa-pen-to-square"></i>
-                                </a>
-                                <a href="{% url 'delete_parent' parent.pk %}" class="btn-icon delete" 
-                                   onclick="return confirm('Are you sure you want to delete this parent record?');" title="Delete Record">
-                                    <i class="fas fa-trash-can"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="empty-state">
-                            <div class="empty-content">
-                                <i class="fas fa-users-slash"></i>
-                                <h3>No parents found</h3>
-                                <p>Try adjusting your search or add a new parent to the system.</p>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                        </div>
+                    </td>
+
+                    <td class="hide-mobile">
+                        <div class="occup-info">
+                            <i class="fas fa-briefcase"></i> {{ parent.occupation|default:"Not specified" }}
+                        </div>
+                    </td>
+                    <td class="hide-mobile">
+                        <span class="rel-badge">{{ parent.relationship }}</span>
+                    </td>
+                    <td class="hide-mobile">
+                        <div class="student-pill-stack">
+                            {% for child in parent.children.all %}
+                                <span class="student-pill"><i class="fas fa-graduation-cap"></i> {{ child.user.get_full_name }}</span>
+                            {% empty %}
+                                <span class="no-data">None</span>
+                            {% endfor %}
+                        </div>
+                    </td>
+
+                    <td class="action-cell">
+                        <div class="button-group">
+                            <a href="{% url 'edit_parent' parent.pk %}" class="btn-action edit" aria-label="Edit">
+                                <i class="fas fa-pen-to-square"></i>
+                            </a>
+                            <a href="{% url 'delete_parent' parent.pk %}" class="btn-action delete" 
+                               onclick="return confirm('Delete this parent record?');" aria-label="Delete">
+                                <i class="fas fa-trash-can"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-state">
+                        <i class="fas fa-users-slash"></i>
+                        <p>No parent records found.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 
 <style>
 :root {
-    --primary: #4f46e5;
-    --primary-light: #eef2ff;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
-    --bg-main: #f8fafc;
+    --indigo: #4f46e5;
+    --indigo-soft: #eef2ff;
+    --slate-900: #0f172a;
+    --slate-600: #475569;
+    --slate-400: #94a3b8;
+    --red: #ef4444;
+    --white: #ffffff;
+    --bg: #f8fafc;
     --border: #e2e8f0;
-    --danger: #ef4444;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.manage-wrapper {
-    font-family: 'Inter', sans-serif;
+.directory-container {
     padding: 1.5rem;
     max-width: 1200px;
     margin: 0 auto;
+    font-family: 'Inter', sans-serif;
+    color: var(--slate-900);
 }
 
-/* Action Bar */
-.action-bar {
+/* Action Bar Styles */
+.top-bar {
     display: flex;
-    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
     align-items: center;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
 }
 
-.search-container { flex: 1; max-width: 600px; }
-
-.modern-search {
+.search-wrapper {
     position: relative;
-    display: flex;
-    align-items: center;
+    flex: 1;
 }
 
-.modern-search i {
+.search-icon {
     position: absolute;
     left: 14px;
-    color: var(--text-muted);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--slate-400);
 }
 
-.modern-search input {
+.search-wrapper input {
     width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    border: 1.5px solid var(--border);
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    border: 1px solid var(--border);
     border-radius: 12px;
-    font-size: 0.9rem;
-    background: white;
-    transition: all 0.2s;
+    background: var(--white);
+    font-size: 0.95rem;
+    transition: 0.2s;
 }
 
-.modern-search input:focus {
+.search-wrapper input:focus {
     outline: none;
-    border-color: var(--primary);
+    border-color: var(--indigo);
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
 
-.clear-search {
-    position: absolute;
-    right: 12px;
-    color: var(--text-muted);
-    transition: 0.2s;
-}
-
-.clear-search:hover { color: var(--danger); }
-
-.btn-add {
-    background: var(--primary);
-    color: white;
-    text-decoration: none;
+.btn-primary {
+    background: var(--indigo);
+    color: var(--white);
     padding: 0.75rem 1.5rem;
     border-radius: 12px;
-    font-weight: 700;
-    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     transition: 0.2s;
     white-space: nowrap;
 }
 
-.btn-add:hover { background: #4338ca; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+/* Data Table Surface */
+.meta-info { margin-bottom: 1rem; font-size: 0.9rem; color: var(--slate-600); }
+.count-badge { font-weight: 700; color: var(--indigo); }
 
-/* Data Card & Table */
-.table-meta { margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-muted); }
-.table-meta strong { color: var(--text-main); }
-
-.data-card {
-    background: white;
+.content-surface {
+    background: var(--white);
     border: 1px solid var(--border);
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: var(--shadow);
 }
 
-.modern-table { width: 100%; border-collapse: collapse; }
-.modern-table th {
-    background: #fcfcfd;
+.responsive-table { width: 100%; border-collapse: collapse; }
+.responsive-table th {
+    background: #f1f5f9;
     padding: 1rem 1.5rem;
     text-align: left;
     font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    border-bottom: 1px solid var(--border);
+    color: var(--slate-600);
 }
 
-.modern-table td { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.data-row { border-bottom: 1px solid var(--border); transition: 0.2s; }
+.data-row:hover { background: #fafafa; }
+.data-row td { padding: 1rem 1.5rem; vertical-align: middle; }
 
-/* User Cell */
-.avatar-group { display: flex; align-items: center; gap: 12px; }
-.table-avatar { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; }
-.table-avatar-placeholder { 
-    width: 42px; height: 42px; border-radius: 10px; background: var(--bg-main); 
-    display: flex; align-items: center; justify-content: center; color: #cbd5e1;
+/* Profile Layout */
+.profile-card { display: flex; align-items: center; gap: 1rem; }
+.avatar-wrapper { flex-shrink: 0; }
+.avatar-img { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; }
+.avatar-placeholder {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--indigo), #818cf8);
+    color: white; display: grid; place-items: center; font-weight: 700;
 }
 
-.user-info .name { display: block; font-weight: 700; color: var(--text-main); font-size: 0.95rem; margin-bottom: 2px; }
-.user-info .email { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+.full-name { display: block; font-weight: 700; font-size: 1rem; }
+.email-text { font-size: 0.8rem; color: var(--slate-400); display: flex; align-items: center; gap: 4px; }
 
-/* Content Elements */
-.occupation-text { font-size: 0.85rem; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
-.occupation-text i { color: var(--text-muted); font-size: 0.8rem; }
-
-.badge-relationship {
-    background: var(--primary-light);
-    color: var(--primary);
-    padding: 4px 12px;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-weight: 700;
+/* Chips and Badges */
+.rel-badge {
+    background: var(--indigo-soft); color: var(--indigo);
+    padding: 4px 12px; border-radius: 8px; font-weight: 700; font-size: 0.75rem;
 }
 
-.children-stack { display: flex; flex-wrap: wrap; gap: 6px; max-width: 250px; }
-.child-tag {
-    background: #f1f5f9;
-    color: #475569;
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    white-space: nowrap;
+.student-pill-stack { display: flex; flex-wrap: wrap; gap: 6px; }
+.student-pill {
+    background: #f1f5f9; color: var(--slate-600);
+    padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;
 }
-
-.empty-text { font-size: 0.8rem; color: #cbd5e1; font-style: italic; }
 
 /* Actions */
-.action-buttons { display: flex; justify-content: flex-end; gap: 8px; }
-.btn-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    transition: 0.2s;
+.button-group { display: flex; gap: 8px; justify-content: flex-end; }
+.btn-action {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: grid; place-items: center; text-decoration: none; transition: 0.2s;
 }
-.btn-icon.edit { color: var(--primary); background: var(--primary-light); }
-.btn-icon.edit:hover { background: var(--primary); color: white; }
-.btn-icon.delete { color: var(--danger); background: #fef2f2; }
-.btn-icon.delete:hover { background: var(--danger); color: white; }
+.btn-action.edit { background: var(--indigo-soft); color: var(--indigo); }
+.btn-action.delete { background: #fee2e2; color: var(--red); }
 
-/* Empty State */
-.empty-state { text-align: center; padding: 5rem !important; }
-.empty-content i { font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem; }
-.empty-content h3 { margin: 0; color: var(--text-main); }
-.empty-content p { color: var(--text-muted); margin-top: 0.5rem; }
+/* MOBILE RESPONSIVENESS (The "Senior" Part) */
+.mobile-only-details { display: none; flex-direction: column; gap: 4px; margin-top: 6px; }
 
-@media (max-width: 992px) {
-    .action-bar { flex-direction: column; align-items: stretch; }
-    .search-container { max-width: none; }
-    .modern-table thead { display: none; }
-    .modern-table tr { display: block; border-bottom: 8px solid var(--bg-main); padding: 1rem; }
-    .modern-table td { display: flex; justify-content: space-between; align-items: center; border: none; padding: 0.5rem 0; }
-    .modern-table td::before { content: attr(data-label); font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-    .action-buttons { justify-content: flex-start; margin-top: 1rem; }
+@media (max-width: 768px) {
+    .hide-mobile { display: none; }
+    .mobile-only-details { display: flex; }
+    
+    .top-bar { flex-direction: column; align-items: stretch; }
+    .btn-primary span { display: inline; } /* Keep text on mobile for clear CTA */
+    
+    .data-row { display: block; position: relative; padding: 1rem; }
+    .data-row td { display: block; padding: 0; border: none; }
+    
+    .identity-cell { padding-right: 90px !important; } /* Make room for absolute buttons */
+    
+    .action-cell {
+        position: absolute;
+        top: 1.25rem;
+        right: 1rem;
+    }
+    
+    .button-group { flex-direction: column; gap: 10px; }
+    
+    .m-tag { font-size: 0.75rem; color: var(--slate-600); font-weight: 500; }
+    .m-relationship-badge {
+        align-self: flex-start;
+        background: var(--indigo-soft); color: var(--indigo);
+        font-size: 0.65rem; font-weight: 800; padding: 2px 8px; border-radius: 4px;
+        text-transform: uppercase;
+    }
 }
 </style>
 {% endblock %}

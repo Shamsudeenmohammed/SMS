@@ -46,13 +46,21 @@
             </div>
         </div>
 
+        <div class="mobile-select-bar">
+            <label class="checkbox-container">
+                <input type="checkbox" class="select-all-trigger">
+                <span class="checkmark"></span>
+            </label>
+            <span class="select-text">Select All Visible</span>
+        </div>
+
         <div class="table-wrapper">
             <table class="responsive-table" id="studentTable">
                 <thead>
                     <tr>
                         <th class="col-check">
                             <label class="checkbox-container">
-                                <input type="checkbox" id="select-all">
+                                <input type="checkbox" class="select-all-trigger">
                                 <span class="checkmark"></span>
                             </label>
                         </th>
@@ -88,7 +96,7 @@
                     {% empty %}
                     <tr>
                         <td colspan="5" class="empty-state">
-                            <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" width="80" alt="empty" style="opacity: 0.5; margin-bottom: 1rem;">
+                            <i class="fas fa-users-slash" style="font-size: 3rem; margin-bottom: 1rem; display: block; opacity: 0.2;"></i>
                             <p>No student records found.</p>
                         </td>
                     </tr>
@@ -112,7 +120,7 @@
     --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
-body { background-color: var(--background); }
+body { background-color: var(--background); color: var(--text-primary); }
 
 .promotion-container {
     max-width: 1200px;
@@ -121,14 +129,13 @@ body { background-color: var(--background); }
     font-family: 'Inter', sans-serif;
 }
 
-/* Stats Grid */
+/* Stats */
 .dashboard-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1rem;
     margin-bottom: 1.5rem;
 }
-
 .stat-tile {
     background: var(--surface);
     padding: 1.25rem;
@@ -138,225 +145,126 @@ body { background-color: var(--background); }
     gap: 1rem;
     box-shadow: var(--shadow);
 }
-
-.stat-tile.accent { border-top: 4px solid var(--brand); }
-
+.stat-tile.accent { border-left: 4px solid var(--brand); }
 .icon-box {
-    width: 48px;
-    height: 48px;
-    background: #eef2ff;
-    color: var(--brand);
-    border-radius: 10px;
-    display: grid;
-    place-items: center;
-    font-size: 1.25rem;
+    width: 44px; height: 44px; background: #eef2ff;
+    color: var(--brand); border-radius: 10px;
+    display: grid; place-items: center; font-size: 1.1rem;
 }
-
-.label { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin: 0; }
-.value { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.label { font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 2px; }
+.value { font-size: 1.4rem; font-weight: 700; margin: 0; }
 
 /* Sticky Toolbar */
 .sticky-toolbar {
     position: sticky;
-    top: 1rem;
+    top: 10px;
     z-index: 100;
     background: var(--surface);
     padding: 1rem;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
-    align-items: center;
 }
-
-.search-wrapper {
-    position: relative;
-    flex: 1;
-    min-width: 250px;
-}
-
-.search-wrapper i {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-secondary);
-}
-
+.search-wrapper { position: relative; flex: 1; min-width: 200px; }
+.search-wrapper i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
 .search-wrapper input {
-    width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.75rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    transition: 0.3s;
+    width: 100%; padding: 0.7rem 1rem 0.7rem 2.5rem;
+    border: 1px solid #e2e8f0; border-radius: 8px;
 }
+.action-buttons { display: flex; gap: 0.5rem; }
 
-.search-wrapper input:focus {
-    outline: none;
-    border-color: var(--brand);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-.action-buttons {
-    display: flex;
-    gap: 0.5rem;
-}
-
-/* Button Styling */
-[class^="btn-"] {
-    padding: 0.75rem 1.25rem;
-    border-radius: 10px;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: 0.2s;
-    border: 1px solid transparent;
-}
-
-.btn-primary { background: var(--brand); color: white; }
-.btn-primary:hover { background: var(--brand-dark); }
-.btn-outline-danger { background: #fff; border-color: #fee2e2; color: var(--danger); }
-.btn-outline-danger:hover { background: var(--danger); color: white; }
-
-/* Table System */
-.table-wrapper {
-    background: var(--surface);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-}
-
-.responsive-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.responsive-table th {
+/* Mobile Select Bar */
+.mobile-select-bar {
+    display: none; /* Desktop hidden */
     background: #f1f5f9;
-    padding: 1rem;
-    text-align: left;
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    align-items: center;
+    gap: 10px;
 }
+.select-text { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
 
-.responsive-table td {
-    padding: 1rem;
-    border-bottom: 1px solid #f1f5f9;
+/* Buttons */
+[class^="btn-"] {
+    padding: 0.7rem 1.2rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem;
+    cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; border: 1px solid transparent;
 }
+.btn-primary { background: var(--brand); color: white; }
+.btn-outline-danger { background: white; border-color: #fee2e2; color: var(--danger); }
 
-.student-name { display: block; font-weight: 600; color: var(--text-primary); }
-.student-sub { font-size: 0.8rem; color: var(--text-secondary); }
+/* Table */
+.table-wrapper { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.responsive-table { width: 100%; border-collapse: collapse; }
+.responsive-table th { background: #f8fafc; padding: 1rem; text-align: left; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; border-bottom: 1px solid #f1f5f9; }
+.responsive-table td { padding: 1rem; border-bottom: 1px solid #f1f5f9; }
 
-.id-tag { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
-
-.mobile-badges { display: none; gap: 0.5rem; margin-top: 0.5rem; }
-.badge {
-    background: #e0e7ff;
-    color: var(--brand);
-    font-size: 0.7rem;
-    padding: 2px 8px;
-    border-radius: 100px;
-    font-weight: 600;
-}
-.badge.outline { background: transparent; border: 1px solid #e2e8f0; color: var(--text-secondary); }
-
-/* Custom Checkbox */
-.checkbox-container {
-    display: block;
-    position: relative;
-    width: 20px;
-    height: 20px;
-}
-
-.checkbox-container input { display: none; }
-.checkmark {
-    position: absolute;
-    top: 0; left: 0;
-    height: 20px; width: 20px;
-    background-color: #eee;
-    border-radius: 6px;
-    transition: 0.2s;
-}
-
-.checkbox-container input:checked ~ .checkmark { background-color: var(--brand); }
-.checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-    left: 7px; top: 3px;
-    width: 5px; height: 10px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-}
+/* Checkbox */
+.checkbox-container { position: relative; width: 22px; height: 22px; display: block; }
+.checkbox-container input { opacity: 0; width: 0; height: 0; }
+.checkmark { position: absolute; top: 0; left: 0; height: 22px; width: 22px; background: #e2e8f0; border-radius: 6px; transition: 0.2s; cursor: pointer; }
+.checkbox-container input:checked ~ .checkmark { background: var(--brand); }
+.checkmark:after { content: ""; position: absolute; display: none; left: 8px; top: 4px; width: 4px; height: 9px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
 .checkbox-container input:checked ~ .checkmark:after { display: block; }
 
-/* Mobile Adaptations */
+.id-tag { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-family: monospace; }
+.mobile-badges { display: none; gap: 5px; margin-top: 5px; }
+.badge { background: #eef2ff; color: var(--brand); font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+.badge.outline { background: transparent; border: 1px solid #e2e8f0; color: var(--text-secondary); }
+
+/* RESPONSIVE LOGIC */
 @media (max-width: 768px) {
     .desktop-only { display: none; }
     .mobile-badges { display: flex; }
+    .mobile-select-bar { display: flex; }
     
-    .sticky-toolbar { padding: 0.75rem; }
     .action-buttons { width: 100%; }
     .action-buttons button { flex: 1; justify-content: center; }
-
-    .responsive-table thead { display: none; } /* Hide headers on mobile */
     
-    .student-row {
-        display: flex;
-        align-items: flex-start;
-        padding: 1rem;
-        border-bottom: 8px solid var(--background); /* Separation cards */
-    }
-    
-    .col-check { padding: 0 1rem 0 0 !important; }
-    .col-student-main { padding: 0 !important; flex: 1; }
-    
-    .student-name { font-size: 1rem; }
+    .responsive-table thead { display: none; }
+    .student-row { display: flex; align-items: flex-start; padding: 1rem; border-bottom: 4px solid var(--background); }
+    .col-check { padding: 0 1rem 0 0 !important; border: none !important; }
+    .col-student-main { padding: 0 !important; flex: 1; border: none !important; }
+    .student-name { font-size: 1rem; font-weight: 700; }
 }
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.student-row { animation: fadeIn 0.3s ease forwards; }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const selectAll = document.getElementById("select-all");
+    const selectTriggers = document.querySelectorAll(".select-all-trigger");
     const checkboxes = document.querySelectorAll(".student-check");
     const searchInput = document.getElementById("searchInput");
     const rows = document.querySelectorAll(".student-row");
 
-    // Bulk Select
-    selectAll.addEventListener("change", (e) => {
-        rows.forEach(row => {
-            if (row.style.display !== 'none') {
-                const cb = row.querySelector(".student-check");
-                cb.checked = e.target.checked;
-                row.classList.toggle('selected', e.target.checked);
-            }
+    // Unified Select All (Syncs both desktop and mobile checkboxes)
+    selectTriggers.forEach(trigger => {
+        trigger.addEventListener("change", (e) => {
+            const isChecked = e.target.checked;
+            
+            // Sync all "Select All" boxes
+            selectTriggers.forEach(t => t.checked = isChecked);
+
+            // Apply to visible rows only
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    const cb = row.querySelector(".student-check");
+                    cb.checked = isChecked;
+                    row.style.backgroundColor = isChecked ? "rgba(79, 70, 229, 0.04)" : "";
+                }
+            });
         });
     });
 
-    // Real-time Search
+    // Search Filter
     searchInput.addEventListener("input", function() {
         const term = this.value.toLowerCase();
-        
         rows.forEach(row => {
-            const text = row.innerText.toLowerCase();
-            const isMatch = text.includes(term);
+            const isMatch = row.innerText.toLowerCase().includes(term);
             row.style.display = isMatch ? "flex" : "none";
             
-            // Uncheck and disable hidden ones
             const cb = row.querySelector(".student-check");
             if (!isMatch) {
                 cb.checked = false;
@@ -367,10 +275,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Individual Row Click Highlighting
+    // Individual Selection Feedback
     checkboxes.forEach(cb => {
         cb.addEventListener('change', function() {
-            this.closest('.student-row').classList.toggle('selected', this.checked);
+            this.closest('.student-row').style.backgroundColor = this.checked ? "rgba(79, 70, 229, 0.04)" : "";
         });
     });
 });
