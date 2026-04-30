@@ -4,110 +4,139 @@
 {% block title %}💰 Payment History{% endblock %}
 
 {% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
     :root {
         --primary-blue: #1e3a8a;
-        --accent-indigo: #6366f1;
         --success-green: #10b981;
-        --bg-slate: #f8fafc;
         --border-slate: #e2e8f0;
-        --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-        --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+        --text-main: #1e293b;
+        --text-muted: #64748b;
     }
 
-    .dashboard-wrapper { padding: 1.5rem; background-color: #fdfdfd; min-height: 100vh; }
+    .dashboard-wrapper { 
+        padding: 1rem; 
+        background-color: #fdfdfd; 
+        font-family: 'Inter', sans-serif;
+    }
     
     /* Header Section */
     .header-flex {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
         flex-wrap: wrap;
         gap: 1rem;
     }
-    .page-title { font-size: 1.75rem; color: var(--primary-blue); font-weight: 800; margin: 0; }
+    .page-title { font-size: 1.5rem; color: var(--primary-blue); font-weight: 800; margin: 0; }
 
     /* Summary Hero Cards */
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
     }
     .stat-card {
         background: white;
-        padding: 1.5rem;
+        padding: 1.25rem;
         border-radius: 16px;
         border: 1px solid var(--border-slate);
-        box-shadow: var(--shadow-sm);
         display: flex;
         align-items: center;
         gap: 1rem;
     }
     .stat-icon {
-        height: 48px; width: 48px; border-radius: 12px;
+        height: 40px; width: 40px; border-radius: 10px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 1.5rem;
+        font-size: 1.2rem;
     }
     .blue-bg { background: #eff6ff; color: #2563eb; }
     .green-bg { background: #ecfdf5; color: #059669; }
     
-    .stat-label { color: #64748b; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem; }
-    .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary-blue); }
+    .stat-label { color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+    .stat-value { font-size: 1.25rem; font-weight: 800; color: var(--primary-blue); }
 
     /* Tables & Containers */
     .content-card {
         background: white;
         border-radius: 16px;
         border: 1px solid var(--border-slate);
-        box-shadow: var(--shadow-md);
+        margin-bottom: 1.5rem;
         overflow: hidden;
-        margin-bottom: 2rem;
     }
     .card-header {
-        padding: 1.25rem 1.5rem;
-        background: #fff;
+        padding: 1rem 1.25rem;
+        background: #f8fafc;
         border-bottom: 1px solid var(--border-slate);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
     }
-    .card-header h3 { margin: 0; font-size: 1.1rem; color: var(--primary-blue); font-weight: 700; }
+    .card-header h3 { margin: 0; font-size: 1rem; color: var(--primary-blue); font-weight: 700; }
 
-    .table-responsive { width: 100%; overflow-x: auto; }
+    /* Table Logic */
+    .table-responsive { width: 100%; }
     .styled-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
     .styled-table th {
         background: #f8fafc;
-        color: #475569;
-        font-weight: 600;
+        color: var(--text-muted);
+        font-weight: 700;
         text-align: left;
-        padding: 1rem 1.5rem;
-        border-bottom: 2px solid var(--border-slate);
-    }
-    .styled-table td { padding: 1rem 1.5rem; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
-    .styled-table tr:hover { background-color: #fbfcfe; }
-
-    /* Badges */
-    .badge {
-        padding: 4px 10px;
-        border-radius: 6px;
+        padding: 0.75rem 1.25rem;
         font-size: 0.75rem;
-        font-weight: 600;
         text-transform: uppercase;
     }
-    .method-badge { background: #f1f5f9; color: #475569; }
-    .amount-text { font-weight: 700; color: var(--success-green); }
+    .styled-table td { padding: 1rem 1.25rem; border-bottom: 1px solid #f1f5f9; color: var(--text-main); }
 
-    /* Action Buttons */
-    .btn-group { display: flex; gap: 0.75rem; }
+    /* Badges */
+    .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; }
+    .method-badge { background: #f1f5f9; color: #475569; }
+    .amount-text { font-weight: 800; color: var(--success-green); }
+
+    /* Buttons */
+    .btn-group { display: flex; gap: 0.5rem; }
     .btn-export {
-        display: inline-flex; align-items: center; gap: 6px;
+        display: inline-flex; align-items: center; gap: 5px;
         background: white; color: #334155; border: 1px solid var(--border-slate);
-        padding: 0.6rem 1rem; border-radius: 8px; font-size: 0.85rem;
-        font-weight: 600; transition: all 0.2s;
+        padding: 0.5rem 0.8rem; border-radius: 8px; font-size: 0.8rem;
+        font-weight: 700; text-decoration: none; transition: 0.2s;
     }
-    .btn-export:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-1px); }
+    .btn-export:hover { background: #f1f5f9; }
+
+    /* MOBILE TRANSFORMATION */
+    @media (max-width: 768px) {
+        .header-flex { flex-direction: column; align-items: flex-start; }
+        .btn-group { width: 100%; }
+        .btn-export { flex: 1; justify-content: center; }
+
+        /* Summary by Child Tablet Layout */
+        .child-summary-grid { grid-template-columns: 1fr !important; }
+
+        /* Detailed Log Transformation */
+        .styled-table.detailed-log thead { display: none; }
+        .styled-table.detailed-log tr {
+            display: block;
+            border-bottom: 8px solid #f8fafc;
+            padding: 10px;
+        }
+        .styled-table.detailed-log td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            border: none;
+            text-align: right;
+        }
+        .styled-table.detailed-log td::before {
+            content: attr(data-label);
+            font-weight: 700;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            text-align: left;
+        }
+        .mobile-bold { font-weight: 800; color: var(--primary-blue); }
+    }
 </style>
 
 <div class="dashboard-wrapper">
@@ -116,12 +145,10 @@
         {% if payments %}
         <div class="btn-group">
             <a href="{% url 'export_payment_history_excel' %}" class="btn-export">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                Excel
+                <i class="fas fa-file-excel"></i> Excel
             </a>
             <a href="{% url 'export_payment_history_pdf' %}" class="btn-export">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                PDF Receipt
+                <i class="fas fa-file-pdf"></i> PDF Receipt
             </a>
         </div>
         {% endif %}
@@ -129,54 +156,48 @@
 
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon blue-bg">🔢</div>
+            <div class="stat-icon blue-bg"><i class="fas fa-list-ol"></i></div>
             <div>
                 <div class="stat-label">Transactions</div>
                 <div class="stat-value">{{ payments.count }}</div>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon green-bg">₵</div>
+            <div class="stat-icon green-bg"><i class="fas fa-check-circle"></i></div>
             <div>
-                <div class="stat-label">Total Amount Paid</div>
+                <div class="stat-label">Total Paid</div>
                 <div class="stat-value">₵{{ total_amount_paid|floatformat:2 }}</div>
             </div>
         </div>
     </div>
 
-    <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
-        <div class="content-card">
-            <div class="card-header">
-                <h3>🧾 Summary by Child</h3>
-            </div>
-            <div class="table-responsive">
-                <table class="styled-table">
-                    <thead>
-                        <tr>
-                            <th>Child Name</th>
-                            <th style="text-align: right;">Total Paid</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for child in child_totals %}
-                        <tr>
-                            <td><strong>{{ child.student_fee__student__user__first_name }} {{ child.student_fee__student__user__last_name }}</strong></td>
-                            <td style="text-align: right;" class="amount-text">₵{{ child.total|floatformat:2 }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <div class="content-card">
+        <div class="card-header"><h3>🧾 Summary by Child</h3></div>
+        <div class="table-responsive">
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Child Name</th>
+                        <th style="text-align: right;">Total Paid</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for child in child_totals %}
+                    <tr>
+                        <td><strong>{{ child.student_fee__student__user__first_name }} {{ child.student_fee__student__user__last_name }}</strong></td>
+                        <td style="text-align: right;" class="amount-text">₵{{ child.total|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 
     <div class="content-card">
-        <div class="card-header">
-            <h3>📝 Detailed Transaction Log</h3>
-        </div>
+        <div class="card-header"><h3>📝 Detailed Transaction Log</h3></div>
         {% if payments %}
         <div class="table-responsive">
-            <table class="styled-table">
+            <table class="styled-table detailed-log">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -191,13 +212,13 @@
                 <tbody>
                     {% for payment in payments %}
                     <tr>
-                        <td style="color: #94a3b8;">{{ forloop.counter }}</td>
-                        <td><strong>{{ payment.student_fee.student.user.get_full_name }}</strong></td>
-                        <td class="amount-text">₵{{ payment.amount }}</td>
-                        <td><span class="badge method-badge">{{ payment.get_payment_method_display }}</span></td>
-                        <td style="font-family: monospace; font-size: 0.85rem;">{{ payment.reference }}</td>
-                        <td style="white-space: nowrap;">{{ payment.date_paid|date:"M d, Y" }} <br> <small style="color: #64748b;">{{ payment.date_paid|date:"h:i A" }}</small></td>
-                        <td><small>{{ payment.received_by.get_username|default:"System" }}</small></td>
+                        <td data-label="Entry No." style="color: #94a3b8;">{{ forloop.counter }}</td>
+                        <td data-label="Child" class="mobile-bold">{{ payment.student_fee.student.user.get_full_name }}</td>
+                        <td data-label="Amount" class="amount-text">₵{{ payment.amount }}</td>
+                        <td data-label="Method"><span class="badge method-badge">{{ payment.get_payment_method_display }}</span></td>
+                        <td data-label="Reference" style="font-family: monospace;">{{ payment.reference }}</td>
+                        <td data-label="Date">{{ payment.date_paid|date:"M d, Y" }} <small>({{ payment.date_paid|date:"h:i A" }})</small></td>
+                        <td data-label="Staff"><small>{{ payment.received_by.get_username|default:"System" }}</small></td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -205,7 +226,7 @@
         </div>
         {% else %}
         <div style="padding: 3rem; text-align: center; color: #94a3b8;">
-            <p>No payment history found for your children yet.</p>
+            <p>No payment history found yet.</p>
         </div>
         {% endif %}
     </div>

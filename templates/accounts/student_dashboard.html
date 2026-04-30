@@ -4,447 +4,279 @@
 {% block title %}My Academic Dashboard{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="academic-container">
+    <h2 class="page-title">
+        <div class="title-icon"><i class="fas fa-graduation-cap"></i></div>
+        Academic Overview
+    </h2>
+
+    <div class="top-stats-grid">
+        <div class="stat-card">
+            <h3>Average Score</h3>
+            <div class="value">{{ avg_score|default:"0" }}%</div>
+            <div class="card-progress" style="width: {{ avg_score }}%"></div>
+        </div>
+        <div class="stat-card">
+            <h3>Best Subject</h3>
+            <div class="value subject-text">
+                {% if best_subject %}{{ best_subject.subject }}{% else %}-{% endif %}
+            </div>
+        </div>
+        <div class="stat-card">
+            <h3>Lowest Subject</h3>
+            <div class="value subject-text">
+                {% if worst_subject %}{{ worst_subject.subject }}{% else %}-{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="surface-box">
+        <div class="box-header"><i class="fas fa-chart-line"></i> Performance Trend</div>
+        <div class="chart-area">
+            <canvas id="termChart"></canvas>
+        </div>
+    </div>
+
+    <div class="surface-box">
+        <div class="box-header"><i class="fas fa-file-invoice"></i> Recent Academic Results</div>
+        <div class="adaptive-data-container">
+            <table class="smart-table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Term</th>
+                        <th class="hide-mobile">Session</th>
+                        <th>Total</th>
+                        <th>Grade</th>
+                        <th class="hide-tablet">Remark</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in recent_results %}
+                    {% if r.total_score > 0 %}
+                    <tr class="smart-row">
+                        <td data-label="Subject" class="bold-text">{{ r.subject }}</td>
+                        <td data-label="Term">{{ r.term }}</td>
+                        <td data-label="Session" class="hide-mobile">{{ r.session }}</td>
+                        <td data-label="Total"><strong>{{ r.total_score }}</strong></td>
+                        <td data-label="Grade">
+                            <span class="grade-badge" data-grade="{{ r.grade }}">{{ r.grade }}</span>
+                        </td>
+                        <td data-label="Remark" class="hide-tablet">{{ r.remark }}</td>
+                    </tr>
+                    {% endif %}
+                    {% empty %}
+                    <tr><td colspan="6" class="empty-msg">No results recorded yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="finance-section">
+        <div class="finance-info-header">
+            <h3>💰 Finance Overview</h3>
+            <p>Real-time tracking of fees and balances.</p>
+        </div>
+
+        <div class="finance-grid">
+            <div class="f-card">
+                <span class="f-label">Total Due</span>
+                <span class="f-val">₵{{ total_due|floatformat:2 }}</span>
+            </div>
+            <div class="f-card success">
+                <span class="f-label">Total Paid</span>
+                <span class="f-val">₵{{ total_paid|floatformat:2 }}</span>
+            </div>
+            <div class="f-card danger">
+                <span class="f-label">Balance</span>
+                <span class="f-val">₵{{ total_balance|floatformat:2 }}</span>
+            </div>
+            <div class="f-card neutral">
+                <span class="f-label">Cleared</span>
+                <span class="f-val">{{ cleared_fees }}</span>
+            </div>
+        </div>
+
+        <div class="invoice-box">
+            <div class="box-header"><i class="fas fa-receipt"></i> Recent Invoices</div>
+            <div class="adaptive-data-container">
+                <table class="smart-table invoice-theme">
+                    <thead>
+                        <tr>
+                            <th>Inv. No</th>
+                            <th class="hide-mobile">Session</th>
+                            <th>Term</th>
+                            <th>Amount</th>
+                            <th>Paid</th>
+                            <th>Balance</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv in invoices %}
+                        <tr class="smart-row">
+                            <td data-label="Invoice">{{ inv.invoice_number }}</td>
+                            <td data-label="Session" class="hide-mobile">{{ inv.session }}</td>
+                            <td data-label="Term">{{ inv.term }}</td>
+                            <td data-label="Due">₵{{ inv.total_due|floatformat:2 }}</td>
+                            <td data-label="Paid">₵{{ inv.total_paid|floatformat:2 }}</td>
+                            <td data-label="Balance" class="bold-text">₵{{ inv.balance|floatformat:2 }}</td>
+                            <td data-label="Status">
+                                <span class="status-pill {% if inv.is_paid %}paid{% else %}pending{% endif %}">
+                                    {% if inv.is_paid %}Paid{% else %}Pending{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="7" class="empty-msg">No invoices found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
 <style>
-/* 🌟 Page Title */
+:root {
+    --emerald: #10b981;
+    --emerald-dark: #065f46;
+    --slate-900: #0f172a;
+    --slate-600: #475569;
+    --slate-100: #f1f5f9;
+    --border: #e2e8f0;
+}
+
+.academic-container { 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: 1rem; 
+    font-family: 'Inter', sans-serif;
+    color: var(--slate-900);
+}
+
+/* Page Header */
 .page-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 1.2rem;
-  color: #1e293b;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    display: flex; align-items: center; gap: 12px;
+    font-size: 1.75rem; font-weight: 800; margin-bottom: 2rem;
+}
+.title-icon {
+    width: 45px; height: 45px; background: var(--emerald);
+    color: white; border-radius: 12px;
+    display: grid; place-items: center;
 }
 
-/* 📊 Statistic Cards */
-.card {
-  position: relative;
-  border-radius: 16px;
-  padding: 1.2rem 1.5rem;
-  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.07);
-  transition: all 0.3s ease;
-  overflow: hidden;
+/* Top Stats */
+.top-stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem; margin-bottom: 2rem;
 }
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+.stat-card {
+    background: white; padding: 1.5rem; border-radius: 16px;
+    border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    position: relative; overflow: hidden;
 }
-.card::before {
-  content: "";
-  position: absolute;
-  top: -40%;
-  right: -40%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle at center, rgba(16,185,129,0.08), transparent 60%);
-  transform: rotate(25deg);
+.stat-card h3 { font-size: 0.85rem; text-transform: uppercase; color: var(--slate-600); margin: 0; }
+.stat-card .value { font-size: 1.8rem; font-weight: 800; margin-top: 8px; color: var(--emerald-dark); }
+.card-progress { position: absolute; bottom: 0; left: 0; height: 4px; background: var(--emerald); opacity: 0.3; }
+
+/* Surface Boxes */
+.surface-box {
+    background: white; border: 1px solid var(--border); border-radius: 16px;
+    padding: 1.5rem; margin-bottom: 2rem;
 }
-.card h3 {
-  font-size: 1rem;
-  color: #64748b;
-  margin-bottom: 0.2rem;
-}
-.card .value {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #065f46;
+.box-header {
+    font-weight: 700; font-size: 1rem; margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 10px; color: var(--slate-600);
 }
 
-/* 🧾 Table + Chart Section */
-.table-wrapper {
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+/* SMART TABLE (The Responsive Fix) */
+.smart-table { width: 100%; border-collapse: collapse; }
+.smart-table th { 
+    text-align: left; padding: 12px; font-size: 0.75rem;
+    text-transform: uppercase; color: var(--slate-400);
+    border-bottom: 2px solid var(--slate-100);
 }
+.smart-table td { padding: 12px; border-bottom: 1px solid var(--slate-100); font-size: 0.95rem; }
+.bold-text { font-weight: 700; color: var(--slate-900); }
 
-.table-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 0.8rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.table-title::before {
-  content: "▍";
-  color: #10b981;
-  font-weight: bold;
-}
+/* Badges */
+.grade-badge { padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 0.8rem; }
+.grade-badge[data-grade="A"] { background: #dcfce7; color: #166534; }
+.grade-badge[data-grade="F"] { background: #fee2e2; color: #991b1b; }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
-}
-th, td {
-  padding: 0.75rem 0.9rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-th {
-  background: #f8fafc;
-  color: #334155;
-  text-align: left;
-  font-weight: 600;
-}
-td {
-  color: #475569;
-}
-tr:hover td {
-  background-color: #f9fafb;
-}
+/* Finance Styling */
+.finance-section { background: #f8fafc; padding: 1.5rem; border-radius: 20px; }
+.finance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+.f-card { background: white; padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; }
+.f-label { font-size: 0.75rem; font-weight: 700; color: var(--slate-400); }
+.f-val { font-size: 1.5rem; font-weight: 800; }
+.f-card.success .f-val { color: var(--emerald); }
+.f-card.danger .f-val { color: #ef4444; }
 
-/* 📈 Chart */
-canvas {
-  margin-top: 1rem;
-  width: 100% !important;
-  height: 280px !important;
-}
+.status-pill { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+.status-pill.paid { background: #dcfce7; color: #166534; }
+.status-pill.pending { background: #fff7ed; color: #9a3412; }
 
-/* 📱 Responsive */
+/* MOBILE RESPONSIVE LOGIC */
 @media (max-width: 768px) {
-  .page-title { font-size: 1.5rem; }
-  .card .value { font-size: 1.5rem; }
+    .hide-mobile { display: none; }
+    .top-stats-grid { grid-template-columns: 1fr; }
+    .finance-grid { grid-template-columns: 1fr 1fr; }
+
+    /* Force Table to Cards */
+    .smart-table thead { display: none; }
+    .smart-table tr { 
+        display: block; background: white; border: 1px solid var(--border);
+        border-radius: 12px; margin-bottom: 1rem; padding: 10px;
+    }
+    .smart-table td { 
+        display: flex; justify-content: space-between; align-items: center;
+        border: none; padding: 8px 5px; text-align: right;
+    }
+    .smart-table td::before {
+        content: attr(data-label); font-weight: 700; font-size: 0.75rem;
+        color: var(--slate-400); text-transform: uppercase; text-align: left;
+    }
+}
+
+@media (max-width: 1024px) {
+    .hide-tablet { display: none; }
 }
 </style>
-
-<h2 class="page-title">🎓 Academic Overview</h2>
-
-<div class="dashboard-container">
-  <div class="card">
-    <h3>Average Score</h3>
-    <div class="value">{{ avg_score|default:"0" }}</div>
-  </div>
-  <div class="card">
-    <h3>Best Subject</h3>
-    <div class="value">
-      {% if best_subject %}
-        {{ best_subject.subject }}
-      {% else %}
-        -
-      {% endif %}
-    </div>
-  </div>
-  <div class="card">
-    <h3>Lowest Subject</h3>
-    <div class="value">
-      {% if worst_subject %}
-        {{ worst_subject.subject }}
-      {% else %}
-        -
-      {% endif %}
-    </div>
-  </div>
-</div>
-
-<div class="table-wrapper">
-  <div class="table-title">📈 Term Performance</div>
-  <canvas id="termChart"></canvas>
-</div>
-
-<div class="table-wrapper">
-  <div class="table-title">🧾 Recent Results</div>
-  <div class="table-responsive">
-    <table>
-      <thead>
-        <tr>
-          <th>Subject</th>
-          <th>Term</th>
-          <th>Session</th>
-          <th>Total</th>
-          <th>Grade</th>
-          <th>Remark</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for r in recent_results %}
-          {% if r.total_score > 0 %}
-          <tr>
-            <td>{{ r.subject }}</td>
-            <td>{{ r.term }}</td>
-            <td>{{ r.session }}</td>
-            <td><strong>{{ r.total_score }}</strong></td>
-            <td>
-              <span style="color:
-                {% if r.grade == 'A' %}#16a34a
-                {% elif r.grade == 'F' %}#dc2626
-                {% else %}#2563eb{% endif %};
-                font-weight:600;">
-                {{ r.grade }}
-              </span>
-            </td>
-            <td>{{ r.remark }}</td>
-          </tr>
-          {% endif %}
-        {% empty %}
-          <tr><td colspan="6" style="text-align:center; color:#94a3b8;">No results yet.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-const ctx = document.getElementById('termChart').getContext('2d');
-new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: {{ terms|safe }},
-    datasets: [{
-      label: 'Average Score',
-      data: {{ avg_scores|safe }},
-      borderColor: '#10b981',
-      backgroundColor: 'rgba(16,185,129,0.15)',
-      tension: 0.3,
-      fill: true,
-      pointRadius: 5,
-      pointBackgroundColor: '#065f46',
-    }]
-  },
-  options: {
-    scales: { y: { beginAtZero: true, max: 100, grid: { color: '#f1f5f9' } } },
-    plugins: { legend: { display: false } },
-  }
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('termChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ terms|safe }},
+            datasets: [{
+                data: {{ avg_scores|safe }},
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16,185,129,0.1)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4,
+                pointBackgroundColor: '#065f46'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, max: 100, grid: { color: '#f1f5f9' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
 });
 </script>
-
-<div class="finance-section">
-
-  <!-- 🌟 Finance Overview -->
-  <div class="finance-header">
-    <h2>💰 Finance Overview</h2>
-    <p>Track your school fees and payments at a glance.</p>
-  </div>
-
-  <div class="finance-cards">
-    <div class="finance-card">
-      <h3>Total Fees Due</h3>
-      <p class="value">₵{{ total_due|floatformat:2 }}</p>
-    </div>
-
-    <div class="finance-card success">
-      <h3>Total Paid</h3>
-      <p class="value">₵{{ total_paid|floatformat:2 }}</p>
-    </div>
-
-    <div class="finance-card danger">
-      <h3>Outstanding Balance</h3>
-      <p class="value">₵{{ total_balance|floatformat:2 }}</p>
-    </div>
-
-    <div class="finance-card neutral">
-      <h3>Fees Cleared</h3>
-      <p class="value">{{ cleared_fees }}</p>
-    </div>
-  </div>
-
-  <!-- 🧾 Recent Invoices Table -->
-  <div class="invoice-section">
-    <h3 class="invoice-title">🧾 Recent Invoices</h3>
-    <div class="table-responsive">
-      <table class="invoice-table">
-        <thead>
-          <tr>
-            <th>Invoice No.</th>
-            <th>Session</th>
-            <th>Term</th>
-            <th>Total Due</th>
-            <th>Paid</th>
-            <th>Balance</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for inv in invoices %}
-          <tr>
-            <td>{{ inv.invoice_number }}</td>
-            <td>{{ inv.session }}</td>
-            <td>{{ inv.term }}</td>
-            <td>₵{{ inv.total_due|floatformat:2 }}</td>
-            <td>₵{{ inv.total_paid|floatformat:2 }}</td>
-            <td>₵{{ inv.balance|floatformat:2 }}</td>
-            <td>
-              {% if inv.is_paid %}
-                <span class="status paid">Paid</span>
-              {% else %}
-                <span class="status pending">Pending</span>
-              {% endif %}
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="7" class="empty">No invoices yet.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<style>
-
-  /* 📱 Horizontal Scroll for Tables on Mobile */
-.table-responsive {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
-}
-
-.table-responsive table {
-  width: 100%;
-  min-width: 600px; /* prevents squishing on small screens */
-  border-collapse: collapse;
-}
-
-/* 🌟 Finance Section */
-.finance-section {
-  background: #f9fafb;
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-  margin-top: 1.5rem;
-}
-
-/* Header */
-.finance-header {
-  text-align: left;
-  margin-bottom: 1.5rem;
-}
-.finance-header h2 {
-  font-size: 1.5rem;
-  color: #1e293b;
-  font-weight: 700;
-  margin-bottom: 0.2rem;
-}
-.finance-header p {
-  color: #64748b;
-  font-size: 0.95rem;
-}
-
-/* Cards Layout */
-.finance-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.2rem;
-  margin-bottom: 2rem;
-}
-
-.finance-card {
-  background: white;
-  padding: 1.2rem 1.5rem;
-  border-radius: 14px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-.finance-card::before {
-  content: "";
-  position: absolute;
-  top: -40%;
-  right: -40%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle at center, rgba(16,185,129,0.08), transparent 60%);
-  transform: rotate(25deg);
-}
-.finance-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-}
-.finance-card h3 {
-  color: #64748b;
-  font-size: 1rem;
-  font-weight: 600;
-}
-.finance-card .value {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #0f172a;
-}
-.finance-card.success .value { color: #16a34a; }
-.finance-card.danger .value { color: #dc2626; }
-.finance-card.neutral .value { color: #2563eb; }
-
-/* 🧾 Table Section */
-.invoice-section {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 14px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.05);
-}
-.invoice-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 0.8rem;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.invoice-title::before {
-  content: "▍";
-  color: #10b981;
-  font-weight: bold;
-}
-
-/* Table */
-.invoice-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
-}
-.invoice-table th, .invoice-table td {
-  padding: 0.75rem 0.9rem;
-  border-bottom: 1px solid #e2e8f0;
-  text-align: left;
-}
-.invoice-table th {
-  background: #f8fafc;
-  font-weight: 600;
-  color: #334155;
-}
-.invoice-table td {
-  color: #475569;
-}
-.invoice-table tr:hover td {
-  background: #f9fafb;
-}
-
-/* Status */
-.status {
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-.status.paid {
-  background: rgba(22,163,74,0.1);
-  color: #16a34a;
-}
-.status.pending {
-  background: rgba(220,38,38,0.1);
-  color: #dc2626;
-}
-.empty {
-  text-align: center;
-  color: #94a3b8;
-  padding: 1rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .finance-section { padding: 1rem; }
-  .finance-cards { grid-template-columns: 1fr 1fr; }
-  .invoice-table th, .invoice-table td { font-size: 0.85rem; }
-}
-</style>
-
-
 {% endblock %}

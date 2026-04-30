@@ -186,25 +186,51 @@ def conversation_list(request):
 # ================================================================
 # 🔹 VIEW: AJAX filtering / search for conversations
 # ================================================================
+from django.db.models import Q, Count, OuterRef, Subquery, Max
+from .models import Message, Conversation
+
 @login_required
 def conversation_list_ajax(request):
+    # 1. Base Queryset: Conversations user is part of
     conversations = Conversation.objects.filter(participants=request.user)
+
+    # 2. Subquery: Get the latest message content for each conversation
+    latest_msg = Message.objects.filter(conversation=OuterRef('pk')).order_by('-created_at')
+    
+    # 3. Annotate the Queryset
+    # This keeps the logic in the DB, not in Python loops.
+    conversations = conversations.annotate(
+        # Total unread messages for THIS user in THIS conversation
+        unread_count=Count(
+            'messages', 
+            filter=Q(messages__is_read=False) & ~Q(messages__sender=request.user)
+        ),
+        # Get the ID and content of the last message
+        last_msg_text=Subquery(latest_msg.values('content')[:100]), 
+        last_msg_sender_name=Subquery(latest_msg.values('sender__username')[:1]),
+        last_msg_time=Max('messages__created_at')
+    ).order_by('-last_msg_time') # Sort by most recent activity
+
+    # 4. Search & Filter
     q = request.GET.get("q", "")
     filter_option = request.GET.get("filter", "")
 
     if q:
         conversations = conversations.filter(
             Q(name__icontains=q) |
-            Q(participants__username__icontains=q)
+            Q(participants__username__icontains=q) |
+            Q(participants__first_name__icontains=q)
         ).distinct()
 
-    if filter_option == "recent":
-        conversations = conversations.order_by("-updated_at")
-    elif filter_option == "active":
-        conversations = conversations.filter(messages__isnull=False).distinct()
+    if filter_option == "unread":
+        conversations = conversations.filter(unread_count__gt=0)
+    elif filter_option == "recent":
+        # Already ordered by last_msg_time above
+        pass
 
-    return render(request, "communications/conversation_list_partial.html", {"conversations": conversations})
-
+    return render(request, "communications/conversation_list_partial.html", {
+        "conversations": conversations
+    })
 
 # ================================================================
 # 🔹 VIEW: Handle text-only message via JSON (fallback)

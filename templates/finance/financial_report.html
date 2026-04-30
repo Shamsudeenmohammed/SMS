@@ -5,269 +5,301 @@
 {% block header %}📊 Financial Analytics{% endblock %}
 
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<div class="report-container">
-    <div class="report-header">
-        <div class="header-text">
-            <h2>Student Financial Ledger</h2>
-            <p>Filter by session, term, or payment status to generate insights.</p>
+<div class="report-wrapper">
+    <header class="report-header">
+        <div class="header-meta">
+            <h2>Financial Ledger</h2>
+            <p>Real-time student payment analytics and debt tracking.</p>
         </div>
-        <div class="export-group">
-            <a href="{% url 'export_financial_report_excel' %}?session={{ request.GET.session }}&term={{ request.GET.term }}&status={{ request.GET.status }}&search={{ request.GET.search }}&export_excel=true" class="btn-export excel">
-                <i class="fas fa-file-excel"></i> Excel
+        <div class="export-actions">
+            <a href="{% url 'export_financial_report_excel' %}?session={{ request.GET.session }}&term={{ request.GET.term }}&status={{ request.GET.status }}&search={{ request.GET.search }}&export_excel=true" class="btn-exp excel">
+                <i class="fas fa-file-excel"></i> <span>Excel</span>
             </a>
-            <a href="{% url 'export_financial_report_pdf' %}?session={{ request.GET.session }}&term={{ request.GET.term }}&status={{ request.GET.status }}&search={{ request.GET.search }}&export_pdf=true" class="btn-export pdf">
-                <i class="fas fa-file-pdf"></i> PDF
+            <a href="{% url 'export_financial_report_pdf' %}?session={{ request.GET.session }}&term={{ request.GET.term }}&status={{ request.GET.status }}&search={{ request.GET.search }}&export_pdf=true" class="btn-exp pdf">
+                <i class="fas fa-file-pdf"></i> <span>PDF</span>
             </a>
         </div>
-    </div>
+    </header>
 
-    <div class="toolbar-card">
-        <form method="GET" action="{% url 'financial_report' %}" class="filter-grid">
-            <div class="filter-item">
-                <select name="session" class="modern-select">
-                    <option value="">All Sessions</option>
-                    {% for s in sessions %}
-                    <option value="{{ s.id }}" {% if request.GET.session == s.id|stringformat:'s' %}selected{% endif %}>{{ s.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+    <section class="filter-section">
+        <form method="GET" action="{% url 'financial_report' %}" class="filter-form">
+            <div class="filter-inputs">
+                <div class="input-group">
+                    <select name="session">
+                        <option value="">All Sessions</option>
+                        {% for s in sessions %}
+                        <option value="{{ s.id }}" {% if request.GET.session == s.id|stringformat:'s' %}selected{% endif %}>{{ s.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-            <div class="filter-item">
-                <select name="term" class="modern-select">
-                    <option value="">All Terms</option>
-                    <option value="1st" {% if request.GET.term == '1st' %}selected{% endif %}>1st Term</option>
-                    <option value="2nd" {% if request.GET.term == '2nd' %}selected{% endif %}>2nd Term</option>
-                    <option value="3rd" {% if request.GET.term == '3rd' %}selected{% endif %}>3rd Term</option>
-                </select>
-            </div>
+                <div class="input-group">
+                    <select name="term">
+                        <option value="">All Terms</option>
+                        <option value="1st" {% if request.GET.term == '1st' %}selected{% endif %}>1st Term</option>
+                        <option value="2nd" {% if request.GET.term == '2nd' %}selected{% endif %}>2nd Term</option>
+                        <option value="3rd" {% if request.GET.term == '3rd' %}selected{% endif %}>3rd Term</option>
+                    </select>
+                </div>
 
-            <div class="filter-item">
-                <select name="status" class="modern-select">
-                    <option value="">All Statuses</option>
-                    <option value="Cleared" {% if request.GET.status == 'Cleared' %}selected{% endif %}>Cleared</option>
-                    <option value="Owing" {% if request.GET.status == 'Owing' %}selected{% endif %}>Owing</option>
-                    <option value="Overpaid" {% if request.GET.status == 'Overpaid' %}selected{% endif %}>Overpaid</option>
-                </select>
-            </div>
+                <div class="input-group">
+                    <select name="status">
+                        <option value="">Status</option>
+                        <option value="Cleared" {% if request.GET.status == 'Cleared' %}selected{% endif %}>Cleared</option>
+                        <option value="Owing" {% if request.GET.status == 'Owing' %}selected{% endif %}>Owing</option>
+                        <option value="Overpaid" {% if request.GET.status == 'Overpaid' %}selected{% endif %}>Overpaid</option>
+                    </select>
+                </div>
 
-            <div class="filter-item search">
-                <div class="search-wrapper">
+                <div class="input-group search">
                     <i class="fas fa-search"></i>
-                    <input type="text" name="search" placeholder="Student ID..." value="{{ request.GET.search }}">
+                    <input type="text" name="search" placeholder="Search Student ID..." value="{{ request.GET.search }}">
                 </div>
             </div>
 
-            <div class="filter-actions">
-                <button type="submit" class="btn-search">Filter</button>
-                <a href="{% url 'financial_report' %}" class="btn-reset" title="Clear Filters"><i class="fas fa-undo"></i></a>
+            <div class="filter-buttons">
+                <button type="submit" class="btn-submit">Filter</button>
+                <a href="{% url 'financial_report' %}" class="btn-clear"><i class="fas fa-redo"></i></a>
             </div>
         </form>
-    </div>
+    </section>
 
-    <div class="table-card">
-        <div class="table-responsive">
-            <table class="analytics-table">
-                <thead>
-                    <tr>
-                        <th>Student / ID</th>
-                        <th>Period</th>
-                        <th>Total Due</th>
-                        <th>Total Paid</th>
-                        <th>Balance</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for record in report_data %}
-                    <tr>
-                        <td>
-                            <span class="student-id">{{ record.student_id }}</span>
-                        </td>
-                        <td>
-                            <div class="period-stack">
-                                <span class="p-session">{{ record.session__name }}</span>
-                                <span class="p-term">{{ record.term }}</span>
-                            </div>
-                        </td>
-                        <td class="amt">₵{{ record.total_due|floatformat:2 }}</td>
-                        <td class="amt paid">₵{{ record.total_paid|floatformat:2 }}</td>
-                        <td class="amt balance {% if record.balance > 0 %}debt{% endif %}">
-                            ₵{{ record.balance|floatformat:2 }}
-                        </td>
-                        <td>
-                            {% if record.status == "Cleared" %}
-                                <span class="status-badge cleared">Cleared</span>
-                            {% elif record.status == "Overpaid" %}
-                                <span class="status-badge overpaid">Overpaid</span>
-                            {% else %}
-                                <span class="status-badge owing">Owing</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6" class="empty-row">No financial records match your current filters.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <div class="table-container">
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>Student / ID</th>
+                    <th>Period</th>
+                    <th class="text-right">Total Due</th>
+                    <th class="text-right">Total Paid</th>
+                    <th class="text-right">Balance</th>
+                    <th class="text-center">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in report_data %}
+                <tr class="report-row">
+                    <td data-label="Student">
+                        <span class="id-badge">{{ record.student_id }}</span>
+                    </td>
+                    <td data-label="Period">
+                        <div class="period-box">
+                            <span class="session-label">{{ record.session__name }}</span>
+                            <span class="term-label">{{ record.term }}</span>
+                        </div>
+                    </td>
+                    <td data-label="Total Due" class="text-right mono">₵{{ record.total_due|floatformat:2 }}</td>
+                    <td data-label="Total Paid" class="text-right mono text-success">₵{{ record.total_paid|floatformat:2 }}</td>
+                    <td data-label="Balance" class="text-right mono {% if record.balance > 0 %}text-danger bold{% endif %}">
+                        ₵{{ record.balance|floatformat:2 }}
+                    </td>
+                    <td data-label="Status" class="text-center">
+                        <span class="badge {{ record.status|lower }}">{{ record.status }}</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <p>No records found for the selected filters.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 
 <style>
 :root {
     --primary: #4f46e5;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
+    --success: #10b981;
+    --danger: #ef4444;
+    --info: #0ea5e9;
+    --text-dark: #0f172a;
+    --text-light: #64748b;
     --border: #e2e8f0;
-    --bg: #f8fafc;
+    --surface: #ffffff;
+    --radius: 12px;
 }
 
-.report-container {
+* { box-sizing: border-box; }
+
+.report-wrapper {
     font-family: 'Inter', sans-serif;
-    max-width: 1300px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 1.5rem;
-    animation: fadeIn 0.4s ease-out;
+    padding: 1rem;
+    color: var(--text-dark);
 }
 
-/* Header & Exports */
+/* Header & Export */
 .report-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: center;
+    gap: 1.5rem;
     margin-bottom: 2rem;
+    flex-wrap: wrap;
 }
 
-.header-text h2 { font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
-.header-text p { color: var(--text-muted); font-size: 0.9rem; }
+.header-meta h2 { font-size: 1.75rem; font-weight: 800; margin: 0; letter-spacing: -0.02em; }
+.header-meta p { color: var(--text-light); margin: 0.25rem 0 0; }
 
-.export-group { display: flex; gap: 10px; }
-.btn-export {
+.export-actions { display: flex; gap: 0.75rem; }
+.btn-exp {
+    padding: 0.6rem 1.25rem;
+    border-radius: var(--radius);
     text-decoration: none;
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-size: 0.85rem;
     font-weight: 700;
+    font-size: 0.85rem;
     display: flex;
     align-items: center;
     gap: 8px;
-    transition: 0.2s;
+    transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.btn-export.excel { background: #dcfce7; color: #15803d; }
-.btn-export.pdf { background: #fee2e2; color: #b91c1c; }
-.btn-export:hover { transform: translateY(-2px); filter: brightness(0.95); }
+.btn-exp.excel { background: #dcfce7; color: #15803d; }
+.btn-exp.pdf { background: #fee2e2; color: #b91c1c; }
+.btn-exp:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
-/* Toolbar */
-.toolbar-card {
-    background: white;
-    padding: 1.25rem;
-    border-radius: 16px;
+/* Adaptive Filters */
+.filter-section {
+    background: var(--surface);
+    padding: 1rem;
+    border-radius: var(--radius);
     border: 1px solid var(--border);
     margin-bottom: 1.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-.filter-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px;
-    align-items: center;
-}
-
-.modern-select, .search-wrapper input {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    font-size: 0.9rem;
-    color: var(--text-main);
-    background: #fdfdfd;
-}
-
-.search-wrapper { position: relative; }
-.search-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem; }
-.search-wrapper input { padding-left: 35px; }
-
-.filter-actions { display: flex; gap: 8px; }
-.btn-search {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    flex-grow: 1;
-}
-
-.btn-reset {
-    background: #f1f5f9;
-    color: var(--text-muted);
-    width: 42px;
-    height: 42px;
+.filter-form {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    text-decoration: none;
-    transition: 0.2s;
+    flex-direction: column;
+    gap: 1rem;
 }
-.btn-reset:hover { background: var(--border); color: var(--text-main); }
 
-/* Table */
-.table-card {
-    background: white;
-    border-radius: 16px;
+.filter-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+}
+
+.input-group select, .input-group input {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    background: #fcfcfd;
+}
+
+.input-group.search { position: relative; }
+.input-group.search i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
+.input-group.search input { padding-left: 2.25rem; }
+
+.filter-buttons { display: flex; gap: 0.5rem; }
+.btn-submit { background: var(--primary); color: white; border: none; flex: 1; border-radius: 8px; font-weight: 700; cursor: pointer; }
+.btn-clear { background: #f1f5f9; color: var(--text-light); width: 45px; height: 45px; display: grid; place-items: center; border-radius: 8px; text-decoration: none; }
+
+/* Responsive Table / Cards */
+.table-container {
+    background: var(--surface);
+    border-radius: var(--radius);
     border: 1px solid var(--border);
     overflow: hidden;
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.04);
 }
 
-.analytics-table { width: 100%; border-collapse: collapse; }
-.analytics-table th {
+.report-table { width: 100%; border-collapse: collapse; }
+.report-table th {
     background: #f8fafc;
-    padding: 1rem 1.5rem;
+    padding: 1rem;
     text-align: left;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--text-muted);
+    font-size: 0.7rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-weight: 700;
+    color: var(--text-light);
+    border-bottom: 1px solid var(--border);
 }
 
-.analytics-table td { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
-.student-id { font-weight: 700; color: var(--text-main); }
-.period-stack { display: flex; flex-direction: column; gap: 2px; }
-.p-session { font-weight: 600; color: var(--text-main); font-size: 0.85rem; }
-.p-term { font-size: 0.75rem; color: var(--text-muted); }
+.report-table td { padding: 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
 
-.amt { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text-main); }
-.amt.paid { color: #059669; }
-.amt.balance.debt { color: #dc2626; font-weight: 800; }
-
-.status-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
+/* Status Badges */
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 99px;
     font-size: 0.75rem;
     font-weight: 700;
+    display: inline-block;
 }
-.status-badge.cleared { background: #dcfce7; color: #15803d; }
-.status-badge.owing { background: #fee2e2; color: #b91c1c; }
-.status-badge.overpaid { background: #e0f2fe; color: #0369a1; }
+.badge.cleared { background: #dcfce7; color: #15803d; }
+.badge.owing { background: #fee2e2; color: #b91c1c; }
+.badge.overpaid { background: #e0f2fe; color: #0369a1; }
 
-.empty-row { text-align: center; padding: 3rem !important; color: var(--text-muted); font-style: italic; }
+/* Helpers */
+.mono { font-family: 'JetBrains Mono', monospace; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.text-success { color: var(--success); }
+.text-danger { color: var(--danger); }
+.bold { font-weight: 800; }
+.id-badge { font-weight: 700; color: var(--primary); }
+.period-box { display: flex; flex-direction: column; }
+.session-label { font-weight: 600; font-size: 0.85rem; }
+.term-label { font-size: 0.75rem; color: var(--text-light); }
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* MOBILE TRANSFORMATION */
+@media (max-width: 768px) {
+    .report-header { text-align: center; justify-content: center; }
+    .export-actions { width: 100%; }
+    .export-actions a { flex: 1; justify-content: center; }
 
-@media (max-width: 992px) {
-    .report-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
-    .export-group { width: 100%; }
-    .btn-export { flex: 1; justify-content: center; }
+    .report-table, .report-table thead, .report-table tbody, .report-table th, .report-table td, .report-table tr {
+        display: block;
+    }
+
+    .report-table thead { display: none; }
+
+    .report-row {
+        padding: 1rem;
+        border-bottom: 8px solid #f1f5f9;
+        position: relative;
+    }
+
+    .report-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border: none;
+        text-align: right;
+    }
+
+    .report-table td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        font-size: 0.75rem;
+        color: var(--text-light);
+        text-transform: uppercase;
+        margin-right: 1rem;
+    }
+
+    .report-table td[data-label="Student"] {
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.75rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .filter-form { flex-direction: row; align-items: flex-end; }
+    .filter-inputs { flex: 1; }
+    .filter-buttons { flex-shrink: 0; }
+    .btn-submit { padding: 0 2rem; height: 45px; }
 }
 </style>
 {% endblock %}

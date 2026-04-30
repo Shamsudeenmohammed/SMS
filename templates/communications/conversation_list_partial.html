@@ -1,19 +1,82 @@
 <div class="conversation-list">
     {% for convo in conversations %}
     <a href="{% url 'conversation_detail' convo.pk %}" class="conversation-card">
-        <div class="avatar-circle">
-            {{ convo.name|slice:":1"|upper }}
+        <div style="position: relative;">
+            <div class="avatar-circle">
+                {% if convo.name %}
+                    {{ convo.name|slice:":1"|upper }}
+                {% else %}
+                    <i class="fas fa-user"></i>
+                {% endif %}
+            </div>
+            
+            {# ✅ Unread Badge Indicator #}
+            {% if convo.unread_count > 0 %}
+                <span class="unread-badge">{{ convo.unread_count }}</span>
+            {% endif %}
         </div>
+
         <div class="convo-info">
-            <h3>{{ convo.name }}</h3>
-            <p>{{ convo.messages.last.content|truncatechars:35|default:"No messages yet" }}</p>
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                <h3>
+                    {% if convo.name %}
+                        {{ convo.name }} 
+                    {% else %}
+                        {# Logic to show the other person's name if no group name #}
+                        {% for p in convo.participants.all %}
+                            {% if p != request.user %}{{ p.get_full_name|default:p.username }}{% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </h3>
+                <small style="color: #94a3b8;">{{ convo.last_msg_time|date:"H:i" }}</small>
+            </div>
+
+            {# ✅ Last Message Context #}
+            <p class="last-message">
+                {% if convo.last_msg_text %}
+                    <strong>
+                        {% if convo.last_msg_sender_name == request.user.username %}You:{% else %}{{ convo.last_msg_sender_name }}:{% endif %}
+                    </strong> 
+                    {{ convo.last_msg_text|truncatechars:35 }}
+                {% else %}
+                    <span style="font-style: italic;">No new messages yet</span>
+                {% endif %}
+            </p>
         </div>
-        <div class="status-indicator {% if convo.is_active %}active{% endif %}"></div>
     </a>
-    {% empty %}
-    <div class="empty-message" style="grid-column: 1 / -1; width: 100%;">
-        <i class="fas fa-comment-slash" style="font-size: 2.5rem; color: #cbd5e1; margin-bottom: 1rem; display: block;"></i>
-        <p>No conversations found matching your search.</p>
-    </div>
     {% endfor %}
+
+    <style>
+        .unread-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #ef4444; /* Pro-grade Red */
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 800;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.last-message {
+    margin-top: 2px;
+    font-size: 0.85rem;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.last-message strong {
+    color: #1e293b; /* Make the sender name slightly bolder */
+    font-weight: 600;
+}
+    </style>
 </div>

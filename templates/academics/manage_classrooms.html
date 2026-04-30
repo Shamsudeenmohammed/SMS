@@ -5,205 +5,231 @@
 {% block header %}🏫 Classrooms Directory{% endblock %}
 
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<div class="manage-wrapper">
-    <div class="action-header">
-        <div class="header-text">
-            <p class="subtitle">Organize and manage school classrooms and their display priority.</p>
+<div class="directory-container">
+    <header class="directory-header">
+        <div class="header-content">
+            <h2>Classroom Infrastructure</h2>
+            <p>Manage physical learning spaces and their priority sequencing.</p>
         </div>
-        <a href="{% url 'add_classroom' %}" class="btn-add">
-            <i class="fas fa-plus"></i> Create New Class
+        <a href="{% url 'add_classroom' %}" class="btn-primary-action">
+            <i class="fas fa-plus"></i>
+            <span>Create New Class</span>
         </a>
-    </div>
+    </header>
 
-    <div class="content-card">
-        <div class="table-responsive">
-            <table class="modern-table">
-                <thead>
-                    <tr>
-                        <th width="80">Rank</th>
-                        <th>Classroom Name</th>
-                        <th>Description</th>
-                        <th class="text-right">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for classroom in classrooms %}
-                    <tr>
-                        <td>
-                            <span class="order-badge">
-                                #{{ classroom.order }}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="class-info">
-                                <i class="fas fa-school text-primary-icon"></i>
-                                <span class="class-name">{{ classroom.name }}</span>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="desc-text">{{ classroom.description|default:"No description provided" }}</span>
-                        </td>
-                        <td>
-                            <div class="action-group">
-                                <a href="{% url 'edit_classroom' classroom.id %}" class="btn-icon edit" title="Edit Class">
-                                    <i class="fas fa-pen"></i>
-                                </a>
-                                <a href="{% url 'delete_classroom' classroom.id %}" class="btn-icon delete" 
-                                   onclick="return confirm('Deleting this class will affect linked students. Proceed?');" 
-                                   title="Delete Class">
-                                    <i class="fas fa-trash-alt"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="4" class="empty-row">
-                            <div class="empty-state">
-                                <i class="fas fa-chalkboard"></i>
-                                <p>No classrooms have been configured yet.</p>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="surface-card">
+        <div class="grid-table-header">
+            <div class="col-rank">Rank</div>
+            <div class="col-name">Classroom Name</div>
+            <div class="col-desc">Description</div>
+            <div class="col-ops">Management</div>
+        </div>
+
+        <div class="grid-table-body">
+            {% for classroom in classrooms %}
+            <div class="grid-table-row">
+                <div class="col-rank" data-label="Priority">
+                    <span class="rank-id">#{{ classroom.order }}</span>
+                </div>
+
+                <div class="col-name" data-label="Classroom">
+                    <div class="identity-flex">
+                        <div class="icon-sq">
+                            <i class="fas fa-school"></i>
+                        </div>
+                        <span class="text-bold">{{ classroom.name }}</span>
+                    </div>
+                </div>
+
+                <div class="col-desc" data-label="About">
+                    <span class="text-muted">
+                        {{ classroom.description|default:"No description provided" }}
+                    </span>
+                </div>
+
+                <div class="col-ops" data-label="Actions">
+                    <div class="btn-group">
+                        <a href="{% url 'edit_classroom' classroom.id %}" class="tool-btn edit" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'delete_classroom' classroom.id %}" class="tool-btn delete" 
+                           onclick="return confirm('Deleting this class will affect linked students. Proceed?');" 
+                           title="Delete">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-placeholder">
+                <i class="fas fa-chalkboard"></i>
+                <h3>No Data Available</h3>
+                <p>Start by adding your institution's first classroom.</p>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
 
 <style>
 :root {
-    --primary: #4f46e5;
-    --primary-soft: #eef2ff;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
+    --indigo: #4f46e5;
+    --indigo-light: #f5f3ff;
+    --slate-900: #0f172a;
+    --slate-600: #475569;
+    --slate-400: #94a3b8;
+    --slate-100: #f1f5f9;
     --border: #e2e8f0;
-    --danger: #ef4444;
+    --white: #ffffff;
 }
 
-.manage-wrapper {
-    font-family: 'Inter', sans-serif;
-    max-width: 1100px;
+.directory-container {
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 1rem;
-    animation: fadeIn 0.4s ease-out;
+    padding: 1.5rem;
+    font-family: 'Inter', sans-serif;
 }
 
-/* Header Section */
-.action-header {
+/* Header */
+.directory-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 2rem;
+    gap: 1rem;
 }
 
-.subtitle { color: var(--text-muted); font-size: 0.95rem; margin-top: 4px; }
+.header-content h2 { margin: 0; font-size: 1.6rem; font-weight: 800; color: var(--slate-900); }
+.header-content p { margin: 4px 0 0; color: var(--slate-600); font-size: 0.9rem; }
 
-.btn-add {
-    background: var(--primary);
+.btn-primary-action {
+    background: var(--indigo);
     color: white;
     text-decoration: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 0.9rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
     display: flex;
     align-items: center;
-    gap: 10px;
-    transition: 0.2s;
-    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+    gap: 8px;
 }
 
-.btn-add:hover { background: #4338ca; transform: translateY(-1px); }
-
-/* Table Section */
-.content-card {
-    background: white;
+/* THE GRID SYSTEM - Anchored Left */
+.surface-card {
+    background: var(--white);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 
-.modern-table { width: 100%; border-collapse: collapse; }
+.grid-table-header, .grid-table-row {
+    display: grid;
+    /* Fixed rank, medium name, large description, fixed management */
+    grid-template-columns: 80px 280px 1fr 120px; 
+    align-items: center;
+    padding: 0 1.5rem;
+}
 
-.modern-table th {
-    background: #f8fafc;
-    padding: 1.25rem 1.5rem;
-    text-align: left;
+.grid-table-header {
+    height: 50px;
+    background: #fcfdfe;
+    border-bottom: 1px solid var(--border);
+    border-radius: 14px 14px 0 0;
+    color: var(--slate-400);
     font-size: 0.75rem;
     font-weight: 700;
-    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    border-bottom: 1px solid var(--border);
 }
 
-.modern-table td {
-    padding: 1.25rem 1.5rem;
+.grid-table-row {
+    height: 75px;
     border-bottom: 1px solid var(--border);
-    vertical-align: middle;
-    color: var(--text-main);
+    transition: background 0.15s ease;
 }
 
-/* Rank Badge */
-.order-badge {
-    background: #f1f5f9;
-    color: #475569;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.8rem;
+.grid-table-row:last-child { border-bottom: none; }
+.grid-table-row:hover { background: #fafafa; }
+
+/* Alignment logic: Most columns stay left by default */
+.col-ops {
+    justify-self: end; /* Management column stays right for layout balance */
+}
+
+/* Row Specifics */
+.rank-id {
     font-weight: 700;
+    color: var(--slate-600);
+    font-size: 0.85rem;
 }
 
-/* Class Info */
-.class-info { display: flex; align-items: center; gap: 12px; }
-.text-primary-icon { color: var(--primary); opacity: 0.6; font-size: 1.1rem; }
-.class-name { font-weight: 700; font-size: 1rem; color: var(--text-main); }
+.identity-flex { display: flex; align-items: center; gap: 12px; }
+.icon-sq {
+    width: 38px; height: 38px;
+    background: var(--indigo-light);
+    color: var(--indigo);
+    border-radius: 8px;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+}
 
-.desc-text {
+.text-bold { font-weight: 700; color: var(--slate-900); }
+.text-muted { 
+    color: var(--slate-600); 
     font-size: 0.9rem;
-    color: var(--text-muted);
-    max-width: 400px;
+    line-height: 1.4;
     display: block;
-    line-height: 1.5;
+    max-width: 90%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Actions */
-.action-group { display: flex; justify-content: flex-end; gap: 8px; }
-.btn-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
+.btn-group { display: flex; gap: 8px; }
+.tool-btn {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: grid; place-items: center; text-decoration: none;
     transition: 0.2s;
 }
+.tool-btn.edit { background: #eff6ff; color: #2563eb; }
+.tool-btn.delete { background: #fff1f2; color: #e11d48; }
+.tool-btn:hover { transform: scale(1.05); }
 
-.btn-icon.edit { background: var(--primary-soft); color: var(--primary); }
-.btn-icon.edit:hover { background: var(--primary); color: white; }
-.btn-icon.delete { background: #fee2e2; color: var(--danger); }
-.btn-icon.delete:hover { background: var(--danger); color: white; }
-
-/* Empty State */
-.empty-row { padding: 4rem !important; text-align: center; }
-.empty-state i { font-size: 3rem; color: #e2e8f0; margin-bottom: 1rem; }
-.empty-state p { color: var(--text-muted); font-weight: 500; }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-@media (max-width: 768px) {
-    .action-header { flex-direction: column; gap: 1rem; }
-    .modern-table thead { display: none; }
-    .modern-table td { display: flex; justify-content: space-between; align-items: center; border: none; padding: 0.75rem 1rem; }
-    .modern-table td::before { content: attr(data-label); font-weight: 700; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; }
-    .modern-table tr { display: block; border-bottom: 8px solid #f8fafc; padding: 1rem 0; }
+/* Mobile Logic */
+@media (max-width: 992px) {
+    .grid-table-header { display: none; }
+    .grid-table-row {
+        grid-template-columns: 1fr;
+        height: auto;
+        padding: 1.25rem;
+        gap: 12px;
+        border-bottom: 4px solid var(--slate-100);
+    }
+    .grid-table-row > div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: left; /* Keep left alignment on mobile labels */
+    }
+    .grid-table-row > div::before {
+        content: attr(data-label);
+        font-weight: 700;
+        font-size: 0.7rem;
+        color: var(--slate-400);
+        text-transform: uppercase;
+    }
+    .identity-flex { width: 100%; justify-content: flex-end; }
+    .col-ops { justify-self: stretch; }
+    .col-name { border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    .col-name::before { display: none; }
 }
+
+.empty-placeholder { padding: 4rem; text-align: center; }
+.empty-placeholder i { font-size: 3rem; color: var(--border); margin-bottom: 1rem; display: block; }
 </style>
 {% endblock %}
