@@ -74,6 +74,7 @@ def ordinal(n):
 def generate_report(request, student_id=None, session_id=None, term=None):
     """
     Supports SINGLE REPORT MODE and BULK REPORT MODE
+    Only processes active students.
     """
 
     # ---------------------------------------------------------
@@ -86,22 +87,27 @@ def generate_report(request, student_id=None, session_id=None, term=None):
             term = session_opts["term"]
             session_obj = Session.objects.get(id=session_opts["session_id"])
             student_ids = session_opts["students"]
-            class_id = session_opts["class_id"]  # <-- FIX: Retrieve class
+            class_id = session_opts["class_id"]
 
-            # Restrict students to this class
+            # Restrict to active students in the selected class
             class_students = Student.objects.filter(
-                current_class_id=class_id
+                current_class_id=class_id,
+                is_active=True
             ).order_by("user__last_name")
 
-            # Apply student selection
+            # Apply specific student selection if not "ALL"
             if student_ids == "ALL":
                 final_students = class_students
             else:
                 final_students = class_students.filter(id__in=student_ids)
 
-            # ✔ FIX: Call generate_bulk_reports ONLY on filtered students
+            if not final_students.exists():
+                messages.warning(request, "No active students found for this selection.")
+                return redirect("select_report_options")
+
+            # Generate bulk data
             bulk_reports = generate_bulk_reports(
-                [s.id for s in final_students],  # list of selected student IDs
+                [s.id for s in final_students],
                 session_obj,
                 term
             )
@@ -113,7 +119,7 @@ def generate_report(request, student_id=None, session_id=None, term=None):
                 "reports": bulk_reports,
                 "session": session_obj,
                 "term": term,
-                "classroom": class_students.first().current_class if class_students else None,
+                "classroom": final_students.first().current_class,
             })
 
         except Exception as e:
@@ -121,10 +127,11 @@ def generate_report(request, student_id=None, session_id=None, term=None):
             return redirect("select_report_options")
 
     # ---------------------------------------------------------
-    # 🔥 SINGLE REPORT MODE (unchanged)
+    # 🔥 SINGLE REPORT MODE
     # ---------------------------------------------------------
     try:
-        student = get_object_or_404(Student, id=student_id)
+        # Enforce is_active=True even for direct URL access
+        student = get_object_or_404(Student, id=student_id, is_active=True)
         session = get_object_or_404(Session, id=session_id)
         classroom = student.current_class
 
@@ -147,17 +154,16 @@ def generate_report(request, student_id=None, session_id=None, term=None):
                 used_subjects.add(r.subject)
             r.position_display = ordinal(r.position) if r.position else "-"
 
-        # Invoice
+        # Invoice/Financials
         invoice = Invoice.objects.filter(
             student=student,
             session=session,
             term=term
         ).first()
 
-        avg_score = (
-            round(sum(r.total_score for r in results) / results.count(), 2)
-            if results.exists() else 0
-        )
+        # Calculation logic
+        count = results.count()
+        avg_score = round(sum(r.total_score for r in results) / count, 2) if count > 0 else 0
 
         class_positions = calculate_overall_class_positions(session, term, classroom)
         raw_overall_position = class_positions.get(student.id)
@@ -173,7 +179,6 @@ def generate_report(request, student_id=None, session_id=None, term=None):
             "avg_score": avg_score,
             "overall_position": overall_position,
             "total_students": len(class_positions),
-
             "teacher_remarks": "",
             "headmaster_remarks": "",
             "reopening_date": "",
@@ -193,11 +198,9 @@ def generate_report(request, student_id=None, session_id=None, term=None):
 @login_required
 def select_report_options(request):
     try:
-        # Get all classes
         classes = ClassRoom.objects.all().order_by("order")
-
-        # Active session
         active_session = Session.objects.filter(is_current=True).first()
+
         if not active_session:
             messages.error(request, "No active session found.")
             return render(request, "reportcard/select_report_options.html", {
@@ -208,13 +211,16 @@ def select_report_options(request):
             })
 
         students = []
-
-        # When class is selected
         selected_class_id = request.GET.get("class_id")
+
         if selected_class_id:
-            students = Student.objects.filter(
-                current_class_id=selected_class_id
-            ).order_by("user__last_name")
+            # Senior Dev Debug: Check your console/terminal to see if Hafiz appears here
+            all_students_in_class = Student.objects.filter(current_class_id=selected_class_id)
+            print(f"DEBUG: Total students in class: {all_students_in_class.count()}")
+            
+            # Explicitly filtering by is_active=True
+            students = all_students_in_class.filter(is_active=True).order_by("user__last_name")
+            print(f"DEBUG: Active students in class: {students.count()}")
 
         if request.method == "POST":
             class_id = request.POST.get("class_id")
@@ -222,29 +228,27 @@ def select_report_options(request):
             select_all = request.POST.get("select_all")
             selected_students = request.POST.getlist("student_ids")
 
-            if not class_id:
-                messages.error(request, "Please select a class.")
+            if not class_id or not term:
+                messages.error(request, "Please select both a class and a term.")
                 return redirect("select_report_options")
 
-            if not term:
-                messages.error(request, "Please select a term.")
-                return redirect("select_report_options")
-
-            # Fetch students for class
-            class_students = Student.objects.filter(
-                current_class_id=class_id
+            # Final server-side safety check: Only pull active IDs
+            active_class_students = Student.objects.filter(
+                current_class_id=class_id, 
+                is_active=True
             )
 
-            # Bulk select
             if select_all == "on":
                 student_ids = "ALL"
             else:
-                if len(selected_students) == 0:
-                    messages.error(request, "Select students or choose Select All.")
+                # Intersect selected IDs with only active IDs to prevent manual URL injection
+                allowed_ids = list(active_class_students.values_list('id', flat=True))
+                student_ids = [s_id for s_id in selected_students if int(s_id) in allowed_ids]
+                
+                if not student_ids:
+                    messages.error(request, "No valid active students selected.")
                     return redirect("select_report_options")
-                student_ids = selected_students
 
-            # Save session values
             request.session["report_options"] = {
                 "class_id": class_id,
                 "students": student_ids,
@@ -252,12 +256,7 @@ def select_report_options(request):
                 "session_id": active_session.id,
             }
 
-            return redirect(
-                "generate_report",
-                student_id=0,
-                session_id=active_session.id,
-                term=term,
-            )
+            return redirect("generate_report", student_id=0, session_id=active_session.id, term=term)
 
         context = {
             "classes": classes,

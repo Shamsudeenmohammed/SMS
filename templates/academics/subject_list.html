@@ -9,77 +9,90 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <div class="manage-wrapper">
-    <div class="table-header-row">
-        <div class="meta-info">
-            <p>Total Subjects: <strong>{{ subjects.count }}</strong></p>
+    <!-- TOOLBAR: Strategic Search and Add -->
+    <div class="toolbar-row">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="subjectSearch" placeholder="Filter subjects or codes..." onkeyup="filterTable()">
         </div>
-        <div class="action-buttons">
-            <a href="{% url 'add_subject' %}" class="btn-create">
-                <i class="fas fa-plus"></i> Add New Subject
+        
+        <div class="toolbar-actions">
+            <div class="stats-pill">
+                <span class="label">Total:</span>
+                <span class="value">{{ subjects.count }}</span>
+            </div>
+            <a href="{% url 'add_subject' %}" class="btn-primary-action">
+                <i class="fas fa-plus-circle"></i> <span>Add Subject</span>
             </a>
         </div>
     </div>
 
-    <div class="content-card">
+    <!-- MAIN DATA CONTAINER -->
+    <div class="data-surface">
         <div class="table-responsive">
-            <table class="modern-table">
+            <table class="pro-table" id="subjectsTable">
                 <thead>
                     <tr>
-                        <th>Subject Details</th>
-                        <th>Subject Code</th>
-                        <th>Assigned Classroom</th>
+                        <th>Subject & Code</th>
+                        <th>Classroom</th>
                         <th>Instructor</th>
-                        <th class="text-right">Manage</th>
+                        <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for subject in subjects %}
-                    <tr>
-                        <td class="subject-main">
-                            <div class="subject-icon-box">
-                                <i class="fas fa-book-open"></i>
+                    <tr class="subject-row">
+                        <td data-label="Subject">
+                            <div class="subject-meta">
+                                <div class="icon-avatar">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div class="name-stack">
+                                    <span class="primary-name">{{ subject.name }}</span>
+                                    <code class="secondary-code">{{ subject.code }}</code>
+                                </div>
                             </div>
-                            <span class="subject-name">{{ subject.name }}</span>
                         </td>
-                        <td>
-                            <code class="subject-code">{{ subject.code }}</code>
+                        <td data-label="Classroom">
+                            <div class="badge-classroom">
+                                <i class="fas fa-door-open"></i> {{ subject.classroom.name }}
+                            </div>
                         </td>
-                        <td>
-                            <span class="class-badge">
-                                <i class="fas fa-chalkboard"></i> {{ subject.classroom.name }}
-                            </span>
-                        </td>
-                        <td>
+                        <td data-label="Instructor">
                             {% if subject.teacher %}
-                                <div class="teacher-info">
-                                    <span class="teacher-name">{{ subject.teacher.get_full_name|default:subject.teacher.username }}</span>
+                                <div class="user-pill">
+                                    <div class="user-init">
+                                        {{ subject.teacher.username|slice:":1"|upper }}
+                                    </div>
+                                    <span class="user-name">{{ subject.teacher.get_full_name|default:subject.teacher.username }}</span>
                                 </div>
                             {% else %}
-                                <span class="unassigned-text">
-                                    <i class="fas fa-user-slash"></i> Unassigned
+                                <span class="status-indicator warning">
+                                    <i class="fas fa-exclamation-triangle"></i> Unassigned
                                 </span>
                             {% endif %}
                         </td>
-                        <td>
-                            <div class="action-links">
-                                <a href="{% url 'edit_subject' subject.pk %}" class="link-btn edit" title="Edit Subject">
-                                    <i class="fas fa-pen-to-square"></i>
+                        <td class="text-center">
+                            <div class="action-orbit">
+                                <a href="{% url 'edit_subject' subject.pk %}" class="orbit-link edit" title="Edit">
+                                    <i class="fas fa-pen"></i>
                                 </a>
-                                <a href="{% url 'delete_subject' subject.pk %}" class="link-btn delete" 
-                                   onclick="return confirm('Remove this subject? This may affect linked results.');" title="Delete Subject">
-                                    <i class="fas fa-trash-can"></i>
+                                <a href="{% url 'delete_subject' subject.pk %}" class="orbit-link delete" 
+                                   onclick="return confirm('Critical: Deleting this subject will affect student reports. Proceed?');">
+                                    <i class="fas fa-trash-alt"></i>
                                 </a>
                             </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="empty-state">
-                            <div class="empty-content">
-                                <i class="fas fa-layer-group"></i>
-                                <p>No subjects found in the curriculum.</p>
-                                <a href="{% url 'add_subject' %}" class="btn-link">Add your first subject</a>
+                        <td colspan="4" class="empty-state-card">
+                            <div class="empty-svg-wrapper">
+                                <i class="fas fa-folder-open"></i>
                             </div>
+                            <h3>No Subjects Registered</h3>
+                            <p>Your curriculum is currently empty. Start by defining your academic subjects.</p>
+                            <a href="{% url 'add_subject' %}" class="btn-empty-add">Initialize Curriculum</a>
                         </td>
                     </tr>
                     {% endfor %}
@@ -89,153 +102,267 @@
     </div>
 </div>
 
+<script>
+    // Simple client-side filtering for better UX
+    function filterTable() {
+        let input = document.getElementById("subjectSearch");
+        let filter = input.value.toUpperCase();
+        let rows = document.querySelectorAll(".subject-row");
+
+        rows.forEach(row => {
+            let text = row.innerText.toUpperCase();
+            row.style.display = text.includes(filter) ? "" : "none";
+        });
+    }
+</script>
+
 <style>
 :root {
-    --primary: #4f46e5;
-    --primary-soft: #eef2ff;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
+    --brand: #4f46e5;
+    --brand-glow: rgba(79, 70, 229, 0.1);
+    --surface: #ffffff;
+    --background: #f8fafc;
+    --text-high: #0f172a;
+    --text-low: #64748b;
     --border: #e2e8f0;
+    --warning: #f59e0b;
     --danger: #ef4444;
 }
 
 .manage-wrapper {
-    font-family: 'Inter', sans-serif;
-    padding: 1rem;
-    max-width: 1200px;
+    font-family: 'Inter', system-ui, sans-serif;
+    padding: clamp(1rem, 3vw, 2.5rem);
+    max-width: 1400px;
     margin: 0 auto;
-    animation: fadeIn 0.4s ease-out;
 }
 
-/* Header Row */
-.table-header-row {
+/* Toolbar Styling */
+.toolbar-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
 }
 
-.meta-info p { font-size: 0.9rem; color: var(--text-muted); }
-.meta-info strong { color: var(--text-main); }
+.search-box {
+    position: relative;
+    flex: 1;
+    min-width: 280px;
+}
 
-.btn-create {
-    background: var(--primary);
+.search-box i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-low);
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    transition: 0.2s;
+    font-size: 0.9rem;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 4px var(--brand-glow);
+}
+
+.toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stats-pill {
+    background: var(--surface);
+    padding: 0.5rem 1rem;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    font-size: 0.85rem;
+}
+
+.stats-pill .label { color: var(--text-low); margin-right: 4px; }
+.stats-pill .value { font-weight: 700; color: var(--brand); }
+
+.btn-primary-action {
+    background: var(--brand);
     color: white;
     text-decoration: none;
-    padding: 0.75rem 1.5rem;
+    padding: 0.75rem 1.25rem;
     border-radius: 12px;
-    font-weight: 700;
-    font-size: 0.85rem;
+    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 8px;
     transition: 0.2s;
 }
 
-.btn-create:hover { background: #4338ca; transform: translateY(-1px); }
-
-/* Table Design */
-.content-card {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+.btn-primary-action:hover {
+    background: #4338ca;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2);
 }
 
-.modern-table { width: 100%; border-collapse: collapse; }
+/* Professional Table Styling */
+.data-surface {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
 
-.modern-table th {
-    background: #f8fafc;
+.pro-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pro-table th {
+    background: #fcfdfe;
     padding: 1rem 1.5rem;
     text-align: left;
     font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--text-muted);
+    font-weight: 600;
+    color: var(--text-low);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     border-bottom: 1px solid var(--border);
 }
 
-.modern-table td {
-    padding: 1.1rem 1.5rem;
+.pro-table td {
+    padding: 1.25rem 1.5rem;
     border-bottom: 1px solid var(--border);
-    font-size: 0.9rem;
-    color: var(--text-main);
     vertical-align: middle;
 }
 
-/* Subject Cell */
-.subject-main { display: flex; align-items: center; gap: 12px; }
-.subject-icon-box {
-    width: 36px;
-    height: 36px;
-    background: var(--primary-soft);
-    color: var(--primary);
+/* Subject Meta Styling */
+.subject-meta { display: flex; align-items: center; gap: 1rem; }
+.icon-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--brand-glow);
+    color: var(--brand);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
-    font-size: 0.9rem;
+    border-radius: 10px;
+    font-size: 1rem;
 }
-.subject-name { font-weight: 700; color: var(--text-main); }
+.name-stack { display: flex; flex-direction: column; }
+.primary-name { font-weight: 700; color: var(--text-high); font-size: 0.95rem; }
+.secondary-code { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--brand); font-weight: 600; }
 
-/* Code and Badge */
-.subject-code {
+.badge-classroom {
     background: #f1f5f9;
-    padding: 3px 8px;
+    padding: 4px 10px;
     border-radius: 6px;
-    font-weight: 600;
-    font-family: 'Monaco', monospace;
+    font-size: 0.85rem;
     color: #475569;
-}
-
-.class-badge {
-    color: var(--text-muted);
-    font-weight: 500;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
+    font-weight: 500;
 }
 
-/* Teacher Status */
-.unassigned-text { color: #cbd5e1; font-style: italic; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
-.teacher-name { font-weight: 600; color: var(--text-main); }
+/* User Pill Styling */
+.user-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8fafc;
+    padding: 4px 12px 4px 4px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    width: fit-content;
+}
 
-/* Actions */
-.action-links { display: flex; justify-content: flex-end; gap: 8px; }
-.link-btn {
-    width: 34px;
-    height: 34px;
+.user-init {
+    width: 24px;
+    height: 24px;
+    background: var(--brand);
+    color: white;
+    border-radius: 50%;
+    font-size: 0.7rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: 0.2s;
+    font-weight: 700;
 }
 
-.link-btn.edit { background: var(--primary-soft); color: var(--primary); }
-.link-btn.edit:hover { background: var(--primary); color: white; }
-.link-btn.delete { background: #fee2e2; color: var(--danger); }
-.link-btn.delete:hover { background: var(--danger); color: white; }
+.user-name { font-size: 0.85rem; font-weight: 600; color: var(--text-high); }
 
-/* Empty State */
-.empty-state { text-align: center; padding: 4rem !important; }
-.empty-content i { font-size: 3rem; color: var(--border); margin-bottom: 1rem; display: block; }
-.empty-content p { color: var(--text-muted); margin-bottom: 1rem; }
-.btn-link { color: var(--primary); font-weight: 700; text-decoration: none; }
+.status-indicator.warning {
+    color: #b45309;
+    background: #fffbeb;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* Actions Styling */
+.action-orbit { display: flex; justify-content: center; gap: 10px; }
+.orbit-link {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+    text-decoration: none;
+}
+.orbit-link.edit { background: #eef2ff; color: var(--brand); }
+.orbit-link.delete { background: #fef2f2; color: var(--danger); }
+.orbit-link:hover { transform: scale(1.1); filter: brightness(0.95); }
 
-/* Mobile Adjustments */
-@media (max-width: 768px) {
-    .table-header-row { flex-direction: column; gap: 1rem; align-items: stretch; }
-    .modern-table thead { display: none; }
-    .modern-table tr { display: block; padding: 1rem; border-bottom: 8px solid #f8fafc; }
-    .modern-table td { display: flex; justify-content: space-between; border: none; padding: 0.5rem 0; text-align: right; }
-    .modern-table td::before { content: attr(data-label); font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.7rem; }
-    .action-links { justify-content: flex-start; margin-top: 10px; }
+/* Card-style Mobile View (Sincere Senior Approach) */
+@media (max-width: 992px) {
+    .pro-table thead { display: none; }
+    .pro-table tr {
+        display: block;
+        border-bottom: 1px solid var(--border);
+        padding: 1.5rem;
+    }
+    .pro-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: none;
+        padding: 0.5rem 0;
+        text-align: right;
+    }
+    .pro-table td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: var(--text-low);
+        text-transform: uppercase;
+        font-size: 0.65rem;
+    }
+    .action-orbit { justify-content: flex-end; margin-top: 1rem; }
+    .user-pill { margin-left: auto; }
+}
+
+/* Empty State Styling */
+.empty-state-card { text-align: center; padding: 5rem 2rem !important; }
+.empty-svg-wrapper { font-size: 4rem; color: var(--border); margin-bottom: 1.5rem; }
+.empty-state-card h3 { color: var(--text-high); margin-bottom: 0.5rem; }
+.empty-state-card p { color: var(--text-low); margin-bottom: 2rem; max-width: 400px; margin-inline: auto; }
+.btn-empty-add {
+    background: var(--brand);
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 700;
 }
 </style>
 {% endblock %}

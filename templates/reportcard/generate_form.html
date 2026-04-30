@@ -9,6 +9,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <div class="generation-wrapper">
+    {# SAFETY CHECK: Ensure we only show content if student is active #}
+    {% if student.is_active %}
     <div class="generation-card">
         <div class="student-profile-header">
             <div class="profile-avatar">
@@ -17,8 +19,9 @@
             <div class="profile-info">
                 <h2>{{ student.user.get_full_name }}</h2>
                 <div class="period-badges">
-                    <span class="badge-item"><i class="fas fa-calendar-alt"></i> {{ report.session }}</span>
-                    <span class="badge-item"><i class="fas fa-clock"></i> {{ report.term }} Term</span>
+                    <span class="badge-item"><i class="fas fa-calendar-alt"></i> {{ session }}</span>
+                    <span class="badge-item"><i class="fas fa-clock"></i> {{ term }} Term</span>
+                    <span class="badge-item"><i class="fas fa-school"></i> {{ student.current_class.name }}</span>
                 </div>
             </div>
         </div>
@@ -42,7 +45,7 @@
                 </label>
                 <p class="field-desc">Upload a digital signature (PNG or JPG) to be appended to the PDF.</p>
                 <div class="file-upload-wrapper">
-                    <input type="file" name="teacher_signature" id="teacher_signature" class="file-input">
+                    <input type="file" name="teacher_signature" id="teacher_signature" class="file-input" accept="image/*">
                     <div class="file-dummy">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <span>Click to browse or drag signature here</span>
@@ -51,16 +54,25 @@
             </div>
 
             <div class="form-actions">
-                <a href="{% url 'student_list' %}" class="btn-back">Cancel</a>
+                <a href="{% url 'select_report_options' %}" class="btn-back">Cancel</a>
                 <button type="submit" class="btn-generate">
                     <i class="fas fa-file-pdf"></i> Finalize & Generate PDF
                 </button>
             </div>
         </form>
     </div>
+    {% else %}
+    <div class="generation-card" style="text-align: center;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
+        <h2>Access Denied</h2>
+        <p>This student account is currently inactive. Reports cannot be generated.</p>
+        <a href="{% url 'select_report_options' %}" class="btn-generate" style="margin-top: 1rem; display: inline-flex;">Return to Selection</a>
+    </div>
+    {% endif %}
 </div>
 
 <style>
+/* ... (Your existing CSS remains exactly the same) ... */
 :root {
     --primary: #4f46e5;
     --primary-dark: #4338ca;
@@ -85,7 +97,6 @@
     box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
 }
 
-/* Header Section */
 .student-profile-header {
     display: flex;
     align-items: center;
@@ -96,7 +107,7 @@
 .profile-avatar {
     width: 64px;
     height: 64px;
-    background: var(--primary-soft, #eef2ff);
+    background: #eef2ff;
     color: var(--primary);
     border-radius: 18px;
     display: flex;
@@ -122,7 +133,6 @@
 
 .divider { border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0 2rem 0; }
 
-/* Form Elements */
 .form-section { margin-bottom: 2rem; }
 .form-section label {
     display: flex;
@@ -155,7 +165,6 @@ textarea:focus {
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
 
-/* Custom File Upload */
 .file-upload-wrapper {
     position: relative;
     height: 100px;
@@ -186,7 +195,6 @@ textarea:focus {
 
 .file-upload-wrapper:hover { border-color: var(--primary); background: #eef2ff; }
 
-/* Actions */
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -215,6 +223,7 @@ textarea:focus {
     align-items: center;
     gap: 10px;
     transition: 0.2s;
+    text-decoration: none;
 }
 
 .btn-generate:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
@@ -229,7 +238,6 @@ textarea:focus {
 </style>
 
 <script>
-    // Simple UI tweak to show filename when selected
     document.getElementById('teacher_signature').onchange = function() {
         const dummy = this.nextElementSibling.querySelector('span');
         dummy.innerText = this.files[0] ? this.files[0].name : "Click to browse or drag signature here";

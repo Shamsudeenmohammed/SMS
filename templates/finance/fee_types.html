@@ -8,84 +8,91 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<div class="fee-wrapper">
-    <div class="fee-layout-grid">
+<div class="app-container">
+    <div class="responsive-layout">
         
-        <div class="side-panel">
-            <div class="content-card">
-                <div class="card-header-simple">
-                    <h3><i class="fas fa-plus-circle"></i> Create Fee Type</h3>
-                    <p>Define recurring or one-time charges.</p>
+        <!-- CONFIGURATION PANEL -->
+        <aside class="config-sidebar">
+            <div class="card shadow-sm">
+                <div class="card-header-alt">
+                    <i class="fas fa-sliders-h"></i>
+                    <div>
+                        <h4 class="m-0">Configure Fees</h4>
+                        <small class="text-muted">Set up student billing types</small>
+                    </div>
                 </div>
                 
-                <form method="post" class="modern-form">
+                <form method="post" class="p-4">
                     {% csrf_token %}
-                    <div class="form-grid-stack">
+                    <div class="stack-gap">
                         {% for field in form %}
-                        <div class="field-group">
-                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        <div class="form-field">
+                            <label class="small-label">{{ field.label }}</label>
                             {{ field }}
                             {% if field.errors %}
-                                <span class="error-text">{{ field.errors.0 }}</span>
+                                <div class="error-bubble">{{ field.errors.0 }}</div>
                             {% endif %}
                         </div>
                         {% endfor %}
                     </div>
-                    <button type="submit" class="btn-save-full">
-                        <i class="fas fa-check"></i> Register Fee Type
+                    <button type="submit" class="btn-primary-pro mt-4">
+                        <i class="fas fa-plus"></i> Add Fee Type
                     </button>
                 </form>
             </div>
-        </div>
+        </aside>
 
-        <div class="main-panel">
-            <div class="content-card no-padding">
-                <div class="card-header-table">
-                    <h3>Defined Fee Structures</h3>
+        <!-- DATA MANAGEMENT PANEL -->
+        <main class="data-main">
+            <div class="card shadow-sm overflow-hidden">
+                <div class="table-info-bar">
+                    <h5 class="m-0">Defined Structures</h5>
+                    <span class="count-chip">{{ fees|length }} Items</span>
                 </div>
                 
-                <div class="table-responsive">
-                    <table class="modern-table">
+                <div class="responsive-view">
+                    <table class="smart-table">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Fee Description</th>
+                                <th>Description</th>
                                 <th>Amount</th>
-                                <th>Visibility</th>
-                                <th class="text-right">Manage</th>
+                                <th class="status-col">Status</th>
+                                <th class="actions-col text-end">Manage</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for fee in fees %}
                             <tr>
-                                <td class="text-muted">{{ forloop.counter }}</td>
-                                <td><span class="fee-name">{{ fee.name }}</span></td>
-                                <td><span class="fee-amount">₵{{ fee.amount }}</span></td>
-                                <td>
+                                <td data-label="Description">
+                                    <span class="fee-name">{{ fee.name }}</span>
+                                </td>
+                                <td data-label="Amount">
+                                    <span class="amount-badge">₵{{ fee.amount }}</span>
+                                </td>
+                                <td data-label="Status" class="status-col">
                                     {% if fee.is_active %}
-                                        <span class="status-pill active">Active</span>
+                                        <span class="dot-indicator success">Active</span>
                                     {% else %}
-                                        <span class="status-pill inactive">Hidden</span>
+                                        <span class="dot-indicator neutral">Hidden</span>
                                     {% endif %}
                                 </td>
-                                <td>
-                                    <div class="action-flex-end">
-                                        <a href="{% url 'edit_fee_type' fee.id %}" class="action-btn edit" title="Edit">
-                                            <i class="fas fa-pen-to-square"></i>
+                                <td data-label="Actions" class="actions-col text-end">
+                                    <div class="btn-group-sm">
+                                        <a href="{% url 'edit_fee_type' fee.id %}" class="btn-link-edit">
+                                            <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="{% url 'delete_fee_type' fee.id %}" class="action-btn delete" 
-                                           onclick="return confirm('Ensure no students are currently assigned to this fee before deleting. Proceed?');" 
-                                           title="Delete">
-                                            <i class="fas fa-trash-can"></i>
+                                        <a href="{% url 'delete_fee_type' fee.id %}" class="btn-link-delete" 
+                                           onclick="return confirm('Confirm deletion?');">
+                                            <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
                                 </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="5" class="empty-state">
+                                <td colspan="4" class="empty-state-container">
                                     <i class="fas fa-receipt"></i>
-                                    <p>No fee types have been configured.</p>
+                                    <p>No fees configured.</p>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -93,143 +100,102 @@
                     </table>
                 </div>
             </div>
-        </div>
-
+        </main>
     </div>
 </div>
 
 <style>
+/* CORE VARS */
 :root {
     --primary: #4f46e5;
-    --primary-soft: #eef2ff;
     --success: #10b981;
     --danger: #ef4444;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
+    --slate-800: #1e293b;
+    --slate-500: #64748b;
+    --slate-100: #f1f5f9;
     --border: #e2e8f0;
+    --radius: 12px;
 }
 
-.fee-wrapper {
-    font-family: 'Inter', sans-serif;
+.app-container { font-family: 'Inter', sans-serif; padding: clamp(10px, 3vw, 30px); background: #f8fafc; min-height: 100vh; }
+
+.responsive-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 1rem;
-    animation: fadeIn 0.4s ease-out;
 }
 
-.fee-layout-grid {
-    display: grid;
-    grid-template-columns: 350px 1fr;
-    gap: 2rem;
-    align-items: start;
+/* TABLE-TO-CARD LOGIC FOR MOBILE */
+@media (max-width: 768px) {
+    .smart-table thead { display: none; }
+    .smart-table tr { 
+        display: flex; flex-direction: column; 
+        padding: 15px; border-bottom: 8px solid var(--slate-100); 
+    }
+    .smart-table td { 
+        display: flex; justify-content: space-between; align-items: center; 
+        padding: 8px 0; border: none !important; 
+    }
+    .smart-table td::before { 
+        content: attr(data-label); font-weight: 700; font-size: 0.75rem; 
+        color: var(--slate-500); text-transform: uppercase;
+    }
+    .status-col, .actions-col { width: 100% !important; text-align: left !important; }
 }
 
-.content-card {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
-    padding: 1.5rem;
+@media (min-width: 1024px) {
+    .responsive-layout { grid-template-columns: 340px 1fr; align-items: start; }
 }
 
-.content-card.no-padding { padding: 0; overflow: hidden; }
+/* CARDS & COMPONENTS */
+.card { background: white; border-radius: var(--radius); border: 1px solid var(--border); }
+.card-header-alt { padding: 20px; display: flex; gap: 12px; align-items: center; border-bottom: 1px solid var(--border); }
+.card-header-alt i { font-size: 1.4rem; color: var(--primary); }
 
-/* Header Styling */
-.card-header-simple h3, .card-header-table h3 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-main);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
+.stack-gap { display: flex; flex-direction: column; gap: 15px; }
+.small-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--slate-500); margin-bottom: 5px; display: block; }
+
+/* DYNAMIC DJANGO FIELD STYLING */
+input, select {
+    width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); 
+    border-radius: 8px; font-size: 0.95rem; transition: 0.2s;
 }
+input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
 
-.card-header-simple p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
-.card-header-table { padding: 1.5rem; border-bottom: 1px solid var(--border); }
-
-/* Form Elements */
-.form-grid-stack { display: flex; flex-direction: column; gap: 1.25rem; margin-bottom: 1.5rem; }
-.field-group { display: flex; flex-direction: column; gap: 6px; }
-.field-group label { font-size: 0.8rem; font-weight: 700; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.02em; }
-
-.modern-form input, .modern-form select {
-    padding: 0.75rem 1rem;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    font-size: 0.95rem;
-    transition: 0.2s;
+.btn-primary-pro {
+    width: 100%; background: var(--primary); color: white; border: none; 
+    padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s;
 }
+.btn-primary-pro:hover { background: #4338ca; transform: translateY(-1px); }
 
-.modern-form input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+/* TABLE REFINEMENTS */
+.smart-table { width: 100%; border-collapse: collapse; }
+.table-info-bar { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+.smart-table th { background: #fcfdfe; padding: 12px 20px; text-align: left; font-size: 0.75rem; color: var(--slate-500); border-bottom: 1px solid var(--border); }
+.smart-table td { padding: 16px 20px; border-bottom: 1px solid var(--border); }
 
-.btn-save-full {
-    width: 100%;
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 0.8rem;
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
+.fee-name { font-weight: 600; color: var(--slate-800); }
+.amount-badge { font-weight: 700; color: var(--primary); background: #eef2ff; padding: 4px 8px; border-radius: 6px; }
 
-.btn-save-full:hover { background: #4338ca; transform: translateY(-1px); }
+.dot-indicator { font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
+.dot-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; display: block; }
+.success::before { background: var(--success); }
+.neutral::before { background: var(--slate-500); }
 
-/* Table Styling */
-.modern-table { width: 100%; border-collapse: collapse; }
-.modern-table th {
-    background: #f8fafc;
-    padding: 1rem 1.5rem;
-    text-align: left;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--text-muted);
-    text-transform: uppercase;
-}
+.btn-group-sm { display: flex; gap: 10px; justify-content: flex-end; }
+.btn-link-edit, .btn-link-delete { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 8px; transition: 0.2s; }
+.btn-link-edit { background: #f1f5f9; color: var(--primary); }
+.btn-link-delete { background: #fef2f2; color: var(--danger); }
+.btn-link-edit:hover { background: var(--primary); color: white; }
 
-.modern-table td { padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-.fee-name { font-weight: 600; color: var(--text-main); }
-.fee-amount { font-weight: 700; color: var(--primary); font-family: 'JetBrains Mono', monospace; }
+.empty-state-container { text-align: center; padding: 60px !important; color: var(--slate-500); }
+.empty-state-container i { font-size: 2rem; opacity: 0.3; }
 
-/* Status Pills */
-.status-pill {
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
-}
-.status-pill.active { background: #dcfce7; color: #15803d; }
-.status-pill.inactive { background: #f1f5f9; color: #64748b; }
-
-/* Action Buttons */
-.action-flex-end { display: flex; gap: 8px; justify-content: flex-end; }
-.action-btn {
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    transition: 0.2s;
-    text-decoration: none;
-}
-.action-btn.edit { background: var(--primary-soft); color: var(--primary); }
-.action-btn.delete { background: #fee2e2; color: var(--danger); }
-.action-btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
-
-.empty-state { text-align: center; padding: 4rem 1rem !important; color: var(--text-muted); }
-.empty-state i { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.3; }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-@media (max-width: 992px) {
-    .fee-layout-grid { grid-template-columns: 1fr; }
-}
+.text-end { text-align: right; }
+.m-0 { margin: 0; }
+.mt-4 { margin-top: 1.5rem; }
+.shadow-sm { box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
 </style>
 {% endblock %}
