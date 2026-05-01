@@ -494,7 +494,7 @@ def export_financial_report_pdf(request):
 
     # Title
     p.setFont("Helvetica-Bold", 16)
-    p.drawCentredString(width / 2, height - 40, "Student Financial Report")
+    p.drawCentredString(width / 2, height - 40, "Students Financial Report")
 
     # Table header
     y = height - 80
