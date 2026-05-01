@@ -205,28 +205,67 @@
         </div>
         
         <nav class="sidebar-nav">
-            {% if user.role == "admin" %}
-              <a href="{% url 'admin_dashboard' %}" class="nav-link">🏠 Admin Dashboard</a>
-              <a href="{% url 'profile' %}" class="nav-link">👤 My Profile</a>
-              <a href="{% url 'conversation_list' %}" class="nav-link">
-                  <i class="fas fa-envelope"></i> <span>Messages</span>
-                  <span class="global-unread-badge">0</span>
-              </a>
-              <a href="{% url 'manage_fees' %}" class="nav-link">📚 Manage Fees</a>
-              <a href="{% url 'financial_report' %}" class="nav-link">📊 Financial Reports</a>
-              <a href="{% url 'manage_students' %}" class="nav-link">🎓 Manage Students</a>
-              <a href="{% url 'manage_teachers' %}" class="nav-link">👨‍🏫 Manage Teachers</a>
-              <a href="{% url 'manage_classrooms' %}" class="nav-link">🏫 Manage Classrooms</a>
-              <a href="{% url 'subject_list' %}" class="nav-link">📚 Manage Subjects</a>
-              <a href="{% url 'manage_sessions' %}" class="nav-link">📚 Manage Sessions</a>
-              <a href="{% url 'manage_parents' %}" class="nav-link">👨‍👩‍👧 Manage Parents</a>
-              <a href="{% url 'select_report_options' %}" class="nav-link">📄 Generate Report</a>
-            <!-- Repeat logic for other roles as per your original file -->
-            {% elif user.role == "teacher" %}
-              <a href="{% url 'teacher_dashboard' %}" class="nav-link">🏠 Teacher Dashboard</a>
-              <a href="{% url 'profile' %}" class="nav-link">👤 My Profile</a>
-              <!-- [Other Teacher Links] -->
-            {% endif %}
+        {% if user.role == "admin" %}
+          <a href="{% url 'admin_dashboard' %}" class="nav-link">🏠 Admin Dashboard</a>
+          <a href="{% url 'profile' %}" class="nav-link">👤 My Profile</a>
+          <a href="{% url 'conversation_list' %}" class="nav-link">
+              <i class="fas fa-envelope"></i>
+              <span>Messages</span>
+              <span class="global-unread-badge">0</span>
+          </a>
+          <a href="{% url 'manage_fees' %}" class="nav-link">📚 Manage Fees</a>
+          <a href="{% url 'financial_report' %}" class="nav-link">📊 Financial Reports</a>
+          <a href="{% url 'manage_students' %}" class="nav-link">🎓 Manage Students</a>
+          <a href="{% url 'manage_teachers' %}" class="nav-link">👨‍🏫 Manage Teachers</a>
+          <a href="{% url 'manage_classrooms' %}" class="nav-link">🏫 Manage Classrooms</a>
+          <a href="{% url 'subject_list' %}" class="nav-link">📚 Manage Subjects</a>
+          <a href="{% url 'manage_sessions' %}" class="nav-link">📚 Manage Sessions</a>
+          <a href="{% url 'manage_parents' %}" class="nav-link">👨‍👩‍👧 Manage Parents</a>
+          <a href="{% url 'select_report_options' %}" class="nav-link">📄 Generate Report</a>
+
+        {% elif user.role == "teacher" %}
+          <a href="{% url 'teacher_dashboard' %}" class="nav-link">🏠 Teacher Dashboard</a>
+          <a href="{% url 'profile' %}" class="nav-link">👤 My Profile</a>
+          <a href="{% url 'conversation_list' %}" class="nav-link">
+              <i class="fas fa-envelope"></i>
+              <span>Messages</span>
+              <span class="global-unread-badge">0</span>
+          </a>
+          <a href="{% url 'start_attendance_session' %}" class="nav-link">🕒 Start Session</a>
+          <a href="#" class="nav-link">📝 Take Attendance</a>
+          <a href="{% url 'mark_results' %}" class="nav-link">🖊️ Mark Results</a>
+          <a href="{% url 'select_report_options' %}" class="nav-link">📄 Generate Report</a>
+          
+        {% elif user.role == "student" %}
+          <a href="{% url 'student_dashboard' %}" class="nav-link">🏠 Student Dashboard</a>
+          <a href="{% url 'profile' %}" class="nav-link">👤 My Profile</a>
+          <a href="{% url 'my_invoices' %}" class="nav-link">💰 My Invoices</a>
+          <a href="{% url 'student_fees' %}" class="nav-link">🧾 My Fees</a>
+          <a href="{% url 'view_my_results' %}" class="nav-link">📊 View Results</a>
+          
+        {% elif user.role == "accountant" %}
+          <a href="{% url 'accountant_dashboard' %}" class="nav-link">🏠 Accountant Dashboard</a>
+          <a href="{% url 'profile' %}" class="nav-link">👤 My Profile</a>
+          <a href="{% url 'conversation_list' %}" class="nav-link">
+              <i class="fas fa-envelope"></i>
+              <span>Messages</span>
+              <span class="global-unread-badge">0</span>
+          </a>
+          <a href="{% url 'record_payment' %}" class="nav-link">💸 Record Payment</a>
+          <a href="{% url 'financial_report' %}" class="nav-link">📊 Financial Reports</a>
+          
+        {% elif user.role == "parent" %}
+          <a href="{% url 'parent_dashboard' %}" class="nav-link">🏠 Parent Dashboard</a>
+          <a href="{% url 'profile' %}" class="nav-link">👤 My Profile</a>
+          <a href="{% url 'conversation_list' %}" class="nav-link">
+              <i class="fas fa-envelope"></i>
+              <span>Messages</span>
+              <span class="global-unread-badge">0</span>
+          </a>
+          <a href="{% url 'child_performance' %}" class="nav-link">📚 Child Performance</a>
+          <a href="{% url 'parent_attendance' %}" class="nav-link">🕒 Attendance</a>
+          <a href="{% url 'parent_payment_history' %}" class="nav-link">💰 Payment History</a>
+        {% endif %}
         </nav>
 
         <!-- SENIOR FIX: Fixed Logout at Sidebar Bottom -->
