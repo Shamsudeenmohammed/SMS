@@ -2,6 +2,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<<<<<<< HEAD
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Dashboard{% endblock %} | School Management</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ======= MODERN VARIABLES ======= */
+    :root {
+      --primary: #1a73e8;
+      --primary-dark: #1557b0;
+      --sidebar-bg: #0f172a;
+      --sidebar-hover: rgba(255, 255, 255, 0.1);
+      --bg-light: #f8fafc;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ======= RESET & BASE ======= */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body { background: var(--bg-light); color: var(--text-main); min-height: 100vh; overflow-x: hidden; }
+
+    /* ======= ALERTS (Floating Style) ======= */
+    .alert-container {
+      position: fixed; top: 20px; right: 20px; z-index: 10000;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .alert-top {
+      padding: 14px 24px; border-radius: 12px; color: #fff; font-weight: 500;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      display: flex; align-items: center; justify-content: space-between;
+      min-width: 300px; animation: slideIn 0.4s ease-out;
+    }
+    .alert-top.success { background: #10b981; }
+    .alert-top.error { background: #ef4444; }
+    .close-top { cursor: pointer; background: none; border: none; color: white; font-size: 20px; margin-left: 10px; }
+
+    /* ======= DASHBOARD LAYOUT ======= */
+    .dashboard-container { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+
+    /* ======= SIDEBAR ======= */
+    .sidebar {
+      background: var(--sidebar-bg); color: #cbd5e1;
+      display: flex; flex-direction: column; padding: 24px 0;
+      position: sticky; top: 0; height: 100vh; z-index: 999;
+      border-right: 1px solid rgba(255,255,255,0.05);
+    }
+    .sidebar-header { padding: 0 24px 30px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+    .sidebar-header h2 { color: #fff; font-size: 1.1rem; letter-spacing: 0.5px; }
+
+    .sidebar-nav { flex-grow: 1; overflow-y: auto; padding: 0 12px; }
+    .nav-link {
+      padding: 12px 16px; color: #94a3b8; font-weight: 500; font-size: 0.9rem;
+      display: flex; align-items: center; gap: 12px; border-radius: 10px;
+      transition: var(--transition); margin-bottom: 4px; text-decoration: none;
+    }
+    .nav-link i { font-size: 1.1rem; width: 24px; text-align: center; }
+    .nav-link:hover, .nav-link.active { background: var(--sidebar-hover); color: #fff; }
+    .nav-link.active { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3); }
+
+    .sidebar-footer { padding: 20px 24px; border-top: 1px solid rgba(255,255,255,0.1); }
+    .logout-btn { color: #f87171; display: flex; align-items: center; gap: 10px; font-weight: 600; text-decoration: none; font-size: 0.9rem; transition: 0.2s; }
+
+    /* ======= MAIN CONTENT ======= */
+    .main-section { display: flex; flex-direction: column; width: 100%; }
+    .main-header {
+      background: #fff; padding: 16px 40px; display: flex;
+      align-items: center; gap: 20px; position: sticky; top: 0;
+      z-index: 900; border-bottom: 1px solid #e2e8f0; justify-content: space-between;
+    }
+    .main-content { padding: 40px; flex: 1; animation: fadeIn 0.5s ease-out; }
+    .footer { padding: 20px; text-align: center; font-size: 0.85rem; color: var(--text-muted); background: #fff; border-top: 1px solid #e2e8f0; }
+
+    /* ======= BADGE STYLING ======= */
+    .global-unread-badge {
+      background-color: #ef4444; 
+      color: white; 
+      border-radius: 50%; 
+      padding: 2px 6px; 
+      font-size: 0.75rem; 
+      margin-left: auto;
+      font-weight: 700;
+      display: none; /* Hidden by default */
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  </style>
+=======
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}Dashboard{% endblock %} | School Management</title>
@@ -183,8 +280,31 @@
             100% { transform: scale(1); }
         }
     </style>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 </head>
 <body>
+<<<<<<< HEAD
+  <div class="alert-container">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert-top {{ message.tags }}">
+          <span>{{ message }}</span>
+          <button class="close-top" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <div class="dashboard-container">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-graduation-cap"></i> School Management</h2>
+      </div>
+
+      <nav class="sidebar-nav">
+        {% with url_name=request.resolver_match.url_name %}
+        
+=======
 
     <div class="sidebar-overlay" id="overlay"></div>
 
@@ -205,6 +325,7 @@
         </div>
         
         <nav class="sidebar-nav">
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
         {% if user.role == "admin" %}
           <a href="{% url 'admin_dashboard' %}" class="nav-link">🏠 Admin Dashboard</a>
           <a href="{% url 'profile' %}" class="nav-link">👤 My Profile</a>
@@ -266,6 +387,22 @@
           <a href="{% url 'parent_attendance' %}" class="nav-link">🕒 Attendance</a>
           <a href="{% url 'parent_payment_history' %}" class="nav-link">💰 Payment History</a>
         {% endif %}
+<<<<<<< HEAD
+        
+        {% endwith %}
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="{% url 'logout' %}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </aside>
+
+    <main class="main-section">
+      <header class="main-header">
+        <span class="header-title">{% block header %}Overview{% endblock %}</span>
+        <div class="user-meta">Welcome, <strong>{{ user.username }}</strong></div>
+      </header>
+=======
         </nav>
 
         <!-- SENIOR FIX: Fixed Logout at Sidebar Bottom -->
@@ -284,6 +421,7 @@
                 </button>
                 <div style="font-weight: 700; color: #1e293b; font-size: 1rem;">{% block header %}Overview{% endblock %}</div>
             </div>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 
             <div class="top-nav-right">
                 <div class="user-greeting" style="font-size: 0.85rem; color: #64748b;">
@@ -296,6 +434,52 @@
             </div>
         </header>
 
+<<<<<<< HEAD
+      <footer class="footer">
+        &copy; {% now "Y" %} School Management System.
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // 🔔 UNIFIED GLOBAL UNREAD MESSAGE SYNC
+    function updateGlobalUnreadCount() {
+        fetch('/communications/api/unread-count/')
+            .then(res => res.json())
+            .then(data => {
+                const badges = document.querySelectorAll('.global-unread-badge');
+                badges.forEach(badge => {
+                    if (data.count > 0) {
+                        badge.innerText = data.count > 99 ? '99+' : data.count;
+                        badge.style.display = 'inline-block';
+                        badge.style.animation = "pulse 2s infinite";
+                    } else {
+                        badge.style.display = 'none';
+                        badge.style.animation = "none";
+                    }
+                });
+            })
+            .catch(err => console.warn("Unread sync failed. Ensure /communications/api/unread-count/ exists."));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initial check
+        updateGlobalUnreadCount();
+        
+        // Background updates every 30 seconds
+        setInterval(updateGlobalUnreadCount, 30000);
+
+        // Alert auto-close logic
+        setTimeout(() => {
+            document.querySelectorAll('.alert-top').forEach(a => {
+                a.style.transition = "opacity 0.5s ease";
+                a.style.opacity = "0";
+                setTimeout(() => a.remove(), 500);
+            });
+        }, 5000);
+    });
+  </script>
+=======
         <main class="main-content">
             {% block content %}{% endblock %}
         </main>
@@ -309,6 +493,7 @@
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
         const menuToggle = document.getElementById('menuToggle');
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 
         function toggleSidebar() {
             sidebar.classList.toggle('active');

@@ -9,6 +9,15 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <div class="manage-wrapper">
+<<<<<<< HEAD
+    <div class="table-header-row">
+        <div class="meta-info">
+            <p>Total Subjects: <strong>{{ subjects.count }}</strong></p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'add_subject' %}" class="btn-create">
+                <i class="fas fa-plus"></i> Add New Subject
+=======
     <!-- TOOLBAR: Strategic Search and Add -->
     <div class="toolbar-row">
         <div class="search-box">
@@ -23,10 +32,23 @@
             </div>
             <a href="{% url 'add_subject' %}" class="btn-primary-action">
                 <i class="fas fa-plus-circle"></i> <span>Add Subject</span>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
             </a>
         </div>
     </div>
 
+<<<<<<< HEAD
+    <div class="content-card">
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Subject Details</th>
+                        <th>Subject Code</th>
+                        <th>Assigned Classroom</th>
+                        <th>Instructor</th>
+                        <th class="text-right">Manage</th>
+=======
     <!-- MAIN DATA CONTAINER -->
     <div class="data-surface">
         <div class="table-responsive">
@@ -37,10 +59,47 @@
                         <th>Classroom</th>
                         <th>Instructor</th>
                         <th class="text-center">Actions</th>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
                     </tr>
                 </thead>
                 <tbody>
                     {% for subject in subjects %}
+<<<<<<< HEAD
+                    <tr>
+                        <td class="subject-main">
+                            <div class="subject-icon-box">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <span class="subject-name">{{ subject.name }}</span>
+                        </td>
+                        <td>
+                            <code class="subject-code">{{ subject.code }}</code>
+                        </td>
+                        <td>
+                            <span class="class-badge">
+                                <i class="fas fa-chalkboard"></i> {{ subject.classroom.name }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if subject.teacher %}
+                                <div class="teacher-info">
+                                    <span class="teacher-name">{{ subject.teacher.get_full_name|default:subject.teacher.username }}</span>
+                                </div>
+                            {% else %}
+                                <span class="unassigned-text">
+                                    <i class="fas fa-user-slash"></i> Unassigned
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-links">
+                                <a href="{% url 'edit_subject' subject.pk %}" class="link-btn edit" title="Edit Subject">
+                                    <i class="fas fa-pen-to-square"></i>
+                                </a>
+                                <a href="{% url 'delete_subject' subject.pk %}" class="link-btn delete" 
+                                   onclick="return confirm('Remove this subject? This may affect linked results.');" title="Delete Subject">
+                                    <i class="fas fa-trash-can"></i>
+=======
                     <tr class="subject-row">
                         <td data-label="Subject">
                             <div class="subject-meta">
@@ -80,12 +139,21 @@
                                 <a href="{% url 'delete_subject' subject.pk %}" class="orbit-link delete" 
                                    onclick="return confirm('Critical: Deleting this subject will affect student reports. Proceed?');">
                                     <i class="fas fa-trash-alt"></i>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
                                 </a>
                             </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
+<<<<<<< HEAD
+                        <td colspan="5" class="empty-state">
+                            <div class="empty-content">
+                                <i class="fas fa-layer-group"></i>
+                                <p>No subjects found in the curriculum.</p>
+                                <a href="{% url 'add_subject' %}" class="btn-link">Add your first subject</a>
+                            </div>
+=======
                         <td colspan="4" class="empty-state-card">
                             <div class="empty-svg-wrapper">
                                 <i class="fas fa-folder-open"></i>
@@ -93,6 +161,7 @@
                             <h3>No Subjects Registered</h3>
                             <p>Your curriculum is currently empty. Start by defining your academic subjects.</p>
                             <a href="{% url 'add_subject' %}" class="btn-empty-add">Initialize Curriculum</a>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
                         </td>
                     </tr>
                     {% endfor %}
@@ -102,6 +171,15 @@
     </div>
 </div>
 
+<<<<<<< HEAD
+<style>
+:root {
+    --primary: #4f46e5;
+    --primary-soft: #eef2ff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+=======
 <script>
     // Simple client-side filtering for better UX
     function filterTable() {
@@ -126,10 +204,149 @@
     --text-low: #64748b;
     --border: #e2e8f0;
     --warning: #f59e0b;
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
     --danger: #ef4444;
 }
 
 .manage-wrapper {
+<<<<<<< HEAD
+    font-family: 'Inter', sans-serif;
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Header Row */
+.table-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.meta-info p { font-size: 0.9rem; color: var(--text-muted); }
+.meta-info strong { color: var(--text-main); }
+
+.btn-create {
+    background: var(--primary);
+    color: white;
+    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.2s;
+}
+
+.btn-create:hover { background: #4338ca; transform: translateY(-1px); }
+
+/* Table Design */
+.content-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.modern-table { width: 100%; border-collapse: collapse; }
+
+.modern-table th {
+    background: #f8fafc;
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+}
+
+.modern-table td {
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+    color: var(--text-main);
+    vertical-align: middle;
+}
+
+/* Subject Cell */
+.subject-main { display: flex; align-items: center; gap: 12px; }
+.subject-icon-box {
+    width: 36px;
+    height: 36px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+.subject-name { font-weight: 700; color: var(--text-main); }
+
+/* Code and Badge */
+.subject-code {
+    background: #f1f5f9;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-family: 'Monaco', monospace;
+    color: #475569;
+}
+
+.class-badge {
+    color: var(--text-muted);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Teacher Status */
+.unassigned-text { color: #cbd5e1; font-style: italic; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
+.teacher-name { font-weight: 600; color: var(--text-main); }
+
+/* Actions */
+.action-links { display: flex; justify-content: flex-end; gap: 8px; }
+.link-btn {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.link-btn.edit { background: var(--primary-soft); color: var(--primary); }
+.link-btn.edit:hover { background: var(--primary); color: white; }
+.link-btn.delete { background: #fee2e2; color: var(--danger); }
+.link-btn.delete:hover { background: var(--danger); color: white; }
+
+/* Empty State */
+.empty-state { text-align: center; padding: 4rem !important; }
+.empty-content i { font-size: 3rem; color: var(--border); margin-bottom: 1rem; display: block; }
+.empty-content p { color: var(--text-muted); margin-bottom: 1rem; }
+.btn-link { color: var(--primary); font-weight: 700; text-decoration: none; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .table-header-row { flex-direction: column; gap: 1rem; align-items: stretch; }
+    .modern-table thead { display: none; }
+    .modern-table tr { display: block; padding: 1rem; border-bottom: 8px solid #f8fafc; }
+    .modern-table td { display: flex; justify-content: space-between; border: none; padding: 0.5rem 0; text-align: right; }
+    .modern-table td::before { content: attr(data-label); font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.7rem; }
+    .action-links { justify-content: flex-start; margin-top: 10px; }
+=======
     font-family: 'Inter', system-ui, sans-serif;
     padding: clamp(1rem, 3vw, 2.5rem);
     max-width: 1400px;
@@ -363,6 +580,7 @@
     border-radius: 10px;
     text-decoration: none;
     font-weight: 700;
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 }
 </style>
 {% endblock %}

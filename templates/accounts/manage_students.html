@@ -1,9 +1,30 @@
 {% extends "accounts/base_dashboard.html" %}
-
 {% block title %}Manage Students{% endblock %}
 {% block header %}Manage Students{% endblock %}
 
 {% block content %}
+<<<<<<< HEAD
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="student-manager">
+  
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
+      <div class="stat-content">
+        <span class="stat-label">Total Enrollment</span>
+        <span class="stat-value">{{ total_students }}</span>
+      </div>
+    </div>
+    {% if query %}
+    <div class="stat-card search-results">
+      <div class="stat-icon"><i class="fas fa-search"></i></div>
+      <div class="stat-content">
+        <span class="stat-label">Matches Found</span>
+        <span class="stat-value">{{ students|length }}</span>
+      </div>
+=======
 <!-- Preloading and External Assets -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
@@ -61,8 +82,92 @@
                 <button type="submit" class="btn-filter-submit">Apply</button>
             </div>
         </form>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
     </div>
 
+<<<<<<< HEAD
+  <div class="toolbar">
+    <div class="primary-actions">
+      <a href="{% url 'add_student' %}" class="btn btn-add">
+        <i class="fas fa-plus"></i> Add Student
+      </a>
+      <a href="{% url 'manage_promotions' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-up-right-dots"></i> Promote
+      </a>
+      <a href="{% url 'import_students' %}" class="btn btn-secondary">
+        <i class="fas fa-file-import"></i> Import
+      </a>
+    </div>
+
+    <form method="get" class="filter-box">
+      <div class="input-group">
+        <i class="fas fa-search"></i>
+        <input type="text" name="q" placeholder="Search name or ID..." value="{{ query }}">
+      </div>
+      <select name="status" onchange="this.form.submit()">
+        <option value="all" {% if status == "all" %}selected{% endif %}>All Status</option>
+        <option value="active" {% if status == "active" %}selected{% endif %}>Active</option>
+        <option value="inactive" {% if status == "inactive" %}selected{% endif %}>Inactive</option>
+      </select>
+      <button type="submit" class="btn-filter">Filter</button>
+    </form>
+  </div>
+
+  <div class="data-card">
+    <div class="table-responsive">
+      <table class="modern-table">
+        <thead>
+          <tr>
+            <th>Student Details</th>
+            <th>Class</th>
+            <th>Status</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in students %}
+          <tr>
+            <td>
+              <div class="student-info">
+                <span class="student-name">{{ student.user.get_full_name }}</span>
+                <span class="student-email">{{ student.user.email }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="class-badge">{{ student.current_class }}</span>
+            </td>
+            <td>
+              {% if student.user.is_active %}
+                <span class="status-pill active">Active</span>
+              {% else %}
+                <span class="status-pill inactive">Inactive</span>
+              {% endif %}
+            </td>
+            <td class="text-right">
+              <div class="table-actions">
+                <a href="{% url 'edit_student' student.pk %}" class="action-btn edit" title="Edit Profile">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'delete_student' student.pk %}" class="action-btn delete" 
+                   onclick="return confirm('Delete this student record?');" title="Delete">
+                  <i class="fas fa-trash-alt"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="empty-row">
+              <i class="fas fa-users-slash"></i>
+              <p>No students match your criteria.</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+=======
     <!-- Data Surface -->
     <div class="content-surface">
         <table class="adaptive-table">
@@ -135,10 +240,141 @@
             </tbody>
         </table>
     </div>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 </div>
 
 <style>
 :root {
+<<<<<<< HEAD
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --success: #10b981;
+  --danger: #ef4444;
+  --border: #e2e8f0;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --bg-light: #f8fafc;
+}
+
+.student-manager {
+  font-family: 'Inter', sans-serif;
+  padding: 1.5rem;
+  animation: slideUp 0.4s ease-out;
+}
+
+/* Stats Row */
+.stats-row { display: flex; gap: 1rem; margin-bottom: 2rem; }
+.stat-card {
+  background: #fff;
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  max-width: 280px;
+}
+.stat-icon {
+  width: 48px; height: 48px;
+  background: #eef2ff;
+  color: var(--primary);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.25rem;
+}
+.stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; display: block; }
+.stat-value { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.primary-actions { display: flex; gap: 0.75rem; }
+
+.btn {
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.2s;
+}
+.btn-add { background: var(--primary); color: white; }
+.btn-secondary { background: #fff; border: 1px solid var(--border); color: var(--text-main); }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+
+/* Filter Box */
+.filter-box { display: flex; gap: 8px; align-items: center; }
+.input-group { position: relative; }
+.input-group i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.input-group input { padding: 0.6rem 1rem 0.6rem 2.5rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; width: 220px; }
+.filter-box select { padding: 0.6rem; border: 1px solid var(--border); border-radius: 8px; background: #fff; font-size: 0.9rem; }
+.btn-filter { background: #334155; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; }
+
+/* Table Section */
+.data-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.modern-table { width: 100%; border-collapse: collapse; }
+.modern-table th {
+  background: var(--bg-light);
+  padding: 1rem;
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+.modern-table td { padding: 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+
+.student-info { display: flex; flex-direction: column; }
+.student-name { font-weight: 600; color: var(--text-main); }
+.student-email { font-size: 0.8rem; color: var(--text-muted); }
+
+.class-badge { background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; }
+
+.status-pill { padding: 4px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 600; }
+.status-pill.active { background: #ecfdf5; color: #065f46; }
+.status-pill.inactive { background: #fef2f2; color: #991b1b; }
+
+.table-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.action-btn {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: 0.2s;
+}
+.action-btn.edit { background: #eef2ff; color: var(--primary); }
+.action-btn.delete { background: #fff1f2; color: var(--danger); }
+.action-btn:hover { transform: scale(1.1); }
+
+.empty-row { text-align: center; padding: 4rem !important; color: var(--text-muted); }
+.empty-row i { font-size: 2.5rem; opacity: 0.2; margin-bottom: 1rem; display: block; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .filter-box { flex-direction: column; }
+  .input-group input { width: 100%; }
+=======
     --brand: #4f46e5;
     --brand-dark: #4338ca;
     --brand-light: #eef2ff;
@@ -361,6 +597,7 @@
 
     .btn-fab span { display: none; } /* Show only icon on mobile FAB */
     .btn-fab { width: 50px; height: 50px; padding: 0; justify-content: center; border-radius: 50%; }
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 }
 </style>
 {% endblock %}

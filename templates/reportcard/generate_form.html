@@ -9,8 +9,11 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <div class="generation-wrapper">
+<<<<<<< HEAD
+=======
     {# SAFETY CHECK: Ensure we only show content if student is active #}
     {% if student.is_active %}
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
     <div class="generation-card">
         <div class="student-profile-header">
             <div class="profile-avatar">
@@ -19,9 +22,14 @@
             <div class="profile-info">
                 <h2>{{ student.user.get_full_name }}</h2>
                 <div class="period-badges">
+<<<<<<< HEAD
+                    <span class="badge-item"><i class="fas fa-calendar-alt"></i> {{ report.session }}</span>
+                    <span class="badge-item"><i class="fas fa-clock"></i> {{ report.term }} Term</span>
+=======
                     <span class="badge-item"><i class="fas fa-calendar-alt"></i> {{ session }}</span>
                     <span class="badge-item"><i class="fas fa-clock"></i> {{ term }} Term</span>
                     <span class="badge-item"><i class="fas fa-school"></i> {{ student.current_class.name }}</span>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
                 </div>
             </div>
         </div>
@@ -45,7 +53,11 @@
                 </label>
                 <p class="field-desc">Upload a digital signature (PNG or JPG) to be appended to the PDF.</p>
                 <div class="file-upload-wrapper">
+<<<<<<< HEAD
+                    <input type="file" name="teacher_signature" id="teacher_signature" class="file-input">
+=======
                     <input type="file" name="teacher_signature" id="teacher_signature" class="file-input" accept="image/*">
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
                     <div class="file-dummy">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <span>Click to browse or drag signature here</span>
@@ -54,13 +66,22 @@
             </div>
 
             <div class="form-actions">
+<<<<<<< HEAD
+                <a href="{% url 'student_list' %}" class="btn-back">Cancel</a>
+=======
                 <a href="{% url 'select_report_options' %}" class="btn-back">Cancel</a>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
                 <button type="submit" class="btn-generate">
                     <i class="fas fa-file-pdf"></i> Finalize & Generate PDF
                 </button>
             </div>
         </form>
     </div>
+<<<<<<< HEAD
+</div>
+
+<style>
+=======
     {% else %}
     <div class="generation-card" style="text-align: center;">
         <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
@@ -73,6 +94,7 @@
 
 <style>
 /* ... (Your existing CSS remains exactly the same) ... */
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 :root {
     --primary: #4f46e5;
     --primary-dark: #4338ca;
@@ -97,6 +119,10 @@
     box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
 }
 
+<<<<<<< HEAD
+/* Header Section */
+=======
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 .student-profile-header {
     display: flex;
     align-items: center;
@@ -107,7 +133,11 @@
 .profile-avatar {
     width: 64px;
     height: 64px;
+<<<<<<< HEAD
+    background: var(--primary-soft, #eef2ff);
+=======
     background: #eef2ff;
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
     color: var(--primary);
     border-radius: 18px;
     display: flex;
@@ -133,6 +163,10 @@
 
 .divider { border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0 2rem 0; }
 
+<<<<<<< HEAD
+/* Form Elements */
+=======
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 .form-section { margin-bottom: 2rem; }
 .form-section label {
     display: flex;
@@ -165,6 +199,10 @@ textarea:focus {
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
 
+<<<<<<< HEAD
+/* Custom File Upload */
+=======
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 .file-upload-wrapper {
     position: relative;
     height: 100px;
@@ -195,6 +233,10 @@ textarea:focus {
 
 .file-upload-wrapper:hover { border-color: var(--primary); background: #eef2ff; }
 
+<<<<<<< HEAD
+/* Actions */
+=======
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -223,7 +265,10 @@ textarea:focus {
     align-items: center;
     gap: 10px;
     transition: 0.2s;
+<<<<<<< HEAD
+=======
     text-decoration: none;
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 }
 
 .btn-generate:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
@@ -238,6 +283,10 @@ textarea:focus {
 </style>
 
 <script>
+<<<<<<< HEAD
+    // Simple UI tweak to show filename when selected
+=======
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
     document.getElementById('teacher_signature').onchange = function() {
         const dummy = this.nextElementSibling.querySelector('span');
         dummy.innerText = this.files[0] ? this.files[0].name : "Click to browse or drag signature here";

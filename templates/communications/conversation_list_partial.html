@@ -1,6 +1,23 @@
 <div class="conversation-list">
     {% for convo in conversations %}
     <a href="{% url 'conversation_detail' convo.pk %}" class="conversation-card">
+<<<<<<< HEAD
+        <div class="avatar-circle">
+            {{ convo.name|slice:":1"|upper }}
+        </div>
+        <div class="convo-info">
+            <h3>{{ convo.name }}</h3>
+            <p>{{ convo.messages.last.content|truncatechars:35|default:"No messages yet" }}</p>
+        </div>
+        <div class="status-indicator {% if convo.is_active %}active{% endif %}"></div>
+    </a>
+    {% empty %}
+    <div class="empty-message" style="grid-column: 1 / -1; width: 100%;">
+        <i class="fas fa-comment-slash" style="font-size: 2.5rem; color: #cbd5e1; margin-bottom: 1rem; display: block;"></i>
+        <p>No conversations found matching your search.</p>
+    </div>
+    {% endfor %}
+=======
         <div style="position: relative;">
             <div class="avatar-circle">
                 {% if convo.name %}
@@ -79,4 +96,5 @@
     font-weight: 600;
 }
     </style>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 </div>
