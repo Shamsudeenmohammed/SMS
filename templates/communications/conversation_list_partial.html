@@ -1,16 +1,19 @@
-{% if conversations %}
-  <div class="conversation-list">
-    {% for c in conversations %}
-      <div class="conversation-card">
-        <a href="{% url 'conversation_detail' c.pk %}">
-          {{ c.name|default:"Conversation #" }}{{ c.pk }}
-        </a>
-        <small>{{ c.participants.count }} member{{ c.participants.count|pluralize }}</small>
-      </div>
+<div class="conversation-list">
+    {% for convo in conversations %}
+    <a href="{% url 'conversation_detail' convo.pk %}" class="conversation-card">
+        <div class="avatar-circle">
+            {{ convo.name|slice:":1"|upper }}
+        </div>
+        <div class="convo-info">
+            <h3>{{ convo.name }}</h3>
+            <p>{{ convo.messages.last.content|truncatechars:35|default:"No messages yet" }}</p>
+        </div>
+        <div class="status-indicator {% if convo.is_active %}active{% endif %}"></div>
+    </a>
+    {% empty %}
+    <div class="empty-message" style="grid-column: 1 / -1; width: 100%;">
+        <i class="fas fa-comment-slash" style="font-size: 2.5rem; color: #cbd5e1; margin-bottom: 1rem; display: block;"></i>
+        <p>No conversations found matching your search.</p>
+    </div>
     {% endfor %}
-  </div>
-{% else %}
-  <div class="empty-message">
-    <p>No conversations found.</p>
-  </div>
-{% endif %}
+</div>

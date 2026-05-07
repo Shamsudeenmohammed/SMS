@@ -2,200 +2,224 @@
 {% block header %}💸 Record Payment{% endblock %}
 
 {% block content %}
-<!-- ✅ Select2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
-<!-- ✅ jQuery + Select2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <style>
 /* ===========================
-   💳 Record Payment Page
+    💳 Record Payment Refined
    =========================== */
-.payment-form-container {
-    max-width: 600px;
-    margin: 30px auto;
+.payment-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+.payment-form-card {
+    width: 100%;
+    max-width: 580px;
     background: #ffffff;
-    padding: 35px 45px;
-    border-radius: 20px;
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
-    animation: fadeIn 0.6s ease-in-out;
+    padding: 40px;
+    border-radius: 24px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    animation: fadeIn 0.5s ease-out;
 }
 
-.payment-form-container h2 {
+.card-header {
     text-align: center;
-    font-size: 1.7rem;
-    font-weight: 700;
-    margin-bottom: 25px;
-    color: #004aad;
-    letter-spacing: 0.5px;
+    margin-bottom: 30px;
 }
 
-/* ===== Alerts ===== */
-.alert {
-    padding: 12px 18px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    font-weight: 600;
-    animation: slideDown 0.5s ease;
+.card-header .icon-box {
+    width: 60px;
+    height: 60px;
+    background: #eef2ff;
+    color: #1a73e8;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin: 0 auto 15px;
 }
 
-.alert-success {
-    background: #e6ffed;
-    color: #0a7a2f;
-    border: 1.5px solid #63d471;
+.card-header h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
 }
 
-.alert-error {
-    background: #ffe8e6;
-    color: #b00020;
-    border: 1.5px solid #ff7b7b;
+.card-header p {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-top: 5px;
 }
 
-/* ===== Form Layout ===== */
-.payment-form-container form {
+/* ===== Form Groups ===== */
+.modern-form {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 20px;
 }
 
-.payment-form-container label {
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 6px;
+.form-group label {
     display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
 }
 
-.payment-form-container input,
-.payment-form-container select,
-.payment-form-container textarea {
+/* Customizing Django form inputs */
+.modern-form input:not([type="checkbox"]), 
+.modern-form select, 
+.modern-form textarea {
     width: 100%;
-    padding: 10px 14px;
-    border: 1.5px solid #ccc;
-    border-radius: 10px;
+    padding: 12px 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
     font-size: 0.95rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    color: #1e293b;
+    background-color: #f8fafc;
+    transition: all 0.2s ease;
 }
 
-.payment-form-container input:focus,
-.payment-form-container select:focus,
-.payment-form-container textarea:focus {
-    border-color: #004aad;
-    box-shadow: 0 0 5px rgba(0, 74, 173, 0.25);
+.modern-form input:focus, 
+.modern-form textarea:focus {
+    background-color: #fff;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1);
     outline: none;
 }
 
-/* ===== Button Styling ===== */
-.btn-primary {
-    background: linear-gradient(90deg, #004aad, #007bff);
+/* ===== Select2 Modern Overrides ===== */
+.select2-container--default .select2-selection--single {
+    height: 48px !important;
+    background-color: #f8fafc !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 8px 12px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #1e293b !important;
+    line-height: 28px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 46px !important;
+    right: 10px !important;
+}
+
+.select2-dropdown {
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+    overflow: hidden;
+}
+
+/* ===== Button ===== */
+.btn-submit {
+    background: #1a73e8;
     color: white;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 1rem;
     border: none;
     border-radius: 12px;
-    padding: 12px;
+    padding: 14px;
+    margin-top: 10px;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.3s ease;
-}
-
-.btn-primary:hover {
-    transform: scale(1.03);
-    box-shadow: 0 5px 15px rgba(0, 74, 173, 0.3);
-}
-
-/* ===== Hint Text ===== */
-.form-hint {
-    text-align: center;
-    font-size: 0.9rem;
-    color: #555;
-    margin-top: 12px;
-}
-
-/* ===== Animations ===== */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* ===== Select2 Styling ===== */
-.select2-container--default .select2-selection--single {
-    height: 42px;
-    border: 1.5px solid #ccc;
-    border-radius: 10px;
-    padding: 5px 10px;
-    font-size: 0.95rem;
     display: flex;
     align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s ease;
 }
 
-.select2-container--default .select2-selection--single:hover {
-    border-color: #004aad;
-    box-shadow: 0 0 5px rgba(0, 74, 173, 0.25);
+.btn-submit:hover {
+    background: #1557b0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.25);
 }
 
-.select2-selection__arrow {
-    height: 36px !important;
+.form-error {
+    color: #ef4444;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 5px;
+    display: block;
 }
 
-/* ===== Responsive ===== */
-@media (max-width: 600px) {
-    .payment-form-container {
-        padding: 25px;
-        margin: 15px;
-    }
-    .payment-form-container h2 {
-        font-size: 1.4rem;
-    }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+    .payment-form-card { padding: 25px; border-radius: 0; border: none; }
 }
 </style>
 
-<div class="payment-form-container">
-  <h2>💸 Record New Payment</h2>
-
-  <!-- ✅ Display Success or Error Messages -->
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-
-  <form method="POST">
-    {% csrf_token %}
-    {% for field in form %}
-      {% if field.name != 'received_by' %}
-        <div class="form-group">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {% if field.errors %}
-            <small style="color: red;">{{ field.errors|striptags }}</small>
-          {% endif %}
+<div class="payment-wrapper">
+    <div class="payment-form-card">
+        <div class="card-header">
+            <div class="icon-box">
+                <i class="fas fa-receipt"></i>
+            </div>
+            <h2>Record Payment</h2>
+            <p>Ensure invoice selection matches the physical bank teller or cash received.</p>
         </div>
-      {% endif %}
-    {% endfor %}
-    <button type="submit" class="btn-primary">💾 Record Payment</button>
-  </form>
 
-  <p class="form-hint">Ensure all payment details are accurate before submitting.</p>
+        <form method="POST" class="modern-form">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                {% if field.name != 'received_by' %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">
+                        {% if field.name == 'amount' %}<i class="fas fa-coins"></i> {% endif %}
+                        {% if field.name == 'payment_method' %}<i class="fas fa-credit-card"></i> {% endif %}
+                        {{ field.label }}
+                    </label>
+                    
+                    {{ field }}
+                    
+                    {% if field.errors %}
+                        <span class="form-error"><i class="fas fa-exclamation-circle"></i> {{ field.errors|striptags }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save"></i> Finalize Payment Record
+            </button>
+        </form>
+    </div>
 </div>
 
-<!-- ✅ Activate Select2 -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 {% block extrajs %}
 <script>
-  $(document).ready(function() {
-    $('#id_student_fee').select2({
-      placeholder: '🔍 Search or select a student fee record...',
-      allowClear: true,
-      width: '100%'
+    $(document).ready(function() {
+        // Initialize Select2 with modern styling
+        $('#id_student_fee').select2({
+            placeholder: '🔍 Start typing student name or ID...',
+            allowClear: true,
+            width: '100%'
+        });
+
+        // Auto-dismiss Django messages if they appear in this view
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
     });
-  });
 </script>
 {% endblock %}
+
 {% endblock %}

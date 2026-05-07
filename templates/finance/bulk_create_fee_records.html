@@ -1,98 +1,225 @@
 {% extends "accounts/base_dashboard.html" %}
-{% block title %}🧮 Bulk Fee Creation{% endblock %}
-{% block header %}🧾 Create Fee Records for All Students{% endblock %}
+{% load static %}
+
+{% block title %}Bulk Fee Creation{% endblock %}
+{% block header %}🧮 Bulk Ledger Generation{% endblock %}
 
 {% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="form-wrapper">
+    <div class="form-container">
+        <div class="info-banner">
+            <div class="banner-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="banner-text">
+                <h4>Important Operation</h4>
+                <p>This action will generate new fee records for <strong>all active students</strong> in the system based on the selected criteria.</p>
+            </div>
+        </div>
+
+        <form method="post" class="modern-form">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="form-field-group {% if field.errors %}has-error{% endif %}">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="required">*</span>{% endif %}
+                    </label>
+                    
+                    <div class="input-wrapper">
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="error-message">
+                                <i class="fas fa-circle-exclamation"></i>
+                                {% for error in field.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-generate">
+                    <i class="fas fa-cogs"></i> Run Bulk Generation
+                </button>
+                <a href="{% url 'manage_fees' %}" class="btn-cancel">
+                    Cancel and Return
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
 <style>
-/* 🔹 Page Container */
-.bulk-fee-container {
-  max-width: 600px;
-  margin: 40px auto;
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  padding: 30px 35px;
-  transition: 0.3s ease;
-}
-.bulk-fee-container:hover {
-  transform: translateY(-3px);
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --warning-bg: #fff7ed;
+    --warning-text: #9a3412;
 }
 
-/* 🔹 Heading */
-.bulk-fee-container h2 {
-  text-align: center;
-  font-size: 1.5rem;
-  color: #004aad;
-  margin-bottom: 1.5rem;
-  font-weight: 700;
+.form-wrapper {
+    font-family: 'Inter', sans-serif;
+    padding: 2rem 1rem;
+    animation: fadeIn 0.4s ease-out;
 }
 
-/* 🔹 Form Styles */
-.bulk-fee-container form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.1rem;
-}
-.bulk-fee-container label {
-  font-weight: 600;
-  color: #333;
-  display: block;
-  margin-bottom: 0.4rem;
-}
-.bulk-fee-container select,
-.bulk-fee-container input[type="text"],
-.bulk-fee-container input[type="number"],
-.bulk-fee-container input[type="decimal"],
-.bulk-fee-container input[type="email"],
-.bulk-fee-container input[type="password"],
-.bulk-fee-container input[type="file"] {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1.6px solid #ddd;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-}
-.bulk-fee-container select:focus,
-.bulk-fee-container input:focus {
-  border-color: #004aad;
-  outline: none;
+.form-container {
+    width: 100%;
+    max-width: 580px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    margin: 0 auto;
 }
 
-/* 🔹 Submit Button */
-.btn-primary {
-  background: #004aad;
-  color: #fff;
-  font-weight: 600;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-.btn-primary:hover {
-  background: #003a8c;
-  transform: translateY(-2px);
+/* Info Banner */
+.info-banner {
+    background: var(--warning-bg);
+    border: 1px solid #ffedd5;
+    border-radius: 14px;
+    padding: 1.25rem;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
 }
 
-/* 🔹 Responsive */
+.banner-icon {
+    color: #f97316;
+    font-size: 1.25rem;
+    margin-top: 2px;
+}
+
+.banner-text h4 {
+    color: var(--warning-text);
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.banner-text p {
+    color: #c2410c;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Form Styles */
+.form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.form-field-group label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.required { color: #ef4444; }
+
+.modern-form select, 
+.modern-form input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    background: #f8fafc;
+    transition: all 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.2em;
+}
+
+.modern-form select:focus, 
+.modern-form input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.error-message {
+    color: #ef4444;
+    font-size: 0.8rem;
+    margin-top: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Actions */
+.form-actions {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+}
+
+.btn-generate {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+}
+
+.btn-generate:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2);
+}
+
+.btn-cancel {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.5rem;
+    transition: 0.2s;
+}
+
+.btn-cancel:hover { color: var(--text-main); }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
 @media (max-width: 480px) {
-  .bulk-fee-container {
-    padding: 20px;
-  }
-  .bulk-fee-container h2 {
-    font-size: 1.3rem;
-  }
+    .form-container { padding: 1.5rem; }
 }
 </style>
-
-<div class="bulk-fee-container">
-  <h2>🧮 Create Fee Records for All Students</h2>
-
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn-primary">Generate Records</button>
-  </form>
-</div>
 {% endblock %}

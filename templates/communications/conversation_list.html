@@ -5,116 +5,223 @@
 
 {% block content %}
 <style>
-/* === STYLING === */
-.chat-page { display: flex; flex-direction: column; gap: 1.5rem; }
-.chat-header {
-  display: flex; justify-content: space-between; align-items: center;
-  background: #fff; padding: 1rem 1.5rem; border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+/* === MODERN CHAT HUB STYLING === */
+.chat-page { 
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex; 
+    flex-direction: column; 
+    gap: 1.5rem; 
+    animation: fadeIn 0.4s ease-out;
 }
-.chat-header h1 { font-size: 1.4rem; color: #1e293b; margin: 0; }
-.chat-header a {
-  background: #2563eb; color: #fff; padding: 0.5rem 1rem;
-  border-radius: 8px; text-decoration: none; font-weight: 500;
-  transition: background 0.2s ease;
-}
-.chat-header a:hover { background: #1e40af; }
 
+/* 🔹 Header Section */
+.chat-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    background: #fff; 
+    padding: 1.25rem 2rem; 
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.chat-header h1 { font-size: 1.5rem; font-weight: 800; color: #1e293b; margin: 0; }
+.chat-header .btn-create {
+    background: #1a73e8; 
+    color: #fff; 
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px; 
+    text-decoration: none; 
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+.chat-header .btn-create:hover { 
+    background: #1557b0; 
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+}
+
+/* 🔹 Search & Filter Bar */
 .chat-controls {
-  background: #fff; padding: 1rem 1.5rem; border-radius: 12px;
-  display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    background: #fff; 
+    padding: 1rem; 
+    border-radius: 16px;
+    display: grid;
+    grid-template-columns: 1fr 200px 120px;
+    gap: 1rem; 
+    align-items: center;
+    border: 1px solid #e2e8f0;
 }
 .chat-controls input,
 .chat-controls select {
-  flex: 1; padding: 0.6rem 1rem; border: 1px solid #cbd5e0;
-  border-radius: 8px; font-size: 0.95rem;
+    padding: 0.75rem 1rem; 
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px; 
+    font-size: 0.9rem;
+    background: #f8fafc;
+    transition: all 0.2s;
+    outline: none;
+}
+.chat-controls input:focus {
+    border-color: #1a73e8;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
 }
 .chat-controls button {
-  background: #16a34a; color: #fff; border: none;
-  padding: 0.6rem 1.2rem; border-radius: 8px;
-  cursor: pointer; font-weight: 500;
+    background: #1e293b; 
+    color: #fff; 
+    border: none;
+    padding: 0.75rem; 
+    border-radius: 10px;
+    cursor: pointer; 
+    font-weight: 600;
+    transition: 0.2s;
 }
-.chat-controls button:hover { background: #15803d; }
+.chat-controls button:hover { background: #0f172a; }
 
+/* 🔹 Grid List */
 .conversation-list {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1rem;
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.25rem;
 }
+
+/* 🔹 Conversation Card */
 .conversation-card {
-  background: #fff; border-radius: 12px; padding: 1rem 1.2rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+    background: #fff; 
+    border-radius: 16px; 
+    padding: 1.25rem;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .conversation-card:hover {
-  transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    transform: translateY(-3px); 
+    border-color: #1a73e8;
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
 }
-.conversation-card a {
-  text-decoration: none; color: #1e3a8a;
-  font-weight: 600; font-size: 1.05rem;
+
+.avatar-circle {
+    width: 50px;
+    height: 50px;
+    background: #eef2ff;
+    color: #1a73e8;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    flex-shrink: 0;
 }
-.conversation-card small {
-  display: block; color: #64748b;
-  margin-top: 0.3rem; font-size: 0.85rem;
+
+.convo-info { flex-grow: 1; min-width: 0; }
+.convo-info h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #1e293b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.empty-message {
-  text-align: center; padding: 2rem; color: #6b7280;
-  background: #fff; border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+.convo-info p {
+    margin: 4px 0 0;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #cbd5e1;
+}
+.status-indicator.active {
+    background: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .chat-controls { grid-template-columns: 1fr; }
+    .chat-header h1 { font-size: 1.2rem; }
 }
 </style>
 
 <div class="chat-page">
-  <!-- 🔹 Header -->
-  <div class="chat-header">
-    <h1>💬 Your Conversations</h1>
-    <a href="{% url 'create_conversation' %}">+ Start New Chat</a>
-  </div>
+    <div class="chat-header">
+        <h1><i class="fas fa-comments" style="color: #1a73e8; margin-right: 10px;"></i> Messages</h1>
+        <a href="{% url 'create_conversation' %}" class="btn-create">
+            <i class="fas fa-plus"></i> New Conversation
+        </a>
+    </div>
 
-  <!-- 🔹 Search and Filters -->
-  <form id="chatSearchForm" class="chat-controls">
-    <input type="text" name="q" id="searchInput" placeholder="Search by name or participant...">
-    <select name="filter" id="filterSelect">
-      <option value="">All</option>
-      <option value="recent">Most Recent</option>
-      <option value="active">Active</option>
-    </select>
-    <button type="submit">Search</button>
-  </form>
+    <form id="chatSearchForm" class="chat-controls">
+        <div style="position: relative;">
+            <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+            <input type="text" name="q" id="searchInput" placeholder="Search people or groups..." style="padding-left: 40px;">
+        </div>
+        <select name="filter" id="filterSelect">
+            <option value="">All Chats</option>
+            <option value="recent">Recently Active</option>
+            <option value="unread">Unread Only</option>
+        </select>
+        <button type="submit">Filter</button>
+    </form>
 
-  <!-- 🔹 Conversation List -->
-  <div id="conversationContainer">
-    {% include 'communications/conversation_list_partial.html' %}
-  </div>
+    <div id="conversationContainer">
+        {% include 'communications/conversation_list_partial.html' %}
+    </div>
 </div>
 
-<!-- ✅ AJAX Script -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('chatSearchForm');
-  const container = document.getElementById('conversationContainer');
+    const form = document.getElementById('chatSearchForm');
+    const container = document.getElementById('conversationContainer');
+    const searchInput = document.getElementById('searchInput');
 
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    updateConversations();
-  });
+    const updateConversations = () => {
+        const params = new URLSearchParams(new FormData(form));
+        // Add a "loading" state visual if needed
+        container.style.opacity = '0.6';
+        
+        fetch(`{% url 'conversation_list_ajax' %}?${params.toString()}`)
+            .then(response => response.text())
+            .then(html => {
+                container.innerHTML = html;
+                container.style.opacity = '1';
+            })
+            .catch(err => {
+                console.error("Search Error:", err);
+                container.style.opacity = '1';
+            });
+    };
 
-  // 🔹 Trigger search as you type
-  document.getElementById('searchInput').addEventListener('keyup', () => {
-    clearTimeout(window.searchTimer);
-    window.searchTimer = setTimeout(updateConversations, 400);
-  });
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        updateConversations();
+    });
 
-  // 🔹 Fetch updated results
-  function updateConversations() {
-    const params = new URLSearchParams(new FormData(form));
-    fetch(`{% url 'conversation_list_ajax' %}?${params}`)
-      .then(response => response.text())
-      .then(html => {
-        container.innerHTML = html;
-      })
-      .catch(err => console.error("Error:", err));
-  }
+    // Real-time search with debounce
+    let searchTimer;
+    searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(updateConversations, 350);
+    });
+    
+    document.getElementById('filterSelect').addEventListener('change', updateConversations);
 });
 </script>
 {% endblock %}

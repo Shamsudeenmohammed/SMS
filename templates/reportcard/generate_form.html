@@ -1,17 +1,238 @@
-<!-- reportcard/generate_form.html -->
+{% extends "accounts/base_dashboard.html" %}
+{% load static %}
 
-<h2>Generate Report Card for {{ student.user.get_full_name }}</h2>
+{% block title %}Generate Report Card{% endblock %}
+{% block header %}✍️ Academic Assessment{% endblock %}
 
-<p>Session: {{ report.session }} | Term: {{ report.term }}</p>
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
+<div class="generation-wrapper">
+    <div class="generation-card">
+        <div class="student-profile-header">
+            <div class="profile-avatar">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="profile-info">
+                <h2>{{ student.user.get_full_name }}</h2>
+                <div class="period-badges">
+                    <span class="badge-item"><i class="fas fa-calendar-alt"></i> {{ report.session }}</span>
+                    <span class="badge-item"><i class="fas fa-clock"></i> {{ report.term }} Term</span>
+                </div>
+            </div>
+        </div>
 
-    <label>Teacher Remark</label>
-    <textarea name="teacher_remark" required></textarea>
+        <hr class="divider">
 
-    <label>Signature</label>
-    <input type="file" name="teacher_signature">
+        <form method="post" enctype="multipart/form-data" class="modern-form">
+            {% csrf_token %}
 
-    <button type="submit">Generate Report Card</button>
-</form>
+            <div class="form-section">
+                <label for="teacher_remark">
+                    <i class="fas fa-comment-dots"></i> Teacher's Remarks
+                </label>
+                <p class="field-desc">Provide a professional assessment of the student's academic and behavioral performance.</p>
+                <textarea name="teacher_remark" id="teacher_remark" rows="5" placeholder="Enter performance review..." required></textarea>
+            </div>
+
+            <div class="form-section">
+                <label for="teacher_signature">
+                    <i class="fas fa-file-signature"></i> Official Signature
+                </label>
+                <p class="field-desc">Upload a digital signature (PNG or JPG) to be appended to the PDF.</p>
+                <div class="file-upload-wrapper">
+                    <input type="file" name="teacher_signature" id="teacher_signature" class="file-input">
+                    <div class="file-dummy">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Click to browse or drag signature here</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'student_list' %}" class="btn-back">Cancel</a>
+                <button type="submit" class="btn-generate">
+                    <i class="fas fa-file-pdf"></i> Finalize & Generate PDF
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+:root {
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+}
+
+.generation-wrapper {
+    font-family: 'Inter', sans-serif;
+    padding: 2rem 1.5rem;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.generation-card {
+    max-width: 650px;
+    margin: 0 auto;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+}
+
+/* Header Section */
+.student-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.profile-avatar {
+    width: 64px;
+    height: 64px;
+    background: var(--primary-soft, #eef2ff);
+    color: var(--primary);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.profile-info h2 { font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 6px; }
+
+.period-badges { display: flex; gap: 10px; }
+.badge-item {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.divider { border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0 2rem 0; }
+
+/* Form Elements */
+.form-section { margin-bottom: 2rem; }
+.form-section label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 4px;
+}
+
+.field-desc { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; }
+
+textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    background: #f8fafc;
+    transition: 0.2s;
+    resize: vertical;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+/* Custom File Upload */
+.file-upload-wrapper {
+    position: relative;
+    height: 100px;
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    transition: 0.2s;
+}
+
+.file-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-dummy {
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.file-dummy i { font-size: 1.5rem; display: block; margin-bottom: 8px; }
+.file-dummy span { font-size: 0.85rem; font-weight: 500; }
+
+.file-upload-wrapper:hover { border-color: var(--primary); background: #eef2ff; }
+
+/* Actions */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1.5rem;
+    padding-top: 1rem;
+}
+
+.btn-back {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.btn-generate {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.8rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.2s;
+}
+
+.btn-generate:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 600px) {
+    .generation-card { padding: 1.5rem; }
+    .form-actions { flex-direction: column-reverse; width: 100%; }
+    .btn-generate { width: 100%; justify-content: center; }
+}
+</style>
+
+<script>
+    // Simple UI tweak to show filename when selected
+    document.getElementById('teacher_signature').onchange = function() {
+        const dummy = this.nextElementSibling.querySelector('span');
+        dummy.innerText = this.files[0] ? this.files[0].name : "Click to browse or drag signature here";
+    };
+</script>
+{% endblock %}

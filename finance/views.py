@@ -222,50 +222,89 @@ def download_invoice_pdf(request, invoice_id):
 
     p = canvas.Canvas(response, pagesize=A4)
     width, height = A4
+    
+    # Corrected Capitalization
+    brand_color = colors.HexColor("#1A237E")
+    text_muted = colors.HexColor("#424242")
 
-    # === Header ===
-    p.setFont("Helvetica-Bold", 18)
-    p.drawString(200, height - 80, "CENTER FOR GLORY SCHOOL")
-    p.setFont("Helvetica", 12)
-    p.drawString(220, height - 100, "Invoice Summary")
+    # === Header / Branding ===
+    p.setFillColor(brand_color)
+    p.rect(0, height - 100, width, 100, fill=True, stroke=False)
+    
+    p.setFillColor(colors.white)
+    p.setFont("Helvetica-Bold", 22)
+    p.drawCentredString(width / 2, height - 55, "CENTER FOR GLORY SCHOOL")
+    
+    p.setFont("Helvetica", 11)
+    p.drawCentredString(width / 2, height - 75, "Official Payment Receipt & Invoice Summary")
 
-    # === Invoice Info ===
-    y = height - 150
+    # === Invoice Details ===
+    p.setFillColor(colors.black)
+    y = height - 140
+    
     p.setFont("Helvetica-Bold", 12)
-    p.drawString(50, y, f"Invoice No: {invoice.invoice_number}")
-    y -= 20
-    p.drawString(50, y, f"Student: {invoice.student.get_full_name() if hasattr(invoice.student, 'get_full_name') else str(invoice.student)}")
-    y -= 20
-    p.drawString(50, y, f"Session: {invoice.session}")
-    y -= 20
-    p.drawString(50, y, f"Term: {invoice.term}")
-    y -= 20
-    p.drawString(50, y, f"Date Issued: {invoice.date_issued.strftime('%Y-%m-%d')}")
-
-    # === Financial Details ===
-    y -= 40
-    p.setFont("Helvetica-Bold", 12)
-    p.drawString(50, y, "Summary:")
-    y -= 20
+    p.drawString(50, y, "Billed To:")
     p.setFont("Helvetica", 12)
-    p.drawString(60, y, f"Total Due: ₵{invoice.total_due}")
+    p.drawString(50, y - 20, f"{invoice.student.get_full_name() if hasattr(invoice.student, 'get_full_name') else str(invoice.student)}")
+    
+    p.setFont("Helvetica-Bold", 10)
+    p.drawRightString(width - 50, y, f"Invoice No: {invoice.invoice_number}")
+    p.setFont("Helvetica", 10)
+    p.drawRightString(width - 50, y - 15, f"Date: {invoice.date_issued.strftime('%B %d, %Y')}")
+    p.drawRightString(width - 50, y - 30, f"Session: {invoice.session} ({invoice.term})")
+
+    # === Table Header ===
+    y -= 80
+    p.setStrokeColor(brand_color)
+    p.setLineWidth(1)
+    p.line(50, y + 15, width - 50, y + 15)
+    
+    p.setFont("Helvetica-Bold", 11)
+    p.drawString(60, y, "Description")
+    p.drawRightString(width - 60, y, "Amount")
+    p.line(50, y - 10, width - 50, y - 10)
+
+    # === Table Content ===
+    y -= 30
+    p.setFont("Helvetica", 11)
+    items = [
+        ("Total Tuition & Fees Due", f"GH₵ {invoice.total_due}"),
+        ("Total Amount Paid", f"GH₵ {invoice.total_paid}"),
+    ]
+
+    for label, amt in items:
+        p.drawString(60, y, label)
+        p.drawRightString(width - 60, y, amt)
+        y -= 25
+
+    # === Summary Box ===
     y -= 20
-    p.drawString(60, y, f"Total Paid: ₵{invoice.total_paid}")
-    y -= 20
-    p.drawString(60, y, f"Balance: ₵{invoice.balance}")
-    y -= 20
-    p.drawString(60, y, f"Status: {'PAID ✅' if invoice.is_paid else 'PENDING ⚠️'}")
+    p.setFillColor(colors.whitesmoke)
+    p.rect(300, y - 40, width - 350, 60, fill=True, stroke=False)
+    
+    p.setFillColor(colors.black)
+    p.setFont("Helvetica-Bold", 13)
+    p.drawString(310, y, "Outstanding Balance")
+    p.drawRightString(width - 60, y, f"GH₵ {invoice.balance}")
+    
+    y -= 25
+    status_color = colors.green if invoice.is_paid else colors.red
+    p.setFillColor(status_color)
+    p.setFont("Helvetica-Bold", 11)
+    status_text = "STATUS: FULLY PAID" if invoice.is_paid else "STATUS: PAYMENT PENDING"
+    p.drawString(310, y, status_text)
 
     # === Footer ===
-    y -= 50
-    p.setFont("Helvetica-Oblique", 10)
-    p.drawString(50, y, "Thank you for your payment!")
-    p.drawString(50, y - 15, "Generated automatically by the Finance System")
+    p.setStrokeColor(colors.lightgrey)
+    p.line(50, 100, width - 50, 100)
+    p.setFillColor(text_muted)
+    p.setFont("Helvetica-Oblique", 9)
+    p.drawCentredString(width / 2, 80, "Thank you for choosing Center for Glory School.")
+    p.drawCentredString(width / 2, 65, "This is a computer-generated document. No signature is required.")
 
     p.showPage()
     p.save()
     return response
-
 
 
 

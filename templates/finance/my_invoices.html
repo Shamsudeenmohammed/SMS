@@ -1,164 +1,219 @@
 {% extends "accounts/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}My Invoices{% endblock %}
-{% block header %}💰 My Invoices{% endblock %}
+{% block header %}💰 Financial Overview{% endblock %}
 
 {% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="invoice-wrapper">
+    <div class="summary-grid">
+        <div class="stat-card">
+            <span class="stat-label">Outstanding Balance</span>
+            <span class="stat-value text-danger">₵{{ total_balance|default:"0.00" }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Total Invoices</span>
+            <span class="stat-value">{{ invoices.count }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Currency</span>
+            <span class="stat-value">GHS (₵)</span>
+        </div>
+    </div>
+
+    <div class="invoice-container">
+        <div class="container-header">
+            <h3>Recent Billing History</h3>
+            <p>View and download your official fee invoices and payment receipts.</p>
+        </div>
+
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Invoice ID</th>
+                        <th>Session / Term</th>
+                        <th class="text-right">Total Due</th>
+                        <th class="text-right">Paid</th>
+                        <th class="text-right">Balance</th>
+                        <th class="text-center">Status</th>
+                        <th>Issued Date</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in invoices %}
+                    <tr>
+                        <td class="id-cell">#{{ invoice.invoice_number }}</td>
+                        <td>
+                            <span class="session-text">{{ invoice.session }}</span>
+                            <span class="term-badge">{{ invoice.term }}</span>
+                        </td>
+                        <td class="text-right fw-600">₵{{ invoice.total_due }}</td>
+                        <td class="text-right text-success">₵{{ invoice.total_paid }}</td>
+                        <td class="text-right text-danger">₵{{ invoice.balance }}</td>
+                        <td class="text-center">
+                            {% if invoice.is_paid %}
+                                <span class="badge badge-paid">Full Payment</span>
+                            {% elif invoice.total_paid > 0 %}
+                                <span class="badge badge-partial">Partial</span>
+                            {% else %}
+                                <span class="badge badge-unpaid">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td class="date-cell">{{ invoice.date_issued|date:"M d, Y" }}</td>
+                        <td class="text-center">
+                            <a href="{% url 'download_invoice_pdf' invoice.id %}" class="btn-download" title="Download PDF">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="empty-row">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            <p>No billing records found for your account.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <style>
-/* ====== My Invoices Styling ====== */
-.invoice-section {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-  animation: fadeIn 0.5s ease-in-out;
+:root {
+    --primary: #4f46e5;
+    --primary-soft: #eef2ff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
 }
 
-.invoice-section h2 {
-  font-size: 1.5rem;
-  color: #2d3748;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  text-align: center;
+.invoice-wrapper {
+    font-family: 'Inter', sans-serif;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1rem;
+    animation: fadeIn 0.4s ease-out;
 }
 
-/* 🔹 Scrollable Table Wrapper */
-.table-responsive {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  border-radius: 10px;
+/* Stats Grid */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
 }
 
-/* ====== Table Design ====== */
-.invoice-table {
-  width: 100%;
-  border-collapse: collapse;
-  border-radius: 10px;
-  overflow: hidden;
-  min-width: 800px; /* Prevents cramping on mobile */
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
-.invoice-table thead {
-  background: #3182ce;
-  color: white;
+.stat-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px; }
+.stat-value { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
+.text-danger { color: var(--danger); }
+.text-success { color: var(--success); }
+
+/* Table Container */
+.invoice-container {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.04);
 }
 
-.invoice-table th,
-.invoice-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #e2e8f0;
-  text-align: left;
-  white-space: nowrap;
+.container-header {
+    padding: 2rem;
+    background: #fcfcfd;
+    border-bottom: 1px solid var(--border);
 }
 
-.invoice-table tbody tr:hover {
-  background: #f7fafc;
+.container-header h3 { margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--text-main); }
+.container-header p { margin: 0.4rem 0 0; font-size: 0.9rem; color: var(--text-muted); }
+
+/* Modern Table */
+.modern-table { width: 100%; border-collapse: collapse; }
+.modern-table th {
+    background: #f8fafc;
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
 }
 
-/* ====== Status Badges ====== */
-.status-paid {
-  color: #38a169;
-  font-weight: bold;
+.modern-table td {
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+    color: var(--text-main);
 }
 
-.status-pending {
-  color: #d69e2e;
-  font-weight: bold;
+.id-cell { font-family: monospace; font-weight: 600; color: var(--primary); }
+.session-text { font-weight: 600; display: block; }
+.term-badge { font-size: 0.75rem; color: var(--text-muted); }
+.fw-600 { font-weight: 600; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+
+/* Status Badges */
+.badge {
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 700;
 }
 
-.status-unpaid {
-  color: #e53e3e;
-  font-weight: bold;
+.badge-paid { background: #dcfce7; color: #15803d; }
+.badge-partial { background: #fef3c7; color: #92400e; }
+.badge-unpaid { background: #fee2e2; color: #b91c1c; }
+
+/* Actions */
+.btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: 0.2s;
 }
 
-/* ====== Download Button ====== */
-.download-btn {
-  background: #3182ce;
-  color: #fff;
-  padding: 6px 12px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: background 0.2s;
-  white-space: nowrap;
+.btn-download:hover { background: var(--primary); color: white; transform: translateY(-1px); }
+
+/* Empty State */
+.empty-row {
+    padding: 4rem !important;
+    text-align: center;
+    color: var(--text-muted);
 }
 
-.download-btn:hover {
-  background: #2b6cb0;
-}
+.empty-row i { font-size: 3rem; opacity: 0.2; margin-bottom: 1rem; }
 
-/* ====== Animation ====== */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ====== 📱 Mobile Tweaks ====== */
 @media (max-width: 768px) {
-  .invoice-section {
-    padding: 16px;
-  }
-  .invoice-section h2 {
-    font-size: 1.3rem;
-  }
-  .invoice-table th, .invoice-table td {
-    padding: 10px;
-    font-size: 13px;
-  }
+    .summary-grid { grid-template-columns: 1fr; }
+    .modern-table th:nth-child(4), .modern-table td:nth-child(4),
+    .modern-table th:nth-child(7), .modern-table td:nth-child(7) { display: none; }
 }
 </style>
-
-<div class="invoice-section">
-  <h2>My Invoices</h2>
-
-  <div class="table-responsive">
-    <table class="invoice-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Invoice ID</th>
-          <th>Session</th>
-          <th>Term</th>
-          <th>Total Due (₵)</th>
-          <th>Paid (₵)</th>
-          <th>Balance (₵)</th>
-          <th>Status</th>
-          <th>Date Issued</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for invoice in invoices %}
-        <tr>
-          <td>{{ forloop.counter }}</td>
-          <td>{{ invoice.invoice_number }}</td>
-          <td>{{ invoice.session }}</td>
-          <td>{{ invoice.term }}</td>
-          <td>{{ invoice.total_due }}</td>
-          <td>{{ invoice.total_paid }}</td>
-          <td>{{ invoice.balance }}</td>
-          <td>
-            {% if invoice.is_paid %}
-              <span class="status-paid">Paid</span>
-            {% elif invoice.total_paid > 0 %}
-              <span class="status-pending">Partially Paid</span>
-            {% else %}
-              <span class="status-unpaid">Unpaid</span>
-            {% endif %}
-          </td>
-          <td>{{ invoice.date_issued|date:"M d, Y" }}</td>
-          <td>
-            <a href="{% url 'download_invoice_pdf' invoice.id %}" class="download-btn">Download PDF</a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="10" style="text-align:center; color:#718096;">No invoices found.</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
 {% endblock %}

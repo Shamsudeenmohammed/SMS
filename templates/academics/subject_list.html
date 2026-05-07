@@ -1,198 +1,241 @@
 {% extends "accounts/base_dashboard.html" %}
+{% load static %}
+
 {% block title %}Manage Subjects{% endblock %}
+{% block header %}📚 Subject Curriculum{% endblock %}
 
 {% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="manage-wrapper">
+    <div class="table-header-row">
+        <div class="meta-info">
+            <p>Total Subjects: <strong>{{ subjects.count }}</strong></p>
+        </div>
+        <div class="action-buttons">
+            <a href="{% url 'add_subject' %}" class="btn-create">
+                <i class="fas fa-plus"></i> Add New Subject
+            </a>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div class="table-responsive">
+            <table class="modern-table">
+                <thead>
+                    <tr>
+                        <th>Subject Details</th>
+                        <th>Subject Code</th>
+                        <th>Assigned Classroom</th>
+                        <th>Instructor</th>
+                        <th class="text-right">Manage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject in subjects %}
+                    <tr>
+                        <td class="subject-main">
+                            <div class="subject-icon-box">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <span class="subject-name">{{ subject.name }}</span>
+                        </td>
+                        <td>
+                            <code class="subject-code">{{ subject.code }}</code>
+                        </td>
+                        <td>
+                            <span class="class-badge">
+                                <i class="fas fa-chalkboard"></i> {{ subject.classroom.name }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if subject.teacher %}
+                                <div class="teacher-info">
+                                    <span class="teacher-name">{{ subject.teacher.get_full_name|default:subject.teacher.username }}</span>
+                                </div>
+                            {% else %}
+                                <span class="unassigned-text">
+                                    <i class="fas fa-user-slash"></i> Unassigned
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-links">
+                                <a href="{% url 'edit_subject' subject.pk %}" class="link-btn edit" title="Edit Subject">
+                                    <i class="fas fa-pen-to-square"></i>
+                                </a>
+                                <a href="{% url 'delete_subject' subject.pk %}" class="link-btn delete" 
+                                   onclick="return confirm('Remove this subject? This may affect linked results.');" title="Delete Subject">
+                                    <i class="fas fa-trash-can"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <div class="empty-content">
+                                <i class="fas fa-layer-group"></i>
+                                <p>No subjects found in the curriculum.</p>
+                                <a href="{% url 'add_subject' %}" class="btn-link">Add your first subject</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <style>
-  /* 🌈 Modern Styling for Manage Subjects Page */
-  .manage-subjects-container {
-    background: #f4f6fb;
-    padding: 25px;
-    border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    animation: fadeIn 0.4s ease-in-out;
-  }
+:root {
+    --primary: #4f46e5;
+    --primary-soft: #eef2ff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --danger: #ef4444;
+}
 
-  h2.page-title {
-    color: #1e3a8a;
-    text-align: center;
+.manage-wrapper {
+    font-family: 'Inter', sans-serif;
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Header Row */
+.table-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.meta-info p { font-size: 0.9rem; color: var(--text-muted); }
+.meta-info strong { color: var(--text-main); }
+
+.btn-create {
+    background: var(--primary);
+    color: white;
+    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
     font-weight: 700;
-    margin-bottom: 25px;
-    font-size: 1.8rem;
-    letter-spacing: 0.5px;
-  }
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.2s;
+}
 
-  /* 🎯 Button Styles */
-  .btn {
-    display: inline-flex;
+.btn-create:hover { background: #4338ca; transform: translateY(-1px); }
+
+/* Table Design */
+.content-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.modern-table { width: 100%; border-collapse: collapse; }
+
+.modern-table th {
+    background: #f8fafc;
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+}
+
+.modern-table td {
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+    color: var(--text-main);
+    vertical-align: middle;
+}
+
+/* Subject Cell */
+.subject-main { display: flex; align-items: center; gap: 12px; }
+.subject-icon-box {
+    width: 36px;
+    height: 36px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+.subject-name { font-weight: 700; color: var(--text-main); }
+
+/* Code and Badge */
+.subject-code {
+    background: #f1f5f9;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-family: 'Monaco', monospace;
+    color: #475569;
+}
+
+.class-badge {
+    color: var(--text-muted);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
     gap: 6px;
-    padding: 10px 18px;
+}
+
+/* Teacher Status */
+.unassigned-text { color: #cbd5e1; font-style: italic; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
+.teacher-name { font-weight: 600; color: var(--text-main); }
+
+/* Actions */
+.action-links { display: flex; justify-content: flex-end; gap: 8px; }
+.link-btn {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 8px;
     text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    border: none;
-    transition: all 0.25s ease;
-  }
+    transition: 0.2s;
+}
 
-  .btn-primary {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: #fff;
-  }
-  .btn-primary:hover {
-    background: linear-gradient(135deg, #1e40af, #1d4ed8);
-    transform: translateY(-2px);
-  }
+.link-btn.edit { background: var(--primary-soft); color: var(--primary); }
+.link-btn.edit:hover { background: var(--primary); color: white; }
+.link-btn.delete { background: #fee2e2; color: var(--danger); }
+.link-btn.delete:hover { background: var(--danger); color: white; }
 
-  .btn-success {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    color: #fff;
-  }
-  .btn-success:hover {
-    background: linear-gradient(135deg, #15803d, #16a34a);
-    transform: translateY(-2px);
-  }
+/* Empty State */
+.empty-state { text-align: center; padding: 4rem !important; }
+.empty-content i { font-size: 3rem; color: var(--border); margin-bottom: 1rem; display: block; }
+.empty-content p { color: var(--text-muted); margin-bottom: 1rem; }
+.btn-link { color: var(--primary); font-weight: 700; text-decoration: none; }
 
-  .btn-danger {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: #fff;
-  }
-  .btn-danger:hover {
-    background: linear-gradient(135deg, #b91c1c, #dc2626);
-    transform: translateY(-2px);
-  }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* 📋 Table Styles */
-  .subject-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    background: #fff;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-
-  .subject-table th {
-    background: #1e3a8a;
-    color: #fff;
-    font-weight: 600;
-    text-transform: uppercase;
-    padding: 14px;
-    letter-spacing: 0.4px;
-  }
-
-  .subject-table td {
-    padding: 13px 15px;
-    border-bottom: 1px solid #e2e8f0;
-    color: #333;
-    font-size: 14px;
-  }
-
-  .subject-table tbody tr:hover {
-    background: #f9fafb;
-    transition: background 0.25s ease;
-  }
-
-  .text-center {
-    text-align: center;
-    color: #64748b;
-    font-style: italic;
-  }
-
-  /* ⚙️ Top Action Bar */
-  .action-bar {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 20px;
-  }
-
-  /* 📱 Responsive */
-  @media (max-width: 768px) {
-    .subject-table,
-    .subject-table thead,
-    .subject-table tbody,
-    .subject-table th,
-    .subject-table td,
-    .subject-table tr {
-      display: block;
-    }
-
-    .subject-table th {
-      display: none;
-    }
-
-    .subject-table td {
-      position: relative;
-      padding-left: 50%;
-      border: none;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .subject-table td::before {
-      content: attr(data-label);
-      position: absolute;
-      left: 15px;
-      width: 45%;
-      font-weight: 600;
-      color: #1e3a8a;
-    }
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .table-header-row { flex-direction: column; gap: 1rem; align-items: stretch; }
+    .modern-table thead { display: none; }
+    .modern-table tr { display: block; padding: 1rem; border-bottom: 8px solid #f8fafc; }
+    .modern-table td { display: flex; justify-content: space-between; border: none; padding: 0.5rem 0; text-align: right; }
+    .modern-table td::before { content: attr(data-label); font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.7rem; }
+    .action-links { justify-content: flex-start; margin-top: 10px; }
+}
 </style>
-
-<div class="manage-subjects-container">
-  <h2 class="page-title">📚 Manage Subjects</h2>
-
-  <div class="action-bar">
-    <a href="{% url 'add_subject' %}" class="btn btn-primary">➕ Add Subject</a>
-  </div>
-
-  <table class="subject-table">
-    <thead>
-      <tr>
-        <th>Subject Name</th>
-        <th>Code</th>
-        <th>Class</th>
-        <th>Teacher</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for subject in subjects %}
-      <tr>
-        <td data-label="Subject Name">{{ subject.name }}</td>
-        <td data-label="Code">{{ subject.code }}</td>
-        <td data-label="Class">{{ subject.classroom.name }}</td>
-        <td data-label="Teacher">
-        {% if subject.teacher %}
-            {{ subject.teacher.get_full_name|default:subject.teacher.username }}
-        {% else %}
-            <span style="color: #9ca3af; font-style: italic;">Not yet assigned</span>
-        {% endif %}
-        </td>
-        <td data-label="Actions">
-          <a href="{% url 'edit_subject' subject.pk %}" class="btn btn-success btn-sm">✏️ Edit</a>
-          <a href="{% url 'delete_subject' subject.pk %}" class="btn btn-danger btn-sm">🗑️ Delete</a>
-        </td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="5" class="text-center">No subjects available.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
 {% endblock %}

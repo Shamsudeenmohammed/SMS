@@ -1,171 +1,271 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
+
 {% block title %}My Profile{% endblock %}
 {% block header %}👤 My Profile{% endblock %}
+
 {% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="profile-wrapper">
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="avatar-container">
+                {# Global Fix Applied Here: using the user.profile_photo property #}
+                <img src="{{ user.profile_photo }}" alt="{{ user.username }}" class="main-avatar">
+                <div class="status-indicator"></div>
+            </div>
+            <h2 class="user-display-name">{{ user.get_full_name|default:user.username }}</h2>
+            <span class="role-badge">{{ user.get_role_display|default:role }}</span>
+        </div>
+
+        <div class="profile-body">
+            <div class="info-section">
+                <h3 class="group-title">Account Information</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-envelope"></i> Email Address</span>
+                        <span class="info-value">{{ user.email|default:"Not provided" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-user-tag"></i> Username</span>
+                        <span class="info-value">@{{ user.username }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {% if profile_data %}
+            <div class="info-section">
+                <h3 class="group-title">Personal Details</h3>
+                <div class="info-grid">
+                    {% if profile_data.date_of_birth %}
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-calendar-alt"></i> Date of Birth</span>
+                        <span class="info-value">{{ profile_data.date_of_birth }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if profile_data.gender %}
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-venus-mars"></i> Gender</span>
+                        <span class="info-value">{{ profile_data.gender }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if profile_data.address %}
+                    <div class="info-item full-width">
+                        <span class="info-label"><i class="fas fa-map-marker-alt"></i> Residential Address</span>
+                        <span class="info-value">{{ profile_data.address }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if role == "Parent" %}
+            <div class="info-section parent-special">
+                <h3 class="group-title">Guardian Details</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-briefcase"></i> Occupation</span>
+                        <span class="info-value">{{ profile_data.occupation|default:"N/A" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="fas fa-users"></i> Relationship</span>
+                        <span class="info-value">{{ profile_data.relationship }}</span>
+                    </div>
+                    
+                    {% if profile_data.children.exists %}
+                    <div class="info-item full-width">
+                        <span class="info-label"><i class="fas fa-child"></i> Linked Students</span>
+                        <div class="children-tags">
+                            {% for child in profile_data.children.all %}
+                                <span class="child-tag">{{ child.user.get_full_name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+
+        <div class="profile-footer">
+            <a href="{% url 'edit_profile' %}" class="btn-edit">
+                <i class="fas fa-user-edit"></i> Update My Profile
+            </a>
+        </div>
+    </div>
+</div>
+
 <style>
-/* 🌟 Profile Page Styling */
-.profile-container {
-  max-width: 750px;
-  margin: 40px auto;
-  padding: 40px;
-  background: rgba(255,255,255,0.9);
-  backdrop-filter: blur(18px);
-  border-radius: 22px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-  text-align: center;
-  transition: all 0.4s ease;
+:root {
+    --primary: #4f46e5;
+    --primary-soft: #eef2ff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --white: #ffffff;
 }
 
-.profile-container:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 45px rgba(0,0,0,0.15);
+.profile-wrapper {
+    font-family: 'Inter', sans-serif;
+    padding: 3rem 1rem;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
-/* 🖼 Avatar */
-.profile-avatar {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  overflow: hidden;
-  margin: 0 auto 18px;
-  border: 4px solid #6366f1;
-  box-shadow: 0 6px 20px rgba(99,102,241,0.25);
+.profile-card {
+    background: var(--white);
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    animation: fadeInUp 0.5s ease-out;
 }
 
-.profile-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* Header Section */
+.profile-header {
+    background: linear-gradient(to bottom, #f8fafc, #ffffff);
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
 }
 
-/* 🎖 Role Badge */
-.role-badge {
-  display: inline-block;
-  background: linear-gradient(135deg, #3b82f6, #9333ea);
-  color: #fff;
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  margin-top: 8px;
-  box-shadow: 0 3px 10px rgba(59,130,246,0.3);
+.avatar-container {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    margin: 0 auto 1.5rem;
 }
 
-/* ℹ️ Info Section */
-.profile-info {
-  text-align: left;
-  margin-top: 30px;
-  font-size: 1rem;
-  line-height: 1.7;
-  color: #374151;
-}
-
-.profile-info p {
-  margin: 8px 0;
-  padding: 6px 10px;
-  border-left: 4px solid #3b82f6;
-  background: #f9fafb;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.profile-info p:hover {
-  background: #eff6ff;
-}
-
-.profile-info strong {
-  color: #111827;
-  font-weight: 600;
-}
-
-/* ✏️ Edit Button */
-.edit-btn {
-  margin-top: 28px;
-  display: inline-block;
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
-  color: #fff;
-  padding: 12px 26px;
-  border-radius: 12px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 14px rgba(37,99,235,0.25);
-}
-.edit-btn:hover {
-  background: linear-gradient(135deg, #1d4ed8, #6d28d9);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(37,99,235,0.35);
-}
-
-/* 📱 Responsive Design */
-@media (max-width: 600px) {
-  .profile-container {
-    padding: 25px;
-    margin: 20px;
-  }
-  .profile-avatar {
-    width: 110px;
-    height: 110px;
-  }
-  .edit-btn {
+.main-avatar {
     width: 100%;
-    padding: 12px;
-  }
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--white);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.status-indicator {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    background: #10b981;
+    border: 3px solid var(--white);
+    border-radius: 50%;
+}
+
+.user-display-name {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0 0 0.5rem;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+/* Body Content */
+.profile-body { padding: 2.5rem; }
+
+.info-section { margin-bottom: 2.5rem; }
+.info-section:last-child { margin-bottom: 0; }
+
+.group-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.full-width { grid-column: span 2; }
+
+.info-item { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.info-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-value {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.children-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.child-tag {
+    background: #f1f5f9;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+/* Footer Actions */
+.profile-footer {
+    padding: 2rem 2.5rem;
+    background: #f8fafc;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-edit {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--primary);
+    color: var(--white);
+    padding: 0.8rem 2rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-edit:hover {
+    background: #4338ca;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+    .info-grid { grid-template-columns: 1fr; }
+    .full-width { grid-column: 1; }
+    .profile-body { padding: 1.5rem; }
 }
 </style>
-
-<div class="profile-container">
-  <!-- Avatar -->
-  <div class="profile-avatar">
-    {% if profile_data and profile_data.photo %}
-      <img src="{{ profile_data.photo.url }}" alt="Profile Photo">
-    {% else %}
-      <img src="{% static 'images/default-profile.png' %}" alt="Profile Photo">
-    {% endif %}
-  </div>
-
-  <h2>{{ user.get_full_name|default:user.username }}</h2>
-  <span class="role-badge">{{ role }}</span>
-
-  <div class="profile-info">
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Username:</strong> {{ user.username }}</p>
-
-    {% if profile_data %}
-      {% if profile_data.date_of_birth %}
-      <p><strong>Date of Birth:</strong> {{ profile_data.date_of_birth }}</p>
-      {% endif %}
-      
-      {% if profile_data.gender %}
-      <p><strong>Gender:</strong> {{ profile_data.gender }}</p>
-      {% endif %}
-
-      {% if profile_data.address %}
-      <p><strong>Address:</strong> {{ profile_data.address }}</p>
-      {% endif %}
-
-      {% if role == "Parent" %}
-        {% if profile_data.occupation %}
-        <p><strong>Occupation:</strong> {{ profile_data.occupation }}</p>
-        {% endif %}
-        {% if profile_data.relationship %}
-        <p><strong>Relationship:</strong> {{ profile_data.relationship }}</p>
-        {% endif %}
-        {% if profile_data.children.exists %}
-        <p><strong>Children:</strong>
-          {% for child in profile_data.children.all %}
-            {{ child.user.get_full_name }}{% if not forloop.last %}, {% endif %}
-          {% empty %}
-            None
-          {% endfor %}
-        </p>
-        {% endif %}
-      {% endif %}
-    {% endif %}
-  </div>
-
-  <a href="{% url 'edit_profile' %}" class="edit-btn">✏️ Edit Profile</a>
-</div>
 {% endblock %}

@@ -5,247 +5,209 @@
 
 {% block content %}
 <style>
-.page-title {
-  font-size: 1.6rem;
-  color: #1e3a8a;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
+    :root {
+        --primary-blue: #1e3a8a;
+        --accent-indigo: #6366f1;
+        --success-green: #10b981;
+        --bg-slate: #f8fafc;
+        --border-slate: #e2e8f0;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+        --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
 
-.export-buttons {
-  margin-bottom: 1rem;
-  display: flex;
-  gap: 10px;
-}
+    .dashboard-wrapper { padding: 1.5rem; background-color: #fdfdfd; min-height: 100vh; }
+    
+    /* Header Section */
+    .header-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .page-title { font-size: 1.75rem; color: var(--primary-blue); font-weight: 800; margin: 0; }
 
-.btn-export {
-  background-color: #2563eb;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  text-decoration: none;
-  transition: background-color 0.3s;
-}
+    /* Summary Hero Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        border: 1px solid var(--border-slate);
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .stat-icon {
+        height: 48px; width: 48px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem;
+    }
+    .blue-bg { background: #eff6ff; color: #2563eb; }
+    .green-bg { background: #ecfdf5; color: #059669; }
+    
+    .stat-label { color: #64748b; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem; }
+    .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary-blue); }
 
-.btn-export:hover {
-  background-color: #1d4ed8;
-}
+    /* Tables & Containers */
+    .content-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid var(--border-slate);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    .card-header {
+        padding: 1.25rem 1.5rem;
+        background: #fff;
+        border-bottom: 1px solid var(--border-slate);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .card-header h3 { margin: 0; font-size: 1.1rem; color: var(--primary-blue); font-weight: 700; }
 
-.table-container {
-  margin-top: 1rem;
-  overflow-x: auto;
-}
+    .table-responsive { width: 100%; overflow-x: auto; }
+    .styled-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .styled-table th {
+        background: #f8fafc;
+        color: #475569;
+        font-weight: 600;
+        text-align: left;
+        padding: 1rem 1.5rem;
+        border-bottom: 2px solid var(--border-slate);
+    }
+    .styled-table td { padding: 1rem 1.5rem; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
+    .styled-table tr:hover { background-color: #fbfcfe; }
 
-.styled-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
+    /* Badges */
+    .badge {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .method-badge { background: #f1f5f9; color: #475569; }
+    .amount-text { font-weight: 700; color: var(--success-green); }
 
-.styled-table th {
-  background: #1e3a8a;
-  color: white;
-  text-align: left;
-  padding: 0.8rem;
-}
-
-.styled-table td {
-  padding: 0.75rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.styled-table tr:nth-child(even) { background: #f9fafb; }
-.styled-table tr:hover { background: #f3f4f6; }
-
-.no-data {
-  color: #9ca3af;
-  font-style: italic;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-.summary-card {
-  margin-top: 1.5rem;
-  background: linear-gradient(135deg, #f3f4f6, #e0e7ff);
-  border-radius: 12px;
-  padding: 1rem 1.5rem;
-  display: flex;
-  gap: 2.5rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.summary-card {
-  margin-top: 2rem;
-  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  align-items: start;
-}
-
-@media (max-width: 900px) {
-  .summary-card {
-    grid-template-columns: 1fr;
-  }
-}
-
-.section-title {
-  font-size: 1.2rem;
-  color: #1e3a8a;
-  font-weight: 600;
-  margin-bottom: 0.8rem;
-  border-left: 4px solid #1e3a8a;
-  padding-left: 0.5rem;
-}
-
-.summary-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-.summary-table th {
-  background: #1e3a8a;
-  color: white;
-  text-align: left;
-  padding: 0.75rem 1rem;
-  font-weight: 500;
-}
-
-.summary-table td {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.summary-table tr:nth-child(even) { background: #f9fafb; }
-.summary-table tr:hover { background: #f1f5f9; }
-
-.amount {
-  color: #16a34a;
-  font-weight: 600;
-}
-
-.overall-summary-card {
-  margin: 2rem auto;
-  background: linear-gradient(145deg, #f8fafc, #e0e7ff);
-  border-radius: 16px;
-  padding: 1.8rem 2rem;
-  max-width: 420px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-  text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.summary-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
-
-.summary-item {
-  background: white;
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
-  transition: background-color 0.3s ease;
-}
-
-.summary-item:hover {
-  background-color: #f9fafb;
-}
-
-.summary-label {
-  font-size: 0.95rem;
-  color: #6b7280;
-  margin-bottom: 0.3rem;
-}
-
-.summary-value {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #1e3a8a;
-}
-
-
+    /* Action Buttons */
+    .btn-group { display: flex; gap: 0.75rem; }
+    .btn-export {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: white; color: #334155; border: 1px solid var(--border-slate);
+        padding: 0.6rem 1rem; border-radius: 8px; font-size: 0.85rem;
+        font-weight: 600; transition: all 0.2s;
+    }
+    .btn-export:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-1px); }
 </style>
 
-<h2 class="page-title">💰 Payment History</h2>
+<div class="dashboard-wrapper">
+    <div class="header-flex">
+        <h2 class="page-title">💰 Payment History</h2>
+        {% if payments %}
+        <div class="btn-group">
+            <a href="{% url 'export_payment_history_excel' %}" class="btn-export">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Excel
+            </a>
+            <a href="{% url 'export_payment_history_pdf' %}" class="btn-export">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                PDF Receipt
+            </a>
+        </div>
+        {% endif %}
+    </div>
 
-{% if payments %}
-<div class="export-buttons">
-  <a href="{% url 'export_payment_history_excel' %}" class="btn-export">⬇️ Download Excel</a>
-  <a href="{% url 'export_payment_history_pdf' %}" class="btn-export">🧾 Download PDF</a>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon blue-bg">🔢</div>
+            <div>
+                <div class="stat-label">Transactions</div>
+                <div class="stat-value">{{ payments.count }}</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green-bg">₵</div>
+            <div>
+                <div class="stat-label">Total Amount Paid</div>
+                <div class="stat-value">₵{{ total_amount_paid|floatformat:2 }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
+        <div class="content-card">
+            <div class="card-header">
+                <h3>🧾 Summary by Child</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Child Name</th>
+                            <th style="text-align: right;">Total Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for child in child_totals %}
+                        <tr>
+                            <td><strong>{{ child.student_fee__student__user__first_name }} {{ child.student_fee__student__user__last_name }}</strong></td>
+                            <td style="text-align: right;" class="amount-text">₵{{ child.total|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-card">
+        <div class="card-header">
+            <h3>📝 Detailed Transaction Log</h3>
+        </div>
+        {% if payments %}
+        <div class="table-responsive">
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Child</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                        <th>Reference</th>
+                        <th>Date & Time</th>
+                        <th>Staff</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td style="color: #94a3b8;">{{ forloop.counter }}</td>
+                        <td><strong>{{ payment.student_fee.student.user.get_full_name }}</strong></td>
+                        <td class="amount-text">₵{{ payment.amount }}</td>
+                        <td><span class="badge method-badge">{{ payment.get_payment_method_display }}</span></td>
+                        <td style="font-family: monospace; font-size: 0.85rem;">{{ payment.reference }}</td>
+                        <td style="white-space: nowrap;">{{ payment.date_paid|date:"M d, Y" }} <br> <small style="color: #64748b;">{{ payment.date_paid|date:"h:i A" }}</small></td>
+                        <td><small>{{ payment.received_by.get_username|default:"System" }}</small></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="padding: 3rem; text-align: center; color: #94a3b8;">
+            <p>No payment history found for your children yet.</p>
+        </div>
+        {% endif %}
+    </div>
 </div>
-
-<div class="table-container">
-  <table class="styled-table">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Child</th>
-        <th>Amount (₵)</th>
-        <th>Method</th>
-        <th>Reference</th>
-        <th>Date Paid</th>
-        <th>Received By</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for payment in payments %}
-      <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>{{ payment.student_fee.student.user.get_full_name }}</td>
-        <td>{{ payment.amount }}</td>
-        <td>{{ payment.get_payment_method_display }}</td>
-        <td>{{ payment.reference }}</td>
-        <td>{{ payment.date_paid|date:"M d, Y - h:i A" }}</td>
-        <td>{{ payment.received_by.get_username|default:"N/A" }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-{% else %}
-  <p class="no-data">No payment history found for your children yet.</p>
-{% endif %}
-    <div class="summary-card">
-    <div>
-        <h3 style="font-weight:600; color:#1e3a8a;">🧾 Summary by Child</h3>
-        <table class="styled-table" style="margin-top:0.5rem;">
-        <thead>
-            <tr>
-            <th>Child</th>
-            <th>Total Paid (₵)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for child in child_totals %}
-            <tr>
-            <td>{{ child.student_fee__student__user__first_name }} {{ child.student_fee__student__user__last_name }}</td>
-            <td>₵{{ child.total|floatformat:2 }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-        </table>
-    </div>
-
-    <div style="text-align:center; margin-top:1rem;">
-        <h3 style="font-weight:600; color:#1e3a8a;">💰 Overall Summary</h3><br>
-        <p style=>Total Payments Made: <strong>{{ payments.count }}</strong></p>
-        <p>Total Amount Paid: <strong>₵{{ total_amount_paid|floatformat:2 }}</strong></p>
-    </div>
-    </div>
-
 {% endblock %}
