@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<<<<<<< HEAD
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Dashboard{% endblock %} | School Management</title>
@@ -97,9 +98,192 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
   </style>
-</head>
+=======
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{% block title %}Dashboard{% endblock %} | School Management</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --sidebar-bg: #0f172a;
+            --bg-light: #f8fafc;
+            --sidebar-width: 280px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ======= CORE FIXES ======= */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { 
+            background: var(--bg-light); 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            display: flex;
+        }
+
+        /* ======= SIDEBAR ======= */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: calc(-1 * var(--sidebar-width)); 
+            z-index: 1000;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            color: #cbd5e1;
+        }
+
+        .sidebar.active { left: 0; }
+
+        .sidebar-header { padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
+        .sidebar-header h2 { color: #fff; font-size: 1.1rem; }
+
+        /* nav-scroll area */
+        .sidebar-nav { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 15px; 
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.2) transparent;
+        }
+
+        /* SENIOR FIX: Sidebar Footer (Sticky Logout) */
+        .sidebar-footer {
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: var(--sidebar-bg); /* Keeps it opaque while scrolling */
+            flex-shrink: 0;
+        }
+
+        .nav-link, .logout-link {
+            padding: 12px 16px;
+            color: #94a3b8;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: var(--transition);
+            font-size: 0.95rem; /* Slightly larger for mobile tap targets */
+        }
+        
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: #fff; }
+        .nav-link.active { background: var(--primary); }
+
+        .logout-link { color: #f87171; font-weight: 600; margin-bottom: 0; }
+        .logout-link:hover { background: rgba(239, 68, 68, 0.1); }
+
+        /* ======= MAIN SECTION ======= */
+        .main-wrapper {
+            flex: 1;
+            width: 100%;
+            min-width: 0; 
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+        }
+
+        .top-navbar {
+            background: #fff;
+            height: 64px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 900;
+        }
+
+        .top-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Mobile Logout Icon */
+        .mobile-logout-btn {
+            display: none;
+            color: #ef4444;
+            font-size: 1.2rem;
+            padding: 8px;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            padding: 8px;
+        }
+
+        .main-content { padding: 20px; flex: 1; }
+
+        /* ======= RESPONSIVE BREAKPOINTS ======= */
+        @media (max-width: 1023px) {
+            .mobile-logout-btn { display: block; }
+            .user-greeting { display: none; } /* Hide text on small screens to save space */
+        }
+
+        @media (min-width: 1024px) {
+            .sidebar { left: 0; }
+            .main-wrapper { margin-left: var(--sidebar-width); }
+            .menu-toggle { display: none; }
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(2px);
+            z-index: 999;
+        }
+        .sidebar-overlay.active { display: block; }
+
+        /* Unread Badge */
+        .global-unread-badge {
+            background: #ef4444; color: #fff; border-radius: 12px;
+            padding: 2px 8px; font-size: 0.75rem; font-weight: 700;
+            margin-left: auto; display: none;
+        }
+
+        .alert-container {
+            position: fixed; top: 20px; right: 20px; z-index: 1100;
+            max-width: 350px; width: calc(100% - 40px);
+        }
+        .alert-top {
+            padding: 15px; border-radius: 10px; color: #fff; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .alert-top.success { background: #10b981; }
+        .alert-top.error { background: #ef4444; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
+</head>
 <body>
+<<<<<<< HEAD
   <div class="alert-container">
     {% if messages %}
       {% for message in messages %}
@@ -120,6 +304,28 @@
       <nav class="sidebar-nav">
         {% with url_name=request.resolver_match.url_name %}
         
+=======
+
+    <div class="sidebar-overlay" id="overlay"></div>
+
+    <div class="alert-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert-top {{ message.tags }}">
+                    <span>{{ message }}</span>
+                    <button style="background:none; border:none; color:white; font-size:20px; cursor:pointer;" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-graduation-cap"></i> School Systems</h2>
+        </div>
+        
+        <nav class="sidebar-nav">
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
         {% if user.role == "admin" %}
           <a href="{% url 'admin_dashboard' %}" class="nav-link">🏠 Admin Dashboard</a>
           <a href="{% url 'profile' %}" class="nav-link">👤 My Profile</a>
@@ -181,6 +387,7 @@
           <a href="{% url 'parent_attendance' %}" class="nav-link">🕒 Attendance</a>
           <a href="{% url 'parent_payment_history' %}" class="nav-link">💰 Payment History</a>
         {% endif %}
+<<<<<<< HEAD
         
         {% endwith %}
       </nav>
@@ -195,11 +402,39 @@
         <span class="header-title">{% block header %}Overview{% endblock %}</span>
         <div class="user-meta">Welcome, <strong>{{ user.username }}</strong></div>
       </header>
+=======
+        </nav>
 
-      <section class="main-content">
-        {% block content %}{% endblock %}
-      </section>
+        <!-- SENIOR FIX: Fixed Logout at Sidebar Bottom -->
+        <div class="sidebar-footer">
+            <a href="{% url 'logout' %}" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </aside>
 
+    <div class="main-wrapper">
+        <header class="top-navbar">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div style="font-weight: 700; color: #1e293b; font-size: 1rem;">{% block header %}Overview{% endblock %}</div>
+            </div>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
+
+            <div class="top-nav-right">
+                <div class="user-greeting" style="font-size: 0.85rem; color: #64748b;">
+                    Hi, <strong>{{ user.username }}</strong>
+                </div>
+                <!-- SENIOR FIX: Mobile quick-access logout -->
+                <a href="{% url 'logout' %}" class="mobile-logout-btn" title="Logout">
+                    <i class="fas fa-power-off"></i>
+                </a>
+            </div>
+        </header>
+
+<<<<<<< HEAD
       <footer class="footer">
         &copy; {% now "Y" %} School Management System.
       </footer>
@@ -244,6 +479,59 @@
         }, 5000);
     });
   </script>
+=======
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
 
+        <footer style="padding: 20px; text-align: center; color: #94a3b8; font-size: 0.8rem;">
+            &copy; {% now "Y" %} School Management System
+        </footer>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const menuToggle = document.getElementById('menuToggle');
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        menuToggle.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+
+        function updateGlobalUnreadCount() {
+            fetch('/communications/api/unread-count/')
+                .then(res => res.json())
+                .then(data => {
+                    const badges = document.querySelectorAll('.global-unread-badge');
+                    badges.forEach(badge => {
+                        if (data.count > 0) {
+                            badge.innerText = data.count > 99 ? '99+' : data.count;
+                            badge.style.display = 'inline-block';
+                            badge.style.animation = "pulse 2s infinite";
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    });
+                }).catch(() => {});
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateGlobalUnreadCount();
+            setInterval(updateGlobalUnreadCount, 60000); // 1 minute is enough for polling
+            
+            setTimeout(() => {
+                document.querySelectorAll('.alert-top').forEach(a => {
+                    a.style.transition = "opacity 0.5s ease";
+                    a.style.opacity = "0";
+                    setTimeout(() => a.remove(), 500);
+                });
+            }, 5000);
+        });
+    </script>
 </body>
 </html>

@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+<<<<<<< HEAD
 <div class="fee-wrapper">
     <div class="fee-layout-grid">
         
@@ -27,10 +28,36 @@
                             {{ field }}
                             {% if field.errors %}
                                 <span class="error-text">{{ field.errors.0 }}</span>
+=======
+<div class="app-container">
+    <div class="responsive-layout">
+        
+        <!-- CONFIGURATION PANEL -->
+        <aside class="config-sidebar">
+            <div class="card shadow-sm">
+                <div class="card-header-alt">
+                    <i class="fas fa-sliders-h"></i>
+                    <div>
+                        <h4 class="m-0">Configure Fees</h4>
+                        <small class="text-muted">Set up student billing types</small>
+                    </div>
+                </div>
+                
+                <form method="post" class="p-4">
+                    {% csrf_token %}
+                    <div class="stack-gap">
+                        {% for field in form %}
+                        <div class="form-field">
+                            <label class="small-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="error-bubble">{{ field.errors.0 }}</div>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
                             {% endif %}
                         </div>
                         {% endfor %}
                     </div>
+<<<<<<< HEAD
                     <button type="submit" class="btn-save-full">
                         <i class="fas fa-check"></i> Register Fee Type
                     </button>
@@ -95,10 +122,79 @@
             </div>
         </div>
 
+=======
+                    <button type="submit" class="btn-primary-pro mt-4">
+                        <i class="fas fa-plus"></i> Add Fee Type
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- DATA MANAGEMENT PANEL -->
+        <main class="data-main">
+            <div class="card shadow-sm overflow-hidden">
+                <div class="table-info-bar">
+                    <h5 class="m-0">Defined Structures</h5>
+                    <span class="count-chip">{{ fees|length }} Items</span>
+                </div>
+                
+                <div class="responsive-view">
+                    <table class="smart-table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th class="status-col">Status</th>
+                                <th class="actions-col text-end">Manage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fee in fees %}
+                            <tr>
+                                <td data-label="Description">
+                                    <span class="fee-name">{{ fee.name }}</span>
+                                </td>
+                                <td data-label="Amount">
+                                    <span class="amount-badge">₵{{ fee.amount }}</span>
+                                </td>
+                                <td data-label="Status" class="status-col">
+                                    {% if fee.is_active %}
+                                        <span class="dot-indicator success">Active</span>
+                                    {% else %}
+                                        <span class="dot-indicator neutral">Hidden</span>
+                                    {% endif %}
+                                </td>
+                                <td data-label="Actions" class="actions-col text-end">
+                                    <div class="btn-group-sm">
+                                        <a href="{% url 'edit_fee_type' fee.id %}" class="btn-link-edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'delete_fee_type' fee.id %}" class="btn-link-delete" 
+                                           onclick="return confirm('Confirm deletion?');">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="empty-state-container">
+                                    <i class="fas fa-receipt"></i>
+                                    <p>No fees configured.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
     </div>
 </div>
 
 <style>
+<<<<<<< HEAD
 :root {
     --primary: #4f46e5;
     --primary-soft: #eef2ff;
@@ -230,6 +326,99 @@
 
 @media (max-width: 992px) {
     .fee-layout-grid { grid-template-columns: 1fr; }
+=======
+/* CORE VARS */
+:root {
+    --primary: #4f46e5;
+    --success: #10b981;
+    --danger: #ef4444;
+    --slate-800: #1e293b;
+    --slate-500: #64748b;
+    --slate-100: #f1f5f9;
+    --border: #e2e8f0;
+    --radius: 12px;
 }
+
+.app-container { font-family: 'Inter', sans-serif; padding: clamp(10px, 3vw, 30px); background: #f8fafc; min-height: 100vh; }
+
+.responsive-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* TABLE-TO-CARD LOGIC FOR MOBILE */
+@media (max-width: 768px) {
+    .smart-table thead { display: none; }
+    .smart-table tr { 
+        display: flex; flex-direction: column; 
+        padding: 15px; border-bottom: 8px solid var(--slate-100); 
+    }
+    .smart-table td { 
+        display: flex; justify-content: space-between; align-items: center; 
+        padding: 8px 0; border: none !important; 
+    }
+    .smart-table td::before { 
+        content: attr(data-label); font-weight: 700; font-size: 0.75rem; 
+        color: var(--slate-500); text-transform: uppercase;
+    }
+    .status-col, .actions-col { width: 100% !important; text-align: left !important; }
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
+}
+
+@media (min-width: 1024px) {
+    .responsive-layout { grid-template-columns: 340px 1fr; align-items: start; }
+}
+
+/* CARDS & COMPONENTS */
+.card { background: white; border-radius: var(--radius); border: 1px solid var(--border); }
+.card-header-alt { padding: 20px; display: flex; gap: 12px; align-items: center; border-bottom: 1px solid var(--border); }
+.card-header-alt i { font-size: 1.4rem; color: var(--primary); }
+
+.stack-gap { display: flex; flex-direction: column; gap: 15px; }
+.small-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--slate-500); margin-bottom: 5px; display: block; }
+
+/* DYNAMIC DJANGO FIELD STYLING */
+input, select {
+    width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); 
+    border-radius: 8px; font-size: 0.95rem; transition: 0.2s;
+}
+input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+
+.btn-primary-pro {
+    width: 100%; background: var(--primary); color: white; border: none; 
+    padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s;
+}
+.btn-primary-pro:hover { background: #4338ca; transform: translateY(-1px); }
+
+/* TABLE REFINEMENTS */
+.smart-table { width: 100%; border-collapse: collapse; }
+.table-info-bar { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+.smart-table th { background: #fcfdfe; padding: 12px 20px; text-align: left; font-size: 0.75rem; color: var(--slate-500); border-bottom: 1px solid var(--border); }
+.smart-table td { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+
+.fee-name { font-weight: 600; color: var(--slate-800); }
+.amount-badge { font-weight: 700; color: var(--primary); background: #eef2ff; padding: 4px 8px; border-radius: 6px; }
+
+.dot-indicator { font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
+.dot-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; display: block; }
+.success::before { background: var(--success); }
+.neutral::before { background: var(--slate-500); }
+
+.btn-group-sm { display: flex; gap: 10px; justify-content: flex-end; }
+.btn-link-edit, .btn-link-delete { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 8px; transition: 0.2s; }
+.btn-link-edit { background: #f1f5f9; color: var(--primary); }
+.btn-link-delete { background: #fef2f2; color: var(--danger); }
+.btn-link-edit:hover { background: var(--primary); color: white; }
+
+.empty-state-container { text-align: center; padding: 60px !important; color: var(--slate-500); }
+.empty-state-container i { font-size: 2rem; opacity: 0.3; }
+
+.text-end { text-align: right; }
+.m-0 { margin: 0; }
+.mt-4 { margin-top: 1.5rem; }
+.shadow-sm { box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
 </style>
 {% endblock %}

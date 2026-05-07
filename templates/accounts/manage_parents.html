@@ -5,6 +5,7 @@
 {% block header %}👨‍👩‍👧 Parent Directory{% endblock %}
 
 {% block content %}
+<<<<<<< HEAD
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -105,11 +106,112 @@
                 </tbody>
             </table>
         </div>
+=======
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="directory-container">
+    
+    <div class="top-bar">
+        <form method="get" class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" name="q" placeholder="Search parents..." value="{{ request.GET.q }}">
+            {% if request.GET.q %}
+                <a href="{% url 'manage_parents' %}" class="clear-btn"><i class="fas fa-times-circle"></i></a>
+            {% endif %}
+        </form>
+        <a href="{% url 'add_parent' %}" class="btn-primary">
+            <i class="fas fa-plus"></i> <span>Register Parent</span>
+        </a>
+    </div>
+
+    <div class="meta-info">
+        Total Registered Parents: <span class="count-badge">{{ parents.count }}</span>
+    </div>
+
+    <div class="content-surface">
+        <table class="responsive-table">
+            <thead>
+                <tr>
+                    <th>Parent Details</th>
+                    <th class="hide-mobile">Professional Info</th>
+                    <th class="hide-mobile">Relationship</th>
+                    <th class="hide-mobile">Linked Students</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for parent in parents %}
+                <tr class="data-row">
+                    <td class="identity-cell">
+                        <div class="profile-card">
+                            <div class="avatar-wrapper">
+                                {% if parent.photo %}
+                                    <img src="{{ parent.photo.url }}" alt="Avatar" class="avatar-img">
+                                {% else %}
+                                    <div class="avatar-placeholder">{{ parent.user.first_name|first|default:"P" }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="profile-details">
+                                <span class="full-name">{{ parent.user.get_full_name|default:parent.user.username }}</span>
+                                <span class="email-text"><i class="far fa-envelope"></i> {{ parent.user.email|default:"No email" }}</span>
+                                
+                                <div class="mobile-only-details">
+                                    <span class="m-tag"><i class="fas fa-briefcase"></i> {{ parent.occupation|default:"Not specified" }}</span>
+                                    <span class="m-relationship-badge">{{ parent.relationship }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td class="hide-mobile">
+                        <div class="occup-info">
+                            <i class="fas fa-briefcase"></i> {{ parent.occupation|default:"Not specified" }}
+                        </div>
+                    </td>
+                    <td class="hide-mobile">
+                        <span class="rel-badge">{{ parent.relationship }}</span>
+                    </td>
+                    <td class="hide-mobile">
+                        <div class="student-pill-stack">
+                            {% for child in parent.children.all %}
+                                <span class="student-pill"><i class="fas fa-graduation-cap"></i> {{ child.user.get_full_name }}</span>
+                            {% empty %}
+                                <span class="no-data">None</span>
+                            {% endfor %}
+                        </div>
+                    </td>
+
+                    <td class="action-cell">
+                        <div class="button-group">
+                            <a href="{% url 'edit_parent' parent.pk %}" class="btn-action edit" aria-label="Edit">
+                                <i class="fas fa-pen-to-square"></i>
+                            </a>
+                            <a href="{% url 'delete_parent' parent.pk %}" class="btn-action delete" 
+                               onclick="return confirm('Delete this parent record?');" aria-label="Delete">
+                                <i class="fas fa-trash-can"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-state">
+                        <i class="fas fa-users-slash"></i>
+                        <p>No parent records found.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
     </div>
 </div>
 
 <style>
 :root {
+<<<<<<< HEAD
     --primary: #4f46e5;
     --primary-light: #eef2ff;
     --text-main: #1e293b;
@@ -185,10 +287,80 @@
     display: flex;
     align-items: center;
     gap: 10px;
+=======
+    --indigo: #4f46e5;
+    --indigo-soft: #eef2ff;
+    --slate-900: #0f172a;
+    --slate-600: #475569;
+    --slate-400: #94a3b8;
+    --red: #ef4444;
+    --white: #ffffff;
+    --bg: #f8fafc;
+    --border: #e2e8f0;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.directory-container {
+    padding: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: 'Inter', sans-serif;
+    color: var(--slate-900);
+}
+
+/* Action Bar Styles */
+.top-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+}
+
+.search-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--slate-400);
+}
+
+.search-wrapper input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--white);
+    font-size: 0.95rem;
+    transition: 0.2s;
+}
+
+.search-wrapper input:focus {
+    outline: none;
+    border-color: var(--indigo);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.btn-primary {
+    background: var(--indigo);
+    color: var(--white);
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
     transition: 0.2s;
     white-space: nowrap;
 }
 
+<<<<<<< HEAD
 .btn-add:hover { background: #4338ca; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
 
 /* Data Card & Table */
@@ -286,6 +458,99 @@
     .modern-table td { display: flex; justify-content: space-between; align-items: center; border: none; padding: 0.5rem 0; }
     .modern-table td::before { content: attr(data-label); font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
     .action-buttons { justify-content: flex-start; margin-top: 1rem; }
+=======
+/* Data Table Surface */
+.meta-info { margin-bottom: 1rem; font-size: 0.9rem; color: var(--slate-600); }
+.count-badge { font-weight: 700; color: var(--indigo); }
+
+.content-surface {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.responsive-table { width: 100%; border-collapse: collapse; }
+.responsive-table th {
+    background: #f1f5f9;
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--slate-600);
+}
+
+.data-row { border-bottom: 1px solid var(--border); transition: 0.2s; }
+.data-row:hover { background: #fafafa; }
+.data-row td { padding: 1rem 1.5rem; vertical-align: middle; }
+
+/* Profile Layout */
+.profile-card { display: flex; align-items: center; gap: 1rem; }
+.avatar-wrapper { flex-shrink: 0; }
+.avatar-img { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; }
+.avatar-placeholder {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--indigo), #818cf8);
+    color: white; display: grid; place-items: center; font-weight: 700;
+}
+
+.full-name { display: block; font-weight: 700; font-size: 1rem; }
+.email-text { font-size: 0.8rem; color: var(--slate-400); display: flex; align-items: center; gap: 4px; }
+
+/* Chips and Badges */
+.rel-badge {
+    background: var(--indigo-soft); color: var(--indigo);
+    padding: 4px 12px; border-radius: 8px; font-weight: 700; font-size: 0.75rem;
+}
+
+.student-pill-stack { display: flex; flex-wrap: wrap; gap: 6px; }
+.student-pill {
+    background: #f1f5f9; color: var(--slate-600);
+    padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;
+}
+
+/* Actions */
+.button-group { display: flex; gap: 8px; justify-content: flex-end; }
+.btn-action {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: grid; place-items: center; text-decoration: none; transition: 0.2s;
+}
+.btn-action.edit { background: var(--indigo-soft); color: var(--indigo); }
+.btn-action.delete { background: #fee2e2; color: var(--red); }
+
+/* MOBILE RESPONSIVENESS (The "Senior" Part) */
+.mobile-only-details { display: none; flex-direction: column; gap: 4px; margin-top: 6px; }
+
+@media (max-width: 768px) {
+    .hide-mobile { display: none; }
+    .mobile-only-details { display: flex; }
+    
+    .top-bar { flex-direction: column; align-items: stretch; }
+    .btn-primary span { display: inline; } /* Keep text on mobile for clear CTA */
+    
+    .data-row { display: block; position: relative; padding: 1rem; }
+    .data-row td { display: block; padding: 0; border: none; }
+    
+    .identity-cell { padding-right: 90px !important; } /* Make room for absolute buttons */
+    
+    .action-cell {
+        position: absolute;
+        top: 1.25rem;
+        right: 1rem;
+    }
+    
+    .button-group { flex-direction: column; gap: 10px; }
+    
+    .m-tag { font-size: 0.75rem; color: var(--slate-600); font-weight: 500; }
+    .m-relationship-badge {
+        align-self: flex-start;
+        background: var(--indigo-soft); color: var(--indigo);
+        font-size: 0.65rem; font-weight: 800; padding: 2px 8px; border-radius: 4px;
+        text-transform: uppercase;
+    }
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 }
 </style>
 {% endblock %}

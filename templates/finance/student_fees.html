@@ -2,128 +2,214 @@
 {% block title %}My Fees{% endblock %}
 
 {% block content %}
-<style>
-  .fees-container {
-    background: #f8fafc;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-  }
-
-  h2.page-title {
-    text-align: center;
-    color: #1e3a8a;
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-    font-weight: 700;
-  }
-
-  /* 🔹 Scroll Wrapper */
-  .table-responsive {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: 10px;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 10px;
-    overflow: hidden;
-    min-width: 700px; /* keeps columns readable on small screens */
-  }
-
-  th, td {
-    padding: 12px 14px;
-    border-bottom: 1px solid #e5e7eb;
-    text-align: left;
-    white-space: nowrap; /* prevents breaking fee details */
-  }
-
-  thead {
-    background: #1e3a8a;
-    color: white;
-    text-transform: uppercase;
-    font-size: 14px;
-  }
-
-  .badge {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 13px;
-    color: white;
-    font-weight: 600;
-  }
-  .badge-paid { background: #16a34a; }
-  .badge-unpaid { background: #dc2626; }
-
-  .text-center {
-    text-align: center;
-    color: #6b7280;
-    font-style: italic;
-  }
-
-  /* 📱 Mobile tweaks */
-  @media (max-width: 768px) {
-    .fees-container {
-      padding: 15px;
-    }
-    h2.page-title {
-      font-size: 1.4rem;
-    }
-    table th, table td {
-      padding: 10px;
-      font-size: 13px;
-    }
-  }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <div class="fees-container">
-  <h2 class="page-title">💰 My Fees</h2>
-
-  {% if error %}
-    <p class="text-center">{{ error }}</p>
-  {% else %}
-    <div class="table-responsive">
-      <table>
-        <thead>
-          <tr>
-            <th>Session</th>
-            <th>Term</th>
-            <th>Fee Type</th>
-            <th>Total (₵)</th>
-            <th>Paid (₵)</th>
-            <th>Balance (₵)</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for fee in fees %}
-          <tr>
-            <td>{{ fee.session.name }}</td>
-            <td>{{ fee.get_term_display }}</td>
-            <td>{{ fee.fee_type.name }}</td>
-            <td>{{ fee.total_amount }}</td>
-            <td>{{ fee.amount_paid }}</td>
-            <td>{{ fee.balance }}</td>
-            <td>
-              {% if fee.is_cleared %}
-                <span class="badge badge-paid">Paid</span>
-              {% else %}
-                <span class="badge badge-unpaid">Pending</span>
-              {% endif %}
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="7" class="text-center">No fee records available yet.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="fees-header">
+        <h2 class="page-title">💰 My Fees</h2>
+        <div class="currency-tag">All amounts in GHS (₵)</div>
     </div>
-  {% endif %}
+
+    {% if error %}
+        <div class="error-state">
+            <p>{{ error }}</p>
+        </div>
+    {% else %}
+        <div class="table-adapter">
+            <table class="fees-table">
+                <thead>
+                    <tr>
+                        <th>Session</th>
+                        <th>Term</th>
+                        <th>Fee Type</th>
+                        <th class="text-right">Total</th>
+                        <th class="text-right">Paid</th>
+                        <th class="text-right">Balance</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fee in fees %}
+                    <tr class="fee-row">
+                        <td data-label="Session" class="fw-600">{{ fee.session.name }}</td>
+                        <td data-label="Term">{{ fee.get_term_display }}</td>
+                        <td data-label="Fee Type">
+                            <span class="type-tag">{{ fee.fee_type.name }}</span>
+                        </td>
+                        <td data-label="Total" class="text-right">₵{{ fee.total_amount }}</td>
+                        <td data-label="Paid" class="text-right text-success">₵{{ fee.amount_paid }}</td>
+                        <td data-label="Balance" class="text-right fw-800 text-danger">₵{{ fee.balance }}</td>
+                        <td data-label="Status" class="text-center">
+                            {% if fee.is_cleared %}
+                                <span class="badge badge-paid">Cleared</span>
+                            {% else %}
+                                <span class="badge badge-unpaid">Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="empty-msg">
+                            <div class="empty-icon">📂</div>
+                            No fee records available yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 </div>
+
+<style>
+:root {
+    --primary-blue: #1e3a8a;
+    --success: #16a34a;
+    --danger: #dc2626;
+    --slate-50: #f8fafc;
+    --slate-200: #e2e8f0;
+    --slate-600: #475569;
+}
+
+.fees-container {
+    font-family: 'Inter', sans-serif;
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.fees-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+h2.page-title {
+    color: var(--primary-blue);
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.currency-tag {
+    font-size: 0.85rem;
+    color: var(--slate-600);
+    font-weight: 500;
+}
+
+/* Table Management */
+.table-adapter {
+    width: 100%;
+}
+
+.fees-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.fees-table thead {
+    background: var(--slate-50);
+}
+
+.fees-table th {
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--slate-600);
+    border-bottom: 2px solid var(--slate-200);
+}
+
+.fees-table td {
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid var(--slate-200);
+    color: #1e293b;
+    font-size: 0.95rem;
+}
+
+/* UI Elements */
+.type-tag {
+    background: #eff6ff;
+    color: #2563eb;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.badge-paid { background: #dcfce7; color: #166534; }
+.badge-unpaid { background: #fee2e2; color: #991b1b; }
+
+.fw-600 { font-weight: 600; }
+.fw-800 { font-weight: 800; }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.text-success { color: var(--success); }
+.text-danger { color: var(--danger); }
+
+.empty-msg {
+    padding: 4rem 0 !important;
+    text-align: center;
+    color: var(--slate-600);
+}
+
+/* 📱 RESPONSIVE: TABLE TO CARDS */
+@media (max-width: 850px) {
+    .fees-container { padding: 1rem; }
+    
+    /* Remove table structure */
+    .fees-table thead { display: none; }
+    
+    .fees-table, .fees-table tbody, .fees-table tr, .fees-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .fee-row {
+        background: #fff;
+        border: 1px solid var(--slate-200);
+        border-radius: 12px;
+        margin-bottom: 1.25rem;
+        padding: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .fees-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: right;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--slate-50);
+    }
+
+    .fees-table td:last-child { border-bottom: none; }
+
+    /* Insert Labels via CSS */
+    .fees-table td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        font-size: 0.75rem;
+        color: var(--slate-600);
+        text-transform: uppercase;
+        text-align: left;
+    }
+
+    .text-right, .text-center { text-align: right; }
+    
+    /* Make the Fee Type tag stand out more on mobile */
+    .type-tag { margin-left: auto; }
+}
+</style>
 {% endblock %}

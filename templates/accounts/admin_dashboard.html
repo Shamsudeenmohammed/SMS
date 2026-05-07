@@ -4,12 +4,147 @@
 {% block title %}Admin Dashboard{% endblock %}
 {% block header %}🧑‍💼 Admin Dashboard{% endblock %}
 
+
+{% block content %}
 {% block extra_css %}
 <link rel="preload" href="{% static 'css/admin_dashboard.css' %}" as="style">
 <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
-{% endblock %}
 
-{% block content %}
+<style>
+  /* SENIOR FIX: Prevent FOUC by hiding the wrapper until CSS/Animation kicks in */
+  .dashboard-wrapper {
+    max-width: 1200px;
+    margin: auto;
+    padding: 30px 25px;
+    background: linear-gradient(145deg, #f9fafb, #eef2ff);
+    border-radius: 16px;
+    opacity: 0; /* Hidden by default */
+  }
+
+  .fade-in {
+    animation: fadeIn 0.6s ease-in forwards; /* 'forwards' ensures it stays visible */
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .summary-grid, .cards-grid, .charts-section {
+    display: grid;
+    gap: 22px;
+  }
+
+  .chart-card canvas { height: 260px !important; }
+
+  .greeting {
+    font-size: 1.9rem;
+    color: #111827;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
+  }
+
+  .subtitle {
+    color: #6b7280;
+    margin-bottom: 35px;
+    font-size: 1rem;
+  }
+
+  .section-title {
+    margin: 40px 0 15px;
+    color: #1e293b;
+    font-weight: 700;
+    font-size: 1.3rem;
+    position: relative;
+  }
+  .section-title::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #2563eb, #06b6d4);
+    margin-top: 8px;
+    border-radius: 2px;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-bottom: 45px;
+  }
+
+  .summary-card {
+    padding: 25px 20px;
+    color: #fff;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    transition: all 0.35s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .summary-card:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+  }
+
+  .summary-card h4 { font-size: 1.05rem; margin-bottom: 10px; font-weight: 500; }
+  .summary-card p { font-size: 1.8rem; font-weight: 700; }
+
+  .cards-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    margin-bottom: 50px;
+  }
+
+  .card {
+    padding: 25px;
+    color: white;
+    border-radius: 18px;
+    text-align: center;
+    text-decoration: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: all 0.35s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-5px) scale(1.02);
+  }
+
+  .charts-section {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    margin-bottom: 40px;
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+
+  .chart-card {
+    background: #ffffffaa;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+  }
+
+  .gradient-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+  .gradient-green { background: linear-gradient(135deg, #10b981, #047857); }
+  .gradient-purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+  .gradient-orange { background: linear-gradient(135deg, #f59e0b, #b45309); }
+  .gradient-red { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+  .gradient-gray { background: linear-gradient(135deg, #6b7280, #374151); }
+
+  /* Responsive Fixes */
+  @media (max-width: 768px) {
+    .dashboard-wrapper { padding: 15px 12px; }
+    .summary-grid, .cards-grid, .charts-section { grid-template-columns: 1fr !important; }
+    .chart-card canvas { width: 100% !important; min-height: 240px; }
+  }
+</style>
+{% endblock %}
 <div class="dashboard-wrapper fade-in">
 
   <h2 class="greeting">
@@ -21,7 +156,6 @@
 
   <!-- ===== SUMMARY GRID ===== -->
   <div class="summary-grid">
-
     <div class="summary-card gradient-blue">
       <h4>Total Students</h4>
       <p id="total_students">0</p>
@@ -61,7 +195,6 @@
       <h4>Total Teachers</h4>
       <p>{{ total_teachers|default:"0" }}</p>
     </div>
-
   </div>
 
   <!-- ===== QUICK LINKS ===== -->
@@ -71,12 +204,10 @@
       <h3>📚 Manage Courses</h3>
       <p>View, add, or update courses</p>
     </a>
-
     <a href="{% url 'manage_teachers' %}" class="card gradient-green">
       <h3>👩‍🏫 Manage Teachers</h3>
       <p>Assign roles and manage records</p>
     </a>
-
     <a href="{% url 'manage_students' %}" class="card gradient-purple">
       <h3>🎓 Manage Students</h3>
       <p>Enroll, update, and monitor progress</p>
@@ -86,19 +217,15 @@
   <!-- ===== CHARTS ===== -->
   <h3 class="section-title">Analytics & Insights</h3>
   <div class="charts-section">
-
     <div class="chart-card glass-card">
       <h3>📊 Fee Collection Overview</h3>
       <canvas id="feeChart"></canvas>
     </div>
-
     <div class="chart-card glass-card">
       <h3>📈 Monthly Revenue Trend</h3>
       <canvas id="revenueChart"></canvas>
     </div>
-
   </div>
-
 </div>
 
 <!-- ===== SCRIPTS ===== -->
@@ -106,17 +233,13 @@
 
 <script defer>
 document.addEventListener("DOMContentLoaded", () => {
-
+  // 1. Initialize Charts
   new Chart(document.getElementById("feeChart"), {
     type: "bar",
     data: {
       labels: ["Paid", "Pending", "Unpaid"],
       datasets: [{
-        data: [
-          {{ total_fees_paid|default:"0" }},
-          {{ pending_fees|default:"0" }},
-          {{ unpaid_fees|default:"0" }}
-        ],
+        data: [{{ total_fees_paid|default:"0" }}, {{ pending_fees|default:"0" }}, {{ unpaid_fees|default:"0" }}],
         backgroundColor: ["#10b981", "#f59e0b", "#ef4444"],
         borderRadius: 8
       }]
@@ -139,284 +262,18 @@ document.addEventListener("DOMContentLoaded", () => {
     options: { responsive: true, plugins: { legend: { display: false } } }
   });
 
+  // 2. Fetch Live Financial Data (Immediately)
+  fetch("{% url 'finance_summary_json' %}")
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("total_students").textContent = data.total_students;
+      document.getElementById("students_with_fees").textContent = data.students_with_fees;
+      document.getElementById("total_invoices").textContent = data.total_invoices;
+      document.getElementById("total_fees_paid").textContent = "₵" + data.total_paid;
+      document.getElementById("pending_fees").textContent = "₵" + data.pending_total;
+      document.getElementById("unpaid_fees").textContent = "₵" + data.total_balance;
+    })
+    .catch(err => console.error("Error loading dashboard data:", err));
 });
 </script>
-
-<script defer>
-document.addEventListener("DOMContentLoaded", function () {
-  setTimeout(() => {
-    fetch("{% url 'finance_summary_json' %}")
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("total_students").textContent = data.total_students;
-        document.getElementById("students_with_fees").textContent = data.students_with_fees;
-        document.getElementById("total_invoices").textContent = data.total_invoices;
-        document.getElementById("total_fees_paid").textContent = "₵" + data.total_paid;
-        document.getElementById("pending_fees").textContent = "₵" + data.pending_total;
-        document.getElementById("unpaid_fees").textContent = "₵" + data.total_balance;
-      });
-  }, 2000);
-});
-</script>
-
-<!-- ===== Styling ===== -->
-<style>
-
-/* === DASHBOARD STYLES (EXACT COPY FROM TEMPLATE) === */
-
-.dashboard-wrapper {
-  max-width: 1200px;
-  margin: auto;
-  padding: 30px 25px;
-  background: linear-gradient(145deg, #f9fafb, #eef2ff);
-  border-radius: 16px;
-}
-
-.fade-in {
-  animation: fadeIn 0.3s ease-in;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.summary-grid,
-.cards-grid,
-.charts-section {
-  display: grid;
-  gap: 22px;
-}
-
-.chart-card canvas {
-  height: 260px !important;
-}
-
-/* gradients, cards, typography — keep same styles */
-
-.greeting {
-  font-size: 1.9rem;
-  color: #111827;
-  font-weight: 700;
-  margin-bottom: 10px;
-  letter-spacing: -0.3px;
-}
-
-.subtitle {
-  color: #6b7280;
-  margin-bottom: 35px;
-  font-size: 1rem;
-}
-
-.section-title {
-  margin: 40px 0 15px;
-  color: #1e293b;
-  font-weight: 700;
-  font-size: 1.3rem;
-  position: relative;
-}
-.section-title::after {
-  content: "";
-  display: block;
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, #2563eb, #06b6d4);
-  margin-top: 8px;
-  border-radius: 2px;
-}
-
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 22px;
-  margin-bottom: 45px;
-}
-
-.summary-card {
-  padding: 25px 20px;
-  color: #fff;
-  border-radius: 16px;
-  text-align: center;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-  transition: all 0.35s ease;
-  position: relative;
-  overflow: hidden;
-}
-.summary-card::before {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: rgba(255,255,255,0.08);
-  transform: rotate(45deg);
-  transition: 0.4s ease;
-}
-.summary-card:hover::before {
-  top: -40%;
-  left: -40%;
-}
-.summary-card:hover {
-  transform: translateY(-6px) scale(1.03);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.18);
-}
-
-.summary-card h4 {
-  font-size: 1.05rem;
-  margin-bottom: 10px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-}
-
-.summary-card p {
-  font-size: 1.8rem;
-  font-weight: 700;
-  animation: countIn 0.8s ease-out;
-}
-
-@keyframes countIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 25px;
-  margin-bottom: 50px;
-}
-
-.card {
-  padding: 25px;
-  color: white;
-  border-radius: 18px;
-  text-align: center;
-  text-decoration: none;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  transition: all 0.35s ease;
-  position: relative;
-}
-.card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(255,255,255,0.1);
-  border-radius: 18px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-.card:hover::after { opacity: 1; }
-.card:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
-
-.card h3 { font-size: 1.2rem; margin-bottom: 8px; }
-.card p { font-size: 0.95rem; opacity: 0.9; }
-
-.charts-section {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 25px;
-  margin-bottom: 40px;
-}
-
-.glass-card {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.3);
-}
-
-.chart-card {
-  background: #ffffffaa;
-  border-radius: 16px;
-  padding: 22px;
-  box-shadow: 0 5px 18px rgba(0,0,0,0.08);
-  transition: transform 0.3s ease;
-}
-.chart-card:hover { transform: translateY(-3px); }
-.chart-card h3 { font-size: 1.1rem; margin-bottom: 15px; color: #1e293b; }
-
-.gradient-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
-.gradient-green { background: linear-gradient(135deg, #10b981, #047857); }
-.gradient-purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
-.gradient-orange { background: linear-gradient(135deg, #f59e0b, #b45309); }
-.gradient-red { background: linear-gradient(135deg, #ef4444, #b91c1c); }
-.gradient-gray { background: linear-gradient(135deg, #6b7280, #374151); }
-
-.fade-in { animation: fadeIn 0.6s ease-in; }
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ===============================
-   MOBILE RESPONSIVENESS FIX
-   (NO VISUAL STYLE CHANGE)
-   =============================== */
-
-@media (max-width: 768px) {
-
-  /* Prevent horizontal overflow */
-  body {
-    overflow-x: hidden;
-  }
-
-  .dashboard-wrapper {
-    padding: 15px 12px;
-  }
-
-  /* Fix grid squeezing */
-  .summary-grid,
-  .cards-grid,
-  .charts-section {
-    grid-template-columns: 1fr !important;
-  }
-
-  /* Fix chart cards cutting off */
-  .chart-card {
-    padding: 16px;
-    overflow: hidden;
-  }
-
-  /* MOST IMPORTANT FIX */
-  .chart-card canvas {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 240px;
-  }
-
-  /* Prevent Chart.js from forcing large canvas */
-  canvas {
-    display: block;
-  }
-
-  /* Reduce chart title spacing */
-  .chart-card h3 {
-    font-size: 1rem;
-    margin-bottom: 10px;
-  }
-}
-
-/* Extra-small devices (very narrow phones) */
-@media (max-width: 480px) {
-
-  .greeting {
-    font-size: 1.4rem;
-  }
-
-  .summary-card p {
-    font-size: 1.4rem;
-  }
-
-  .chart-card canvas {
-    min-height: 220px;
-  }
-}
-</style>
-
 {% endblock %}
-

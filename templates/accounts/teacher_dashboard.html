@@ -4,236 +4,306 @@
 {% block title %}Teacher Dashboard{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <h2 class="page-title">
+            <div class="icon-circle"><i class="fas fa-chalkboard-teacher"></i></div>
+            Teacher Overview
+        </h2>
+        <div class="date-display">{{ "now"|date:"l, d F Y" }}</div>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="fas fa-check-double"></i></div>
+            <div class="stat-content">
+                <h3>Total Results Marked</h3>
+                <div class="value">{{ total_results|default:"0" }}</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon red"><i class="fas fa-exclamation-circle"></i></div>
+            <div class="stat-content">
+                <h3>Unmarked Scripts</h3>
+                <div class="value {% if unmarked_scripts|default:0 == 0 %}none{% endif %}">
+                    {{ unmarked_scripts|default:"None" }}
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon indigo"><i class="fas fa-book"></i></div>
+            <div class="stat-content">
+                <h3>Subjects</h3>
+                <div class="value">{{ total_subjects|default:"0" }}</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="fas fa-graduation-cap"></i></div>
+            <div class="stat-content">
+                <h3>Average Score</h3>
+                <div class="value">{{ avg_score|default:"0" }}%</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="visual-section">
+        <div class="surface chart-surface">
+            <div class="surface-header">
+                <div class="title-accent">📊 Performance Trend</div>
+            </div>
+            <div class="chart-container">
+                <canvas id="termChart"></canvas>
+            </div>
+        </div>
+
+        <div class="surface table-surface">
+            <div class="surface-header">
+                <div class="title-accent">🧾 Recent Results</div>
+            </div>
+            
+            <div class="responsive-container">
+                <table class="pro-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Subject</th>
+                            <th class="hide-sm">Term</th>
+                            <th class="hide-md">Session</th>
+                            <th>Total</th>
+                            <th>Grade</th>
+                            <th class="text-right">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in recent_results %}
+                        {% if r.total_score > 0 %}
+                        <tr class="table-row">
+                            <td data-label="Student">
+                                <div class="student-name">{{ r.student }}</div>
+                            </td>
+                            <td data-label="Subject">
+                                <span class="subject-tag">{{ r.subject }}</span>
+                            </td>
+                            <td data-label="Term" class="hide-sm">{{ r.term }}</td>
+                            <td data-label="Session" class="hide-md">{{ r.session }}</td>
+                            <td data-label="Total"><strong>{{ r.total_score }}</strong></td>
+                            <td data-label="Grade">
+                                <span class="grade-pill" data-grade="{{ r.grade }}">
+                                    {{ r.grade }}
+                                </span>
+                            </td>
+                            <td data-label="Date" class="text-right date-cell">{{ r.date_recorded|date:"M d, Y" }}</td>
+                        </tr>
+                        {% endif %}
+                        {% empty %}
+                        <tr><td colspan="7" class="empty-state">No marked results found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
-/* ====== Teacher Dashboard Styling ====== */
+:root {
+    --primary: #4f46e5;
+    --primary-light: #eef2ff;
+    --success: #16a34a;
+    --danger: #dc2626;
+    --slate-900: #0f172a;
+    --slate-600: #475569;
+    --slate-400: #94a3b8;
+    --border: #e2e8f0;
+    --surface: #ffffff;
+}
+
+.dashboard-container {
+    font-family: 'Inter', sans-serif;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+/* Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
 .page-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  color: #004aad;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--slate-900);
+    margin: 0;
 }
+.icon-circle {
+    width: 45px; height: 45px;
+    background: var(--primary);
+    color: white;
+    border-radius: 12px;
+    display: grid; place-items: center; font-size: 1.2rem;
+}
+.date-display { color: var(--slate-400); font-weight: 500; font-size: 0.9rem; }
 
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 1.3rem;
-  margin-bottom: 2rem;
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
 }
+.stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -10px rgba(0,0,0,0.1); }
 
-.card {
-  position: relative;
-  border-radius: 14px;
-  padding: 1.4rem 1.6rem;
-  background: linear-gradient(145deg, #ffffff, #f3f7ff);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  transition: all 0.3s ease;
-  overflow: hidden;
+.stat-icon {
+    width: 54px; height: 54px;
+    border-radius: 14px;
+    display: grid; place-items: center; font-size: 1.4rem;
 }
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-}
-.card h3 {
-  font-size: 0.95rem;
-  color: #64748b;
-  margin-bottom: 0.4rem;
-}
-.card .value {
-  font-size: 2.2rem;
-  font-weight: 800;
-  color: #1e3a8a;
-}
-.unmarked {
-  color: #9ca3af !important;
-  font-weight: 600;
-  font-size: 1.5rem;
-}
+.stat-icon.blue { background: #eff6ff; color: #2563eb; }
+.stat-icon.red { background: #fff1f2; color: #e11d48; }
+.stat-icon.indigo { background: #f5f3ff; color: #4f46e5; }
+.stat-icon.green { background: #f0fdf4; color: #16a34a; }
 
-/* ====== Table Wrapper ====== */
-.table-wrapper {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  padding: 1.6rem;
-  margin-bottom: 2rem;
-  overflow-x: auto;
-}
+.stat-content h3 { font-size: 0.8rem; font-weight: 700; color: var(--slate-400); text-transform: uppercase; margin: 0; letter-spacing: 0.025em; }
+.stat-content .value { font-size: 1.75rem; font-weight: 800; color: var(--slate-900); }
+.value.none { color: var(--slate-400); font-size: 1.2rem; }
 
-.table-title {
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* Surface Styling */
+.surface {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
 }
-.table-title::before {
-  content: "▍";
-  color: #004aad;
-  font-weight: bold;
-}
+.surface-header { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #f8fafc; }
+.title-accent { font-weight: 700; color: var(--slate-900); font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
+/* Table Logic */
+.responsive-container { overflow-x: visible; }
+.pro-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: -8px; }
+.pro-table th { padding: 0.75rem 1rem; font-size: 0.75rem; text-transform: uppercase; color: var(--slate-400); font-weight: 700; }
+.table-row { transition: 0.2s; }
+.table-row td { 
+    padding: 1rem; background: #fff; 
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
 }
-th, td {
-  padding: 0.8rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-th {
-  background: #f1f5fb;
-  color: #334155;
-  text-align: left;
-  font-weight: 600;
-}
-td {
-  color: #475569;
-}
-tr:hover td {
-  background-color: #f9fafb;
-}
+.table-row td:first-child { border-left: 1px solid var(--border); border-radius: 12px 0 0 12px; }
+.table-row td:last-child { border-right: 1px solid var(--border); border-radius: 0 12px 12px 0; }
+.table-row:hover td { background: var(--slate-50); border-color: var(--slate-200); }
 
-/* ====== Chart ====== */
-canvas {
-  margin-top: 1rem;
-  width: 100% !important;
-  height: 300px !important;
-}
+.subject-tag { background: var(--primary-light); color: var(--primary); padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 0.75rem; }
+.grade-pill { padding: 4px 12px; border-radius: 20px; font-weight: 800; font-size: 0.75rem; }
+.grade-pill[data-grade="A"] { background: #dcfce7; color: #166534; }
+.grade-pill[data-grade="F"] { background: #fee2e2; color: #991b1b; }
+.grade-pill:not([data-grade="A"]):not([data-grade="F"]) { background: #dbeafe; color: #1e40af; }
 
-/* ====== Responsive ====== */
+/* Charts */
+.chart-container { height: 350px; position: relative; }
+
+/* MOBILE BREAKPOINT LOGIC */
 @media (max-width: 768px) {
-  .page-title {
-    font-size: 1.5rem;
-    justify-content: center;
-    text-align: center;
-  }
-  .dashboard-grid {
-    gap: 1rem;
-  }
-  .card {
-    padding: 1rem;
-  }
-  .table-wrapper {
-    padding: 1rem;
-  }
+    .dashboard-header { flex-direction: column; text-align: center; gap: 10px; }
+    .page-title { flex-direction: column; }
+    
+    .hide-sm { display: none; }
+    
+    /* The Magic Table-to-Card Flip */
+    .pro-table, .pro-table thead, .pro-table tbody, .pro-table th, .pro-table td, .pro-table tr { 
+        display: block; 
+    }
+    .pro-table thead { display: none; }
+    .table-row { margin-bottom: 1.5rem; }
+    .table-row td { 
+        display: flex; justify-content: space-between; align-items: center; 
+        border: none !important; border-bottom: 1px solid #f1f5f9 !important;
+        padding: 0.75rem 1rem; border-radius: 0 !important;
+    }
+    .table-row td:last-child { border-bottom: none !important; border-radius: 0 0 12px 12px !important; }
+    .table-row td:first-child { 
+        background: var(--primary-light); 
+        border-radius: 12px 12px 0 0 !important;
+        color: var(--primary); font-weight: 700;
+    }
+    .table-row td::before {
+        content: attr(data-label);
+        font-weight: 800; font-size: 0.7rem; color: var(--slate-400); text-transform: uppercase;
+    }
+    .table-row td:first-child::before { color: var(--primary); }
+    .text-right { text-align: left; }
 }
+
+@media (max-width: 1024px) { .hide-md { display: none; } }
 </style>
 
-<h2 class="page-title">📘 Teacher Dashboard</h2>
-
-<!-- ===== Summary Cards (Attendance Removed) ===== -->
-<div class="dashboard-grid">
-  <div class="card">
-    <h3>Total Results Marked</h3>
-    <div class="value">{{ total_results|default:"0" }}</div>
-  </div>
-
-  <div class="card">
-    <h3>Unmarked Scripts</h3>
-    <div class="value {% if unmarked_scripts|default:0 == 0 %}unmarked{% endif %}">
-      {% if unmarked_scripts|default:0 == 0 %}
-        None
-      {% else %}
-        {{ unmarked_scripts }}
-      {% endif %}
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>Subjects</h3>
-    <div class="value">{{ total_subjects|default:"0" }}</div>
-  </div>
-
-  <div class="card">
-    <h3>Classes</h3>
-    <div class="value">{{ total_classes|default:"0" }}</div>
-  </div>
-
-  <div class="card">
-    <h3>Average Score</h3>
-    <div class="value">{{ avg_score|default:"0" }}</div>
-  </div>
-</div>
-
-<!-- ===== Chart Section ===== -->
-<div class="table-wrapper">
-  <div class="table-title">📊 Term Performance Trend</div>
-  <canvas id="termChart"></canvas>
-</div>
-
-<!-- ===== Recent Results ===== -->
-<div class="table-wrapper">
-  <div class="table-title">🧾 Recent Results (Marked Only)</div>
-  <table>
-    <thead>
-      <tr>
-        <th>Student</th>
-        <th>Subject</th>
-        <th>Term</th>
-        <th>Session</th>
-        <th>Total</th>
-        <th>Grade</th>
-        <th>Date</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for r in recent_results %}
-        {% if r.total_score > 0 %}
-        <tr>
-          <td>{{ r.student }}</td>
-          <td>{{ r.subject }}</td>
-          <td>{{ r.term }}</td>
-          <td>{{ r.session }}</td>
-          <td><strong>{{ r.total_score }}</strong></td>
-          <td>
-            <span style="color:
-              {% if r.grade == 'A' %}#16a34a
-              {% elif r.grade == 'F' %}#dc2626
-              {% else %}#2563eb{% endif %};
-              font-weight:600;">
-              {{ r.grade }}
-            </span>
-          </td>
-          <td>{{ r.date_recorded|date:"M d, Y" }}</td>
-        </tr>
-        {% endif %}
-      {% empty %}
-        <tr><td colspan="7" style="text-align:center; color:#94a3b8;">No results yet.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-
-<!-- ===== Chart.js Script ===== -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-const ctx = document.getElementById('termChart').getContext('2d');
-new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: {{ terms|safe }},
-    datasets: [{
-      label: 'Average Score',
-      data: {{ avg_scores|safe }},
-      borderColor: '#004aad',
-      backgroundColor: 'rgba(0,74,173,0.1)',
-      tension: 0.4,
-      fill: true,
-      pointRadius: 5,
-      pointBackgroundColor: '#1e3a8a',
-    }]
-  },
-  options: {
-    scales: { y: { beginAtZero: true, max: 100, grid: { color: '#f1f5f9' } } },
-    plugins: { legend: { display: false } },
-  }
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('termChart').getContext('2d');
+    
+    // Create a beautiful gradient for the line chart
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(79, 70, 229, 0.2)');
+    gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ terms|safe }},
+            datasets: [{
+                data: {{ avg_scores|safe }},
+                borderColor: '#4f46e5',
+                borderWidth: 4,
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: '#4f46e5',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { 
+                    beginAtZero: true, 
+                    max: 100,
+                    grid: { color: '#f1f5f9', drawBorder: false },
+                    ticks: { color: '#94a3b8', font: { family: 'Inter', weight: 600 } }
+                },
+                x: { 
+                    grid: { display: false },
+                    ticks: { color: '#94a3b8', font: { family: 'Inter', weight: 600 } }
+                }
+            }
+        }
+    });
 });
 </script>
-
 {% endblock %}

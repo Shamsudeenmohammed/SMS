@@ -3,6 +3,7 @@
 {% block header %}Manage Teachers{% endblock %}
 
 {% block content %}
+<<<<<<< HEAD
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -246,6 +247,291 @@
 @media (max-width: 768px) {
   .toolbar { flex-direction: column; align-items: stretch; }
   .search-box input { width: 100%; }
+=======
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="teacher-manager-container">
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon-box"><i class="fas fa-chalkboard-teacher"></i></div>
+            <div class="stat-info">
+                <span class="stat-label">Active Faculty</span>
+                <span class="stat-value">{{ teachers.count }}</span>
+            </div>
+        </div>
+        {% if query %}
+        <div class="stat-card results">
+            <div class="stat-icon-box"><i class="fas fa-search"></i></div>
+            <div class="stat-info">
+                <span class="stat-label">Search Results</span>
+                <span class="stat-value">{{ teachers|length }}</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="toolbar-surface">
+        <div class="actions-group">
+            <a href="{% url 'add_teacher' %}" class="btn-cta">
+                <i class="fas fa-plus"></i> <span>Add Teacher</span>
+            </a>
+            <a href="{% url 'import_teachers' %}" class="btn-ghost" title="Import Faculty">
+                <i class="fas fa-file-import"></i>
+            </a>
+        </div>
+
+        <form method="get" class="search-form">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" name="q" placeholder="Search name, ID, or department..." value="{{ query }}">
+            </div>
+            <button type="submit" class="btn-search">Search</button>
+        </form>
+    </div>
+
+    <div class="data-display-container">
+        <table class="adaptive-table">
+            <thead>
+                <tr>
+                    <th class="desktop-only">#</th>
+                    <th>Faculty Member</th>
+                    <th class="desktop-only">Department</th>
+                    <th class="desktop-only">Qualification</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for teacher in teachers %}
+                <tr class="teacher-row">
+                    <td class="desktop-only index-col">{{ forloop.counter }}</td>
+                    <td class="main-info-col">
+                        <div class="profile-group">
+                            <div class="initials-avatar">{{ teacher.user.first_name|first }}{{ teacher.user.last_name|first }}</div>
+                            <div class="text-meta">
+                                <span class="full-name">{{ teacher.user.get_full_name }}</span>
+                                <span class="email-address">{{ teacher.user.email }}</span>
+                                <div class="mobile-meta">
+                                    <span class="m-dept">{{ teacher.department }}</span>
+                                    <span class="m-qual">{{ teacher.qualification }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="desktop-only">
+                        <span class="dept-chip">{{ teacher.department }}</span>
+                    </td>
+                    <td class="desktop-only qual-text">{{ teacher.qualification }}</td>
+                    <td class="text-right">
+                        <div class="action-flex">
+                            <a href="{% url 'edit_teacher' teacher.pk %}" class="action-link edit" title="Edit">
+                                <i class="fas fa-pen"></i>
+                            </a>
+                            <a href="{% url 'delete_teacher' teacher.pk %}" class="action-link delete" 
+                               onclick="return confirm('Confirm deletion of this faculty record?');" title="Delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-state-cell">
+                        <div class="empty-msg">
+                            <i class="fas fa-folder-open"></i>
+                            <p>No faculty members found matching your search.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+:root {
+    --brand: #4f46e5;
+    --brand-soft: #eef2ff;
+    --success: #10b981;
+    --danger: #ef4444;
+    --surface: #ffffff;
+    --text-dark: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --radius-lg: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.teacher-manager-container {
+    padding: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: 'Inter', sans-serif;
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Stats Dashboard */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--surface);
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: var(--shadow);
+}
+
+.stat-card.results { border-left: 4px solid var(--brand); }
+
+.stat-icon-box {
+    width: 48px; height: 48px;
+    background: var(--brand-soft);
+    color: var(--brand);
+    border-radius: 10px;
+    display: grid; place-items: center; font-size: 1.2rem;
+}
+
+.stat-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+.stat-value { font-size: 1.5rem; font-weight: 800; color: var(--text-dark); display: block; }
+
+/* Toolbar Section */
+.toolbar-surface {
+    background: var(--surface);
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+    flex-wrap: wrap;
+}
+
+.actions-group { display: flex; gap: 0.75rem; align-items: center; }
+
+.btn-cta {
+    background: var(--brand); color: white;
+    padding: 0.75rem 1.25rem; border-radius: var(--radius-sm);
+    font-weight: 600; text-decoration: none;
+    display: flex; align-items: center; gap: 8px; transition: 0.2s;
+}
+
+.btn-ghost {
+    width: 44px; height: 44px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); display: grid; place-items: center;
+    color: var(--text-dark); text-decoration: none;
+}
+
+.search-form { display: flex; gap: 8px; flex: 1; min-width: 300px; }
+.search-input-wrapper { position: relative; flex: 1; }
+.search-input-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.search-input-wrapper input {
+    width: 100%; padding: 0.7rem 1rem 0.7rem 2.5rem;
+    border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.9rem;
+}
+
+.btn-search {
+    background: var(--text-dark); color: white; border: none;
+    padding: 0.7rem 1.2rem; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer;
+}
+
+/* Adaptive Table */
+.data-display-container {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.adaptive-table { width: 100%; border-collapse: collapse; }
+.adaptive-table th {
+    background: #f8fafc; padding: 1rem 1.5rem;
+    text-align: left; font-size: 0.75rem; font-weight: 700;
+    text-transform: uppercase; color: var(--text-muted);
+}
+
+.teacher-row { border-bottom: 1px solid var(--border); transition: 0.2s; }
+.teacher-row:hover { background: #fafafa; }
+.teacher-row td { padding: 1rem 1.5rem; vertical-align: middle; }
+
+.profile-group { display: flex; align-items: center; gap: 1rem; }
+.initials-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand), #818cf8);
+    color: white; display: grid; place-items: center; font-weight: 700; font-size: 0.85rem;
+}
+
+.full-name { display: block; font-weight: 700; color: var(--text-dark); }
+.email-address { font-size: 0.8rem; color: var(--text-muted); }
+
+.dept-chip {
+    background: #f1f5f9; color: #475569;
+    padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;
+}
+
+.qual-text { font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
+
+.action-flex { display: flex; gap: 0.5rem; justify-content: flex-end; }
+.action-link {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: grid; place-items: center; text-decoration: none; transition: 0.2s;
+}
+.action-link.edit { background: var(--brand-soft); color: var(--brand); }
+.action-link.delete { background: #fff1f2; color: var(--danger); }
+.action-link:hover { transform: scale(1.05); }
+
+.mobile-meta { display: none; margin-top: 0.5rem; gap: 8px; }
+.m-dept { font-size: 0.7rem; font-weight: 700; color: var(--brand); background: var(--brand-soft); padding: 2px 6px; border-radius: 4px; }
+.m-qual { font-size: 0.7rem; color: var(--text-muted); }
+
+/* Empty States */
+.empty-state-cell { padding: 4rem 1rem !important; text-align: center; }
+.empty-msg i { font-size: 2.5rem; color: var(--border); margin-bottom: 1rem; display: block; }
+.empty-msg p { color: var(--text-muted); }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* RESPONSIVE BREAKPOINTS */
+@media (max-width: 992px) {
+    .search-form { min-width: 100%; order: 2; }
+    .actions-group { width: 100%; justify-content: space-between; order: 1; }
+}
+
+@media (max-width: 768px) {
+    .desktop-only { display: none; }
+    .mobile-meta { display: flex; }
+    
+    .teacher-row { display: block; position: relative; padding: 1.25rem; }
+    .teacher-row td { display: block; padding: 0; border: none; }
+    
+    .main-info-col { margin-bottom: 0.5rem; padding-right: 80px !important; }
+    
+    .action-flex {
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        flex-direction: column;
+    }
+    
+    .initials-avatar { width: 48px; height: 48px; }
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 }
 </style>
 {% endblock %}

@@ -1150,74 +1150,67 @@ def edit_student(request, pk):
     try:
         student = get_object_or_404(Student, pk=pk)
         user = student.user
-
-        # GET classrooms for datalist
         classrooms = ClassRoom.objects.all()
 
         if request.method == "POST":
+            username = request.POST.get("username") # <-- New username field
             full_name = request.POST.get("full_name")
             email = request.POST.get("email")
-            current_class_name = request.POST.get("current_class")  # string from input
+            current_class_name = request.POST.get("current_class")
             new_password = request.POST.get("new_password")
             confirm_password = request.POST.get("confirm_password")
-            is_active = request.POST.get("is_active")
+            is_active_status = bool(request.POST.get("is_active"))
 
-            # Update user info
+            # Check if username is already taken by a DIFFERENT user
+            if User.objects.filter(username=username).exclude(pk=user.pk).exists():
+                messages.error(request, f"❌ The username '{username}' is already in use.")
+                return render(request, "accounts/edit_student.html", {
+                    "student": student, 
+                    "classrooms": classrooms
+                })
+
+            # Update User info
+            user.username = username
             name_parts = full_name.split(" ", 1)
             user.first_name = name_parts[0]
             user.last_name = name_parts[1] if len(name_parts) > 1 else ""
 
-            # Fix: allow blank email without unique constraint error
             if not email or email.strip() == "":
                 user.email = None
             else:
                 user.email = email
 
-
-            # Optional password reset
             if new_password:
                 if new_password == confirm_password:
                     user.set_password(new_password)
-                    messages.info(request, f"🔑 Password for {user.username} has been reset successfully.")
+                    messages.info(request, f"🔑 Password for {user.username} reset.")
                 else:
                     messages.error(request, "❌ Passwords do not match.")
                     return render(request, "accounts/edit_student.html", {
-                        "student": student,
+                        "student": student, 
                         "classrooms": classrooms
                     })
 
-            # Active toggle
-            user.is_active = bool(is_active)
+            # Sync active status
+            user.is_active = is_active_status
             user.save()
 
-            # Get or create ClassRoom safely
+            student.is_active = is_active_status
+            
+            # Update Classroom
             classroom, _ = ClassRoom.objects.get_or_create(name=current_class_name)
             student.current_class = classroom
             student.save()
 
-            messages.success(request, "✅ Student and user details updated successfully.")
+            messages.success(request, f"✅ Updated {user.get_full_name()} successfully.")
             return redirect("manage_students")
 
-        # GET request
-        context = {"student": student, "classrooms": classrooms}
-        return render(request, "accounts/edit_student.html", context)
+        return render(request, "accounts/edit_student.html", {"student": student, "classrooms": classrooms})
 
     except Exception as e:
-        # Log full error details
         logger.error(f"Error in edit_student: {e}", exc_info=True)
-
-        # Show developer-friendly error message on frontend
-        messages.error(request, f"⚠️ An unexpected error occurred: {str(e)}")
-
-        # Return page with the error visible
-        return render(request, "accounts/edit_student.html", {
-            "student": student,
-            "classrooms": classrooms,
-            "error_message": str(e)
-        })
-
-
-
+        messages.error(request, f"⚠️ Error: {str(e)}")
+        return redirect("manage_students")
 
 
 @login_required

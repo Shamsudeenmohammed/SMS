@@ -5,6 +5,7 @@
 {% block header %}🏫 Classrooms Directory{% endblock %}
 
 {% block content %}
+<<<<<<< HEAD
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -71,12 +72,81 @@
                     {% endfor %}
                 </tbody>
             </table>
+=======
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="directory-container">
+    <header class="directory-header">
+        <div class="header-content">
+            <h2>Classroom Infrastructure</h2>
+            <p>Manage physical learning spaces and their priority sequencing.</p>
+        </div>
+        <a href="{% url 'add_classroom' %}" class="btn-primary-action">
+            <i class="fas fa-plus"></i>
+            <span>Create New Class</span>
+        </a>
+    </header>
+
+    <div class="surface-card">
+        <div class="grid-table-header">
+            <div class="col-rank">Rank</div>
+            <div class="col-name">Classroom Name</div>
+            <div class="col-desc">Description</div>
+            <div class="col-ops">Management</div>
+        </div>
+
+        <div class="grid-table-body">
+            {% for classroom in classrooms %}
+            <div class="grid-table-row">
+                <div class="col-rank" data-label="Priority">
+                    <span class="rank-id">#{{ classroom.order }}</span>
+                </div>
+
+                <div class="col-name" data-label="Classroom">
+                    <div class="identity-flex">
+                        <div class="icon-sq">
+                            <i class="fas fa-school"></i>
+                        </div>
+                        <span class="text-bold">{{ classroom.name }}</span>
+                    </div>
+                </div>
+
+                <div class="col-desc" data-label="About">
+                    <span class="text-muted">
+                        {{ classroom.description|default:"No description provided" }}
+                    </span>
+                </div>
+
+                <div class="col-ops" data-label="Actions">
+                    <div class="btn-group">
+                        <a href="{% url 'edit_classroom' classroom.id %}" class="tool-btn edit" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'delete_classroom' classroom.id %}" class="tool-btn delete" 
+                           onclick="return confirm('Deleting this class will affect linked students. Proceed?');" 
+                           title="Delete">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-placeholder">
+                <i class="fas fa-chalkboard"></i>
+                <h3>No Data Available</h3>
+                <p>Start by adding your institution's first classroom.</p>
+            </div>
+            {% endfor %}
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
         </div>
     </div>
 </div>
 
 <style>
 :root {
+<<<<<<< HEAD
     --primary: #4f46e5;
     --primary-soft: #eef2ff;
     --text-main: #1e293b;
@@ -204,6 +274,161 @@
     .modern-table td { display: flex; justify-content: space-between; align-items: center; border: none; padding: 0.75rem 1rem; }
     .modern-table td::before { content: attr(data-label); font-weight: 700; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; }
     .modern-table tr { display: block; border-bottom: 8px solid #f8fafc; padding: 1rem 0; }
+=======
+    --indigo: #4f46e5;
+    --indigo-light: #f5f3ff;
+    --slate-900: #0f172a;
+    --slate-600: #475569;
+    --slate-400: #94a3b8;
+    --slate-100: #f1f5f9;
+    --border: #e2e8f0;
+    --white: #ffffff;
 }
+
+.directory-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Header */
+.directory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+}
+
+.header-content h2 { margin: 0; font-size: 1.6rem; font-weight: 800; color: var(--slate-900); }
+.header-content p { margin: 4px 0 0; color: var(--slate-600); font-size: 0.9rem; }
+
+.btn-primary-action {
+    background: var(--indigo);
+    color: white;
+    text-decoration: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* THE GRID SYSTEM - Anchored Left */
+.surface-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.grid-table-header, .grid-table-row {
+    display: grid;
+    /* Fixed rank, medium name, large description, fixed management */
+    grid-template-columns: 80px 280px 1fr 120px; 
+    align-items: center;
+    padding: 0 1.5rem;
+}
+
+.grid-table-header {
+    height: 50px;
+    background: #fcfdfe;
+    border-bottom: 1px solid var(--border);
+    border-radius: 14px 14px 0 0;
+    color: var(--slate-400);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.grid-table-row {
+    height: 75px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s ease;
+}
+
+.grid-table-row:last-child { border-bottom: none; }
+.grid-table-row:hover { background: #fafafa; }
+
+/* Alignment logic: Most columns stay left by default */
+.col-ops {
+    justify-self: end; /* Management column stays right for layout balance */
+}
+
+/* Row Specifics */
+.rank-id {
+    font-weight: 700;
+    color: var(--slate-600);
+    font-size: 0.85rem;
+}
+
+.identity-flex { display: flex; align-items: center; gap: 12px; }
+.icon-sq {
+    width: 38px; height: 38px;
+    background: var(--indigo-light);
+    color: var(--indigo);
+    border-radius: 8px;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+}
+
+.text-bold { font-weight: 700; color: var(--slate-900); }
+.text-muted { 
+    color: var(--slate-600); 
+    font-size: 0.9rem;
+    line-height: 1.4;
+    display: block;
+    max-width: 90%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-group { display: flex; gap: 8px; }
+.tool-btn {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: grid; place-items: center; text-decoration: none;
+    transition: 0.2s;
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
+}
+.tool-btn.edit { background: #eff6ff; color: #2563eb; }
+.tool-btn.delete { background: #fff1f2; color: #e11d48; }
+.tool-btn:hover { transform: scale(1.05); }
+
+/* Mobile Logic */
+@media (max-width: 992px) {
+    .grid-table-header { display: none; }
+    .grid-table-row {
+        grid-template-columns: 1fr;
+        height: auto;
+        padding: 1.25rem;
+        gap: 12px;
+        border-bottom: 4px solid var(--slate-100);
+    }
+    .grid-table-row > div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: left; /* Keep left alignment on mobile labels */
+    }
+    .grid-table-row > div::before {
+        content: attr(data-label);
+        font-weight: 700;
+        font-size: 0.7rem;
+        color: var(--slate-400);
+        text-transform: uppercase;
+    }
+    .identity-flex { width: 100%; justify-content: flex-end; }
+    .col-ops { justify-self: stretch; }
+    .col-name { border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    .col-name::before { display: none; }
+}
+
+.empty-placeholder { padding: 4rem; text-align: center; }
+.empty-placeholder i { font-size: 3rem; color: var(--border); margin-bottom: 1rem; display: block; }
 </style>
 {% endblock %}

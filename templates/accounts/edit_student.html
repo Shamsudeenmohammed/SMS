@@ -4,6 +4,10 @@
 {% block header %}Edit Student Profile{% endblock %}
 
 {% block content %}
+<<<<<<< HEAD
+=======
+<!-- Inter Font for modern typography -->
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <div class="edit-wrapper">
@@ -16,6 +20,7 @@
         <form method="POST" class="modern-form" novalidate>
             {% csrf_token %}
 
+<<<<<<< HEAD
             <div class="form-group">
                 <label>Full Name</label>
                 <input type="text" name="full_name" value="{{ student.user.get_full_name }}" placeholder="e.g. John Doe" required>
@@ -29,6 +34,28 @@
             <div class="form-group full-width">
                 <label>Assigned Class</label>
                 <input list="classrooms" name="current_class" value="{{ student.current_class.name }}" placeholder="Search or select class..." required>
+=======
+            <!-- Core Identity Section -->
+            <div class="form-group full-width">
+                <label for="full_name">Full Name</label>
+                <input type="text" name="full_name" id="full_name" value="{{ student.user.get_full_name }}" placeholder="e.g. John Doe" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" name="username" id="username" value="{{ student.user.username }}" placeholder="Login ID" required>
+                <small class="help-text">Used for logging into the portal</small>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" name="email" id="email" value="{{ student.user.email|default:'' }}" placeholder="email@example.com">
+            </div>
+
+            <div class="form-group full-width">
+                <label for="current_class">Assigned Class</label>
+                <input list="classrooms" name="current_class" id="current_class" value="{{ student.current_class.name }}" placeholder="Search or select class..." required>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
                 <datalist id="classrooms">
                     {% for cls in classrooms %}
                         <option value="{{ cls.name }}">
@@ -36,6 +63,7 @@
                 </datalist>
             </div>
 
+<<<<<<< HEAD
             <div class="security-section full-width">
                 <h4 class="section-title"><i class="fas fa-shield-alt"></i> Security & Access</h4>
                 <div class="password-grid">
@@ -46,21 +74,49 @@
                     <div class="form-group">
                         <label>Confirm New Password</label>
                         <input type="password" name="confirm_password" placeholder="Repeat new password">
+=======
+            <!-- Security Section -->
+            <div class="security-section full-width">
+                <h4 class="section-title"><i class="fas fa-shield-alt"></i> Security & Access</h4>
+                
+                <div class="password-grid">
+                    <div class="form-group">
+                        <label for="new_password">New Password</label>
+                        <input type="password" name="new_password" id="new_password" placeholder="Leave blank to keep current">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_password">Confirm New Password</label>
+                        <input type="password" name="confirm_password" id="confirm_password" placeholder="Repeat new password">
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
                     </div>
                 </div>
 
                 <div class="status-control">
                     <label class="toggle-container">
+<<<<<<< HEAD
                         <input type="checkbox" name="is_active" {% if student.user.is_active %}checked{% endif %}>
                         <span class="toggle-slider"></span>
                     </label>
                     <span class="toggle-label">Account Active</span>
+=======
+                        <input type="checkbox" name="is_active" {% if student.is_active %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <div class="toggle-text">
+                        <span class="toggle-label">Account Active</span>
+                        <p class="text-muted">Determines if the student appears in reports and can log in.</p>
+                    </div>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
                 </div>
             </div>
 
             <div class="form-footer full-width">
                 <a href="{% url 'manage_students' %}" class="btn-link">Cancel and Return</a>
+<<<<<<< HEAD
                 <button type="submit" class="btn-save">Update Profile</button>
+=======
+                <button type="submit" class="btn-save">Save Changes</button>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
             </div>
         </form>
     </div>
@@ -98,6 +154,7 @@
     padding: 2rem 2.5rem;
     border-bottom: 1px solid var(--border);
     text-align: center;
+    background: linear-gradient(to bottom, #ffffff, var(--bg-light));
 }
 
 .card-header h2 { margin: 0; color: var(--text-main); font-size: 1.5rem; font-weight: 700; }
@@ -131,6 +188,11 @@
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
 
+<<<<<<< HEAD
+=======
+.help-text { font-size: 0.75rem; color: var(--text-muted); }
+
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 /* Security Section */
 .security-section {
     margin-top: 1rem;
@@ -146,6 +208,7 @@
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+<<<<<<< HEAD
     display: flex;
     align-items: center;
     gap: 8px;
@@ -157,11 +220,14 @@
     margin-top: 1.5rem;
     padding-top: 1.25rem;
     border-top: 1px dashed var(--border);
+=======
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
 }
 
+<<<<<<< HEAD
 /* Modern Toggle */
 .toggle-container {
     position: relative;
@@ -205,30 +271,115 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
 }
 
 .btn-link { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+=======
+.password-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+.status-control {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px dashed var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.toggle-text p { margin: 2px 0 0 0; line-height: 1.4; }
+
+/* Modern Toggle */
+.toggle-container {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.toggle-container input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #cbd5e1;
+    transition: .3s;
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px; width: 18px;
+    left: 3px; bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider { background-color: var(--success); }
+input:checked + .toggle-slider:before { transform: translateX(20px); }
+
+.toggle-label { font-size: 0.95rem; font-weight: 600; color: var(--text-main); }
+
+/* Footer Actions */
+.form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.btn-link { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: 0.2s; }
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 .btn-link:hover { color: var(--danger); }
 
 .btn-save {
     background: var(--primary);
     color: white;
     border: none;
+<<<<<<< HEAD
     padding: 0.8rem 2rem;
+=======
+    padding: 0.8rem 2.5rem;
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
     border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
+<<<<<<< HEAD
 }
 
 .btn-save:hover { background: var(--primary-dark); transform: translateY(-1px); }
+=======
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+}
+
+.btn-save:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); }
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 
 @keyframes slideUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
+<<<<<<< HEAD
 @media (max-width: 600px) {
     .modern-form, .password-grid { grid-template-columns: 1fr; }
     .full-width { grid-column: 1; }
     .card-header, .modern-form { padding: 1.5rem; }
+=======
+/* Responsive Overrides */
+@media (max-width: 768px) {
+    .modern-form { padding: 1.5rem; }
+}
+
+@media (max-width: 600px) {
+    .modern-form, .password-grid { grid-template-columns: 1fr; }
+    .full-width { grid-column: 1; }
+    .form-footer { flex-direction: column-reverse; gap: 1.5rem; text-align: center; }
+    .btn-save { width: 100%; }
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 }
 </style>
 {% endblock %}

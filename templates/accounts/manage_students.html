@@ -3,6 +3,7 @@
 {% block header %}Manage Students{% endblock %}
 
 {% block content %}
+<<<<<<< HEAD
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -23,10 +24,68 @@
         <span class="stat-label">Matches Found</span>
         <span class="stat-value">{{ students|length }}</span>
       </div>
-    </div>
-    {% endif %}
-  </div>
+=======
+<!-- Preloading and External Assets -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+<div class="student-manager-container">
+    
+    <!-- KPI Overview -->
+    <div class="dashboard-grid">
+        <div class="stat-card main">
+            <div class="stat-icon-wrapper"><i class="fas fa-user-graduate"></i></div>
+            <div class="stat-details">
+                <span class="stat-title">Total Enrollment</span>
+                <span class="stat-count">{{ total_students }}</span>
+            </div>
+        </div>
+        {% if query %}
+        <div class="stat-card highlight">
+            <div class="stat-icon-wrapper"><i class="fas fa-search"></i></div>
+            <div class="stat-details">
+                <span class="stat-title">Matches Found</span>
+                <span class="stat-count">{{ students|length }}</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Responsive Toolbar -->
+    <div class="action-toolbar">
+        <div class="toolbar-top">
+            <a href="{% url 'add_student' %}" class="btn-fab btn-primary">
+                <i class="fas fa-plus"></i> <span>Add New Student</span>
+            </a>
+            <div class="secondary-actions">
+                <a href="{% url 'manage_promotions' %}" class="btn-icon-label" title="Promote">
+                    <i class="fas fa-arrow-up-right-dots"></i>
+                </a>
+                <a href="{% url 'import_students' %}" class="btn-icon-label" title="Import">
+                    <i class="fas fa-file-import"></i>
+                </a>
+            </div>
+        </div>
+
+        <form method="get" class="filter-wrapper">
+            <div class="search-input-group">
+                <i class="fas fa-search"></i>
+                <input type="text" name="q" placeholder="Search by name, ID or username..." value="{{ query }}">
+            </div>
+            <div class="filter-controls">
+                <select name="status" class="custom-select" onchange="this.form.submit()">
+                    <option value="all" {% if status == "all" %}selected{% endif %}>All Status</option>
+                    <option value="active" {% if status == "active" %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if status == "inactive" %}selected{% endif %}>Inactive</option>
+                </select>
+                <button type="submit" class="btn-filter-submit">Apply</button>
+            </div>
+        </form>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
+    </div>
+
+<<<<<<< HEAD
   <div class="toolbar">
     <div class="primary-actions">
       <a href="{% url 'add_student' %}" class="btn btn-add">
@@ -108,10 +167,85 @@
       </table>
     </div>
   </div>
+=======
+    <!-- Data Surface -->
+    <div class="content-surface">
+        <table class="adaptive-table">
+            <thead>
+                <tr>
+                    <th>Student Details</th>
+                    <th class="hide-mobile">Class</th>
+                    <th class="hide-mobile">Account Status</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr class="data-row">
+                    <td class="col-main">
+                        <div class="user-profile">
+                            <div class="avatar-circle">
+                                {{ student.user.first_name|first }}{{ student.user.last_name|first }}
+                            </div>
+                            <div class="info">
+                                <span class="name">{{ student.user.get_full_name }}</span>
+                                <span class="subtext">{{ student.user.username }}</span>
+                                
+                                <!-- Mobile-Only Metadata Tags -->
+                                <div class="mobile-only-meta">
+                                    <span class="badge-mini"><i class="fas fa-door-open"></i> {{ student.current_class }}</span>
+                                    {% if student.user.is_active %}
+                                        <span class="dot-active"><i class="fas fa-check-circle"></i> Active</span>
+                                    {% else %}
+                                        <span class="dot-inactive"><i class="fas fa-times-circle"></i> Inactive</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="hide-mobile">
+                        <span class="class-pill">{{ student.current_class }}</span>
+                    </td>
+                    <td class="hide-mobile">
+                        {% if student.user.is_active %}
+                            <span class="status-pill active">Active</span>
+                        {% else %}
+                            <span class="status-pill inactive">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-right">
+                        <div class="action-menu">
+                            <a href="{% url 'edit_student' student.pk %}" class="btn-action edit" title="Edit Profile">
+                                <i class="fas fa-user-edit"></i>
+                            </a>
+                            <a href="{% url 'delete_student' student.pk %}" class="btn-action delete" 
+                               onclick="return confirm('Archive record for {{ student.user.get_full_name }}?');" title="Archive">
+                                <i class="fas fa-archive"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="empty-placeholder">
+                        <div class="empty-state-content">
+                            <div class="empty-icon"><i class="fas fa-user-slash"></i></div>
+                            <h3>No Students Found</h3>
+                            <p>We couldn't find any records matching your search criteria.</p>
+                            <a href="{% url 'manage_students' %}" class="btn-link">Clear all filters</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 </div>
 
 <style>
 :root {
+<<<<<<< HEAD
   --primary: #4f46e5;
   --primary-hover: #4338ca;
   --success: #10b981;
@@ -240,6 +374,230 @@
   .toolbar { flex-direction: column; align-items: stretch; }
   .filter-box { flex-direction: column; }
   .input-group input { width: 100%; }
+=======
+    --brand: #4f46e5;
+    --brand-dark: #4338ca;
+    --brand-light: #eef2ff;
+    --success: #10b981;
+    --danger: #ef4444;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --surface: #ffffff;
+    --background: #f8fafc;
+    --border: #e2e8f0;
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --shadow-soft: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.student-manager-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+}
+
+/* KPI Cards */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+}
+
+.stat-card {
+    background: var(--surface);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover { transform: translateY(-3px); }
+.stat-card.main { border-bottom: 4px solid var(--brand); }
+
+.stat-icon-wrapper {
+    width: 60px; height: 60px;
+    background: var(--brand-light);
+    color: var(--brand);
+    border-radius: 14px;
+    display: grid; place-items: center; font-size: 1.6rem;
+}
+
+.stat-title { font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+.stat-count { font-size: 2rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
+
+/* Sticky Toolbar */
+.action-toolbar {
+    background: var(--surface);
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-soft);
+}
+
+.toolbar-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+
+.btn-fab {
+    background: var(--brand);
+    color: white;
+    padding: 0.85rem 1.75rem;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: 0.2s;
+}
+
+.btn-fab:hover { background: var(--brand-dark); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+
+.secondary-actions { display: flex; gap: 0.75rem; }
+.btn-icon-label {
+    width: 48px; height: 48px;
+    background: var(--background);
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    display: grid; place-items: center;
+    border: 1px solid var(--border);
+    transition: 0.2s;
+}
+
+.btn-icon-label:hover { background: var(--brand-light); color: var(--brand); border-color: var(--brand); }
+
+/* Filter System */
+.filter-wrapper { display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; }
+
+.search-input-group { position: relative; }
+.search-input-group i { position: absolute; left: 1.25rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+.search-input-group input {
+    width: 100%; padding: 0.9rem 1rem 0.9rem 3.25rem;
+    border: 1.5px solid var(--border); border-radius: var(--radius-md);
+    font-size: 1rem; background: var(--background); transition: 0.2s;
+}
+.search-input-group input:focus { outline: none; border-color: var(--brand); background: white; }
+
+.filter-controls { display: flex; gap: 0.75rem; }
+.custom-select {
+    padding: 0 1rem; border-radius: var(--radius-md); border: 1.5px solid var(--border);
+    background: var(--background); font-weight: 600; cursor: pointer;
+}
+
+.btn-filter-submit {
+    background: var(--text-primary); color: white; border: none;
+    padding: 0 1.5rem; border-radius: var(--radius-md); font-weight: 700; cursor: pointer;
+}
+
+/* Table Design */
+.content-surface {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+}
+
+.adaptive-table { width: 100%; border-collapse: collapse; }
+.adaptive-table th {
+    background: var(--background);
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.data-row { border-bottom: 1px solid var(--border); transition: 0.2s; }
+.data-row:hover { background: #fcfdfe; }
+.data-row td { padding: 1.25rem 1.5rem; vertical-align: middle; }
+
+.user-profile { display: flex; align-items: center; gap: 1.25rem; }
+.avatar-circle {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, var(--brand), #818cf8);
+    color: white; border-radius: 14px;
+    display: grid; place-items: center; font-weight: 800; font-size: 1rem;
+}
+
+.name { display: block; font-weight: 700; font-size: 1.05rem; color: var(--text-primary); }
+.subtext { font-size: 0.85rem; color: var(--text-secondary); font-family: monospace; }
+
+.class-pill { 
+    background: var(--brand-light); color: var(--brand); 
+    padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; 
+}
+
+.status-pill { padding: 0.4rem 1rem; border-radius: 100px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
+.status-pill.active { background: #ecfdf5; color: var(--success); }
+.status-pill.inactive { background: #fff1f2; color: var(--danger); }
+
+.action-menu { display: flex; gap: 0.75rem; justify-content: flex-end; }
+.btn-action {
+    width: 42px; height: 42px; border-radius: 10px;
+    display: grid; place-items: center; text-decoration: none; transition: 0.2s;
+}
+.btn-action.edit { background: var(--brand-light); color: var(--brand); }
+.btn-action.delete { background: #fff1f2; color: var(--danger); }
+.btn-action:hover { transform: scale(1.1); }
+
+/* Empty State */
+.empty-placeholder { padding: 6rem 2rem !important; text-align: center; }
+.empty-icon { font-size: 4rem; color: var(--border); margin-bottom: 1.5rem; }
+.empty-state-content h3 { margin-bottom: 0.5rem; font-weight: 800; }
+.btn-link { color: var(--brand); font-weight: 700; text-decoration: none; }
+
+/* Mobile Card Morphing (Crucial for smaller screens) */
+@media (max-width: 900px) {
+    .filter-wrapper { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+    .student-manager-container { padding: 1rem; }
+    .hide-mobile { display: none; }
+    .mobile-only-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 0.75rem; }
+    
+    .data-row {
+        display: block;
+        padding: 1.5rem;
+        position: relative;
+        border-bottom: 8px solid var(--background); /* Distinct cards */
+    }
+    
+    .data-row td { display: block; padding: 0; border: none; }
+    .col-main { margin-bottom: 0; }
+    
+    .action-menu {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        flex-direction: column;
+    }
+
+    .badge-mini {
+        background: var(--background);
+        border: 1px solid var(--border);
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 700;
+        color: var(--text-secondary);
+    }
+    
+    .dot-active { color: var(--success); font-size: 0.75rem; font-weight: 700; }
+    .dot-inactive { color: var(--danger); font-size: 0.75rem; font-weight: 700; }
+
+    .btn-fab span { display: none; } /* Show only icon on mobile FAB */
+    .btn-fab { width: 50px; height: 50px; padding: 0; justify-content: center; border-radius: 50%; }
+>>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 }
 </style>
 {% endblock %}

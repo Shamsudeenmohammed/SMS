@@ -15,11 +15,14 @@ class Session(models.Model):
     class Meta:
         ordering = ['-start_date']
 
-    def save(self, *args, **kwargs):
-        if self.is_current:
-            # Unmark all other sessions
-            Session.objects.filter(is_current=True).update(is_current=False)
-        super().save(*args, **kwargs)
+from django.db import transaction
+
+def save(self, *args, **kwargs):
+    if self.is_current:
+        with transaction.atomic():
+            # Unmark all others, but keep it efficient
+            Session.objects.filter(is_current=True).exclude(pk=self.pk).update(is_current=False)
+    super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

@@ -65,34 +65,42 @@ def manage_promotions(request):
 
 
 # ============================================================
-# 📥 DOWNLOAD STUDENT IMPORT TEMPLATE
+import csv
+from datetime import datetime
+from django.utils.timezone import now
+from django.db import transaction, IntegrityError
+from django.contrib import messages
+from django.shortcuts import redirect, render
+from django.http import HttpResponse
 
+# 📥 DOWNLOAD STUDENT IMPORT TEMPLATE
 def download_student_template(request):
-    """Generate a CSV template for student import fully matching import_students."""
+    """Generate a clean CSV template with headers matching the import logic."""
     try:
         response = HttpResponse(content_type="text/csv")
         response["Content-Disposition"] = 'attachment; filename="student_template.csv"'
 
         writer = csv.writer(response)
 
-        # Header row — MUST match import_students() expected fields
-        writer.writerow([
-            "username",                      # required
-            "full_name",                     # required
-            "email (optional)",              # optional
-            "current_class",                 # required
-            "section",                       # optional
-            "guardian_name",                 # optional
-            "guardian_contact",              # optional
-            "admission_date (YYYY-MM-DD)",   # optional
-        ])
+        # Clean Headers: Removed descriptive text to ensure DictReader matches perfectly
+        headers = [
+            "username", 
+            "full_name", 
+            "email", 
+            "current_class", 
+            "section", 
+            "guardian_name", 
+            "guardian_contact", 
+            "admission_date"
+        ]
+        writer.writerow(headers)
 
-        # Example row — matches exactly what import_students accepts
+        # Example row
         writer.writerow([
             "john123",
             "John Doe",
             "john@example.com",
-            "Grade 1",
+            "Nursery",
             "A",
             "Jane Doe",
             "+233501234567",
@@ -106,22 +114,9 @@ def download_student_template(request):
         return redirect("import_students")
 
 
-
-
-
-# ============================================================
-# 📤 IMPORT STUDENTS FROM CSV (Improved + Flexible Date Parsing)
-# ============================================================
-
-import csv
-from datetime import datetime
-from django.utils.timezone import now
-from django.db import transaction, IntegrityError
-from django.contrib import messages
-from django.shortcuts import redirect, render
-
+# 📤 IMPORT STUDENTS FROM CSV
 def import_students(request):
-    """Bulk import students from CSV (bug-free and fully aligned with Student model + add_student)."""
+    """Bulk import students from CSV matching the student_template.csv format."""
     
     if request.method != "POST":
         return render(request, "academics/import_students.html")
@@ -142,7 +137,7 @@ def import_students(request):
 
         with transaction.atomic():
             for row in reader:
-
+                # Use standard keys that match the template headers exactly
                 full_name = (row.get("full_name") or "").strip()
                 username = (row.get("username") or "").strip()
                 email = (row.get("email") or "").strip()
@@ -152,22 +147,22 @@ def import_students(request):
                 guardian_contact = (row.get("guardian_contact") or "").strip()
                 admission_date_raw = (row.get("admission_date") or "").strip()
 
-                # ❌ Required fields
+                # ❌ Validation: Check for required data
                 if not full_name or not class_name:
                     skipped_count += 1
                     continue
 
-                # If username missing → auto-generate
+                # Auto-generate username if missing
                 if not username:
-                    username = full_name.lower().replace(" ", "")[:10]  # johnDoe → johndoe
-                    username += str(now().timestamp()).replace(".", "")[-4:]  # avoid duplicates
+                    username = full_name.lower().replace(" ", "")[:10]
+                    username += str(now().timestamp()).replace(".", "")[-4:]
 
-                # Parse full name
+                # Parse name
                 parts = full_name.split()
                 first_name = parts[0]
                 last_name = " ".join(parts[1:]) if len(parts) > 1 else ""
 
-                # Parse admission date safely
+                # Robust Date Parsing
                 admission_date = None
                 if admission_date_raw:
                     for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y", "%d-%m-%Y"):
@@ -180,10 +175,10 @@ def import_students(request):
                 if not admission_date:
                     admission_date = now().date()
 
-                # Create / Get class
+                # Get or Create ClassRoom
                 classroom, _ = ClassRoom.objects.get_or_create(name=class_name)
 
-                # Create the user
+                # Create the User account
                 user, created_user = CustomUser.objects.get_or_create(
                     username=username,
                     defaults={
@@ -194,12 +189,11 @@ def import_students(request):
                     },
                 )
 
-                # Set default password for new users
                 if created_user:
                     user.set_password("student123")
                     user.save()
 
-                # Create student profile
+                # Create/Update Student Profile
                 student, created = Student.objects.get_or_create(
                     user=user,
                     defaults={
@@ -219,16 +213,14 @@ def import_students(request):
         messages.success(
             request,
             f"✅ {created_count} students imported successfully. "
-            f"⛔ {skipped_count} skipped (duplicates or missing required fields). "
-            f"Default password set to 'student123' for new accounts."
+            f"⛔ {skipped_count} skipped (duplicates or missing fields). "
+            f"Default password: 'student123'"
         )
 
     except Exception as e:
         messages.error(request, f"❌ Import failed: {str(e)}")
-        return redirect("import_students")
-
+    
     return redirect("import_students")
-
 
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -405,10 +397,20 @@ def edit_session(request, pk):
     return render(request, "academics/session_form.html", {"form": form, "title": "Edit Session"})
 
 
+from django.db import IntegrityError
+
+from django.db import transaction
+
 @login_required
 @user_passes_test(is_admin)
 def delete_session(request, pk):
     session = get_object_or_404(Session, pk=pk)
-    session.delete()
-    messages.success(request, "🗑️ Session deleted successfully!")
+    
+    try:
+        with transaction.atomic():
+            session.delete()
+            messages.success(request, "🗑️ Session deleted successfully!")
+    except Exception as e:
+        messages.error(request, f"❌ Error: {str(e)}")
+        
     return redirect("manage_sessions")
