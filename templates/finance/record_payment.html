@@ -2,6 +2,7 @@
 {% block header %}💸 Record Payment{% endblock %}
 
 {% block content %}
+<!-- Include Select2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 <style>
@@ -73,7 +74,6 @@
     letter-spacing: 0.025em;
 }
 
-/* Customizing Django form inputs */
 .modern-form input:not([type="checkbox"]), 
 .modern-form select, 
 .modern-form textarea {
@@ -87,38 +87,36 @@
     transition: all 0.2s ease;
 }
 
-.modern-form input:focus, 
-.modern-form textarea:focus {
-    background-color: #fff;
-    border-color: #1a73e8;
-    box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1);
-    outline: none;
-}
-
-/* ===== Select2 Modern Overrides ===== */
+/* ===== Select2 Modern Overrides (The Search Engine Look) ===== */
 .select2-container--default .select2-selection--single {
-    height: 48px !important;
+    height: 50px !important;
     background-color: #f8fafc !important;
     border: 1.5px solid #e2e8f0 !important;
     border-radius: 12px !important;
-    padding: 8px 12px !important;
+    display: flex !important;
+    align-items: center !important;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
     color: #1e293b !important;
-    line-height: 28px !important;
+    padding-left: 15px !important;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 46px !important;
-    right: 10px !important;
+    height: 48px !important;
+    right: 12px !important;
 }
 
 .select2-dropdown {
     border: 1px solid #e2e8f0 !important;
     border-radius: 12px !important;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
-    overflow: hidden;
+    z-index: 9999 !important;
+}
+
+.select2-search__field {
+    border-radius: 8px !important;
+    padding: 8px !important;
 }
 
 /* ===== Button ===== */
@@ -170,7 +168,7 @@
                 <i class="fas fa-receipt"></i>
             </div>
             <h2>Record Payment</h2>
-            <p>Ensure invoice selection matches the physical bank teller or cash received.</p>
+            <p>Search for a student to begin recording their payment.</p>
         </div>
 
         <form method="POST" class="modern-form">
@@ -182,6 +180,7 @@
                     <label for="{{ field.id_for_label }}">
                         {% if field.name == 'amount' %}<i class="fas fa-coins"></i> {% endif %}
                         {% if field.name == 'payment_method' %}<i class="fas fa-credit-card"></i> {% endif %}
+                        {% if field.name == 'student' or field.name == 'student_fee' %}<i class="fas fa-user-graduate"></i> {% endif %}
                         {{ field.label }}
                     </label>
                     
@@ -201,25 +200,32 @@
     </div>
 </div>
 
+<!-- Load Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-{% block extrajs %}
 <script>
     $(document).ready(function() {
-        // Initialize Select2 with modern styling
-        $('#id_student_fee').select2({
-            placeholder: '🔍 Start typing student name or ID...',
+        /**
+         * Initialize Select2 on the student selection field.
+         * We target the 'select' element specifically to ensure it catches 
+         * whichever ID Django assigns to the student dropdown.
+         */
+        $('select').select2({
+            placeholder: "🔍 Type student name, ID, or invoice...",
             allowClear: true,
-            width: '100%'
+            width: '100%',
+            language: {
+                noResults: function() {
+                    return "No student found matching that name";
+                }
+            }
         });
 
-        // Auto-dismiss Django messages if they appear in this view
-        setTimeout(function() {
-            $('.alert').fadeOut('slow');
-        }, 5000);
+        // Ensure the search bar gets focus when the dropdown opens
+        $(document).on('select2:open', () => {
+            document.querySelector('.select2-search__field').focus();
+        });
     });
 </script>
-{% endblock %}
-
 {% endblock %}

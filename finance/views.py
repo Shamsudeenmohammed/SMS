@@ -233,7 +233,7 @@ def download_invoice_pdf(request, invoice_id):
     
     p.setFillColor(colors.white)
     p.setFont("Helvetica-Bold", 22)
-    p.drawCentredString(width / 2, height - 55, "CENTER FOR GLORY SCHOOL")
+    p.drawCentredString(width / 2, height - 55, "Your School Name Academy SCHOOL")
     
     p.setFont("Helvetica", 11)
     p.drawCentredString(width / 2, height - 75, "Official Payment Receipt & Invoice Summary")
@@ -299,7 +299,7 @@ def download_invoice_pdf(request, invoice_id):
     p.line(50, 100, width - 50, 100)
     p.setFillColor(text_muted)
     p.setFont("Helvetica-Oblique", 9)
-    p.drawCentredString(width / 2, 80, "Thank you for choosing Center for Glory School.")
+    p.drawCentredString(width / 2, 80, "Thank you for choosing Your School Name Academy School.")
     p.drawCentredString(width / 2, 65, "This is a computer-generated document. No signature is required.")
 
     p.showPage()
