@@ -5,26 +5,11 @@
 {% block header %}💰 Financial Overview{% endblock %}
 
 {% block content %}
-<<<<<<< HEAD
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-=======
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
->>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <div class="invoice-wrapper">
     <div class="summary-grid">
-<<<<<<< HEAD
-        <div class="stat-card">
-            <span class="stat-label">Outstanding Balance</span>
-            <span class="stat-value text-danger">₵{{ total_balance|default:"0.00" }}</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label">Total Invoices</span>
-            <span class="stat-value">{{ invoices.count }}</span>
-        </div>
-        <div class="stat-card">
-=======
         <div class="stat-card balance-card">
             <div class="stat-icon"><i class="fas fa-wallet"></i></div>
             <div>
@@ -37,7 +22,6 @@
             <span class="stat-value">{{ invoices.count }}</span>
         </div>
         <div class="stat-card hide-mobile">
->>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
             <span class="stat-label">Currency</span>
             <span class="stat-value">GHS (₵)</span>
         </div>
@@ -45,13 +29,6 @@
 
     <div class="invoice-container">
         <div class="container-header">
-<<<<<<< HEAD
-            <h3>Recent Billing History</h3>
-            <p>View and download your official fee invoices and payment receipts.</p>
-        </div>
-
-        <div class="table-responsive">
-=======
             <div class="header-content">
                 <h3>Recent Billing History</h3>
                 <p>View and download official invoices.</p>
@@ -59,41 +36,21 @@
         </div>
 
         <div class="adaptive-table-wrapper">
->>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
             <table class="modern-table">
                 <thead>
                     <tr>
                         <th>Invoice ID</th>
                         <th>Session / Term</th>
                         <th class="text-right">Total Due</th>
-<<<<<<< HEAD
-                        <th class="text-right">Paid</th>
-                        <th class="text-right">Balance</th>
-                        <th class="text-center">Status</th>
-                        <th>Issued Date</th>
-=======
                         <th class="text-right hide-tablet">Paid</th>
                         <th class="text-right">Balance</th>
                         <th class="text-center">Status</th>
                         <th class="hide-mobile">Issued Date</th>
->>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
                         <th class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for invoice in invoices %}
-<<<<<<< HEAD
-                    <tr>
-                        <td class="id-cell">#{{ invoice.invoice_number }}</td>
-                        <td>
-                            <span class="session-text">{{ invoice.session }}</span>
-                            <span class="term-badge">{{ invoice.term }}</span>
-                        </td>
-                        <td class="text-right fw-600">₵{{ invoice.total_due }}</td>
-                        <td class="text-right text-success">₵{{ invoice.total_paid }}</td>
-                        <td class="text-right text-danger">₵{{ invoice.balance }}</td>
-                        <td class="text-center">
-=======
                     <tr class="responsive-row">
                         <td data-label="Invoice ID" class="id-cell">#{{ invoice.invoice_number }}</td>
                         <td data-label="Period">
@@ -104,7 +61,6 @@
                         <td data-label="Paid" class="text-right text-success hide-tablet">₵{{ invoice.total_paid }}</td>
                         <td data-label="Balance" class="text-right text-danger fw-700">₵{{ invoice.balance }}</td>
                         <td data-label="Status" class="text-center">
->>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
                             {% if invoice.is_paid %}
                                 <span class="badge badge-paid">Full Payment</span>
                             {% elif invoice.total_paid > 0 %}
@@ -113,17 +69,10 @@
                                 <span class="badge badge-unpaid">Pending</span>
                             {% endif %}
                         </td>
-<<<<<<< HEAD
-                        <td class="date-cell">{{ invoice.date_issued|date:"M d, Y" }}</td>
-                        <td class="text-center">
-                            <a href="{% url 'download_invoice_pdf' invoice.id %}" class="btn-download" title="Download PDF">
-                                <i class="fas fa-file-pdf"></i> PDF
-=======
                         <td data-label="Issued" class="date-cell hide-mobile">{{ invoice.date_issued|date:"M d, Y" }}</td>
                         <td class="text-center action-cell">
                             <a href="{% url 'download_invoice_pdf' invoice.id %}" class="btn-download">
                                 <i class="fas fa-file-pdf"></i> <span class="btn-text">PDF</span>
->>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
                             </a>
                         </td>
                     </tr>
@@ -131,11 +80,7 @@
                     <tr>
                         <td colspan="8" class="empty-row">
                             <i class="fas fa-file-invoice-dollar"></i>
-<<<<<<< HEAD
-                            <p>No billing records found for your account.</p>
-=======
                             <p>No billing records found.</p>
->>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
                         </td>
                     </tr>
                     {% endfor %}
@@ -148,15 +93,6 @@
 <style>
 :root {
     --primary: #4f46e5;
-<<<<<<< HEAD
-    --primary-soft: #eef2ff;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
-    --border: #e2e8f0;
-    --success: #10b981;
-    --danger: #ef4444;
-    --warning: #f59e0b;
-=======
     --primary-soft: #f5f3ff;
     --text-main: #0f172a;
     --text-muted: #64748b;
@@ -164,53 +100,10 @@
     --success: #16a34a;
     --danger: #dc2626;
     --surface: #ffffff;
->>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 }
 
 .invoice-wrapper {
     font-family: 'Inter', sans-serif;
-<<<<<<< HEAD
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 1rem;
-    animation: fadeIn 0.4s ease-out;
-}
-
-/* Stats Grid */
-.summary-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.stat-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-}
-
-.stat-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px; }
-.stat-value { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
-.text-danger { color: var(--danger); }
-.text-success { color: var(--success); }
-
-/* Table Container */
-.invoice-container {
-    background: white;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    overflow: hidden;
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.04);
-}
-
-.container-header {
-    padding: 2rem;
-    background: #fcfcfd;
-    border-bottom: 1px solid var(--border);
-=======
     max-width: 1200px;
     margin: 0 auto;
     padding: 1.5rem;
@@ -244,45 +137,21 @@
     color: var(--primary);
     border-radius: 12px;
     display: grid; place-items: center; font-size: 1.25rem;
->>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 }
 .stat-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
 
-<<<<<<< HEAD
-.container-header h3 { margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--text-main); }
-.container-header p { margin: 0.4rem 0 0; font-size: 0.9rem; color: var(--text-muted); }
-
-/* Modern Table */
-.modern-table { width: 100%; border-collapse: collapse; }
-.modern-table th {
-    background: #f8fafc;
-    padding: 1rem 1.5rem;
-    text-align: left;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--text-muted);
-    text-transform: uppercase;
-=======
 /* Main Container */
 .invoice-container {
     background: var(--surface);
     border-radius: 16px;
     border: 1px solid var(--border);
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
->>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 }
 .container-header { padding: 1.5rem; border-bottom: 1px solid var(--border); }
 .container-header h3 { font-weight: 800; color: var(--text-main); margin: 0; }
 .container-header p { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
 
-<<<<<<< HEAD
-.modern-table td {
-    padding: 1.2rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.9rem;
-    color: var(--text-main);
-=======
 /* Table Logic */
 .modern-table { width: 100%; border-collapse: collapse; }
 .modern-table th {
@@ -293,25 +162,9 @@
     font-weight: 700;
     color: var(--text-muted);
     text-transform: uppercase;
->>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 }
 .modern-table td { padding: 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
 
-<<<<<<< HEAD
-.id-cell { font-family: monospace; font-weight: 600; color: var(--primary); }
-.session-text { font-weight: 600; display: block; }
-.term-badge { font-size: 0.75rem; color: var(--text-muted); }
-.fw-600 { font-weight: 600; }
-.text-right { text-align: right; }
-.text-center { text-align: center; }
-
-/* Status Badges */
-.badge {
-    padding: 4px 12px;
-    border-radius: 99px;
-    font-size: 0.75rem;
-    font-weight: 700;
-=======
 .id-cell { font-family: 'Monaco', monospace; font-weight: 700; color: var(--primary); }
 .session-text { font-weight: 700; display: block; color: var(--text-main); }
 .term-badge { font-size: 0.75rem; color: var(--text-muted); }
@@ -331,48 +184,9 @@
     padding: 8px 12px; background: var(--primary); color: white;
     border-radius: 8px; font-size: 0.75rem; font-weight: 700;
     text-decoration: none; transition: 0.2s;
->>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 }
 .btn-download:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
 
-<<<<<<< HEAD
-.badge-paid { background: #dcfce7; color: #15803d; }
-.badge-partial { background: #fef3c7; color: #92400e; }
-.badge-unpaid { background: #fee2e2; color: #b91c1c; }
-
-/* Actions */
-.btn-download {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    background: var(--primary-soft);
-    color: var(--primary);
-    text-decoration: none;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    transition: 0.2s;
-}
-
-.btn-download:hover { background: var(--primary); color: white; transform: translateY(-1px); }
-
-/* Empty State */
-.empty-row {
-    padding: 4rem !important;
-    text-align: center;
-    color: var(--text-muted);
-}
-
-.empty-row i { font-size: 3rem; opacity: 0.2; margin-bottom: 1rem; }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-@media (max-width: 768px) {
-    .summary-grid { grid-template-columns: 1fr; }
-    .modern-table th:nth-child(4), .modern-table td:nth-child(4),
-    .modern-table th:nth-child(7), .modern-table td:nth-child(7) { display: none; }
-=======
 /* RESPONSIVE FLIP */
 @media (max-width: 768px) {
     .hide-mobile { display: none; }
@@ -426,7 +240,6 @@
 
 @media (max-width: 1024px) {
     .hide-tablet { display: none; }
->>>>>>> e1a1b4bc0fd5e3554292fa7cf6c6e279d31da127
 }
 </style>
 {% endblock %}
