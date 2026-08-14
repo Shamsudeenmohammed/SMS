@@ -1,12 +1,7 @@
 {% extends "accounts/base_dashboard.html" %}
-
 {% block title %}Edit Teacher | {{ teacher.user.get_full_name }}{% endblock %}
 {% block header %}Edit Teacher Profile{% endblock %}
-
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="edit-container">
     <div class="form-card">
         <div class="card-header">
@@ -15,10 +10,8 @@
                 <span class="dept-badge"><i class="fas fa-building"></i> {{ teacher.department }}</span>
             </div>
         </div>
-
         <form method="POST" class="modern-form" novalidate>
             {% csrf_token %}
-
             <div class="form-section">
                 <h3 class="section-title"><i class="fas fa-id-card"></i> Personal & Professional Details</h3>
                 <div class="form-grid">
@@ -29,7 +22,6 @@
                             {% for error in field.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
                         </div>
                     {% endfor %}
-                    
                     {% for field in teacher_form %}
                         <div class="form-group">
                             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -39,11 +31,9 @@
                     {% endfor %}
                 </div>
             </div>
-
             <div class="form-section security-bg">
                 <h3 class="section-title"><i class="fas fa-shield-alt"></i> Security Settings</h3>
                 <p class="section-hint">Update password only if necessary. Leave blank to keep the current password.</p>
-                
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="new_password">New Password</label>
@@ -54,7 +44,6 @@
                         <input type="password" id="confirm_password" name="confirm_password" placeholder="••••••••">
                     </div>
                 </div>
-
                 <div class="status-control">
                     <label class="switch">
                         <input type="checkbox" name="is_active" id="is_active" {% if teacher.user.is_active %}checked{% endif %}>
@@ -63,7 +52,6 @@
                     <span class="status-text">Faculty Account Active</span>
                 </div>
             </div>
-
             <div class="form-footer">
                 <a href="{% url 'manage_teachers' %}" class="btn-cancel">Discard Changes</a>
                 <button type="submit" class="btn-save">Update Profile</button>
@@ -71,7 +59,6 @@
         </form>
     </div>
 </div>
-
 <style>
 :root {
     --primary: #4f46e5;
@@ -83,14 +70,12 @@
     --success: #10b981;
     --danger: #ef4444;
 }
-
 .edit-container {
     font-family: 'Inter', sans-serif;
     padding: 2rem 1rem;
     max-width: 850px;
     margin: 0 auto;
 }
-
 .form-card {
     background: #ffffff;
     border-radius: 20px;
@@ -99,13 +84,11 @@
     overflow: hidden;
     animation: slideUp 0.4s ease-out;
 }
-
 .card-header {
     padding: 2.5rem;
     background: #fcfcfd;
     border-bottom: 1px solid var(--border);
 }
-
 .header-info h2 { margin: 0; color: var(--text-main); font-size: 1.75rem; font-weight: 700; }
 .dept-badge { 
     display: inline-flex;
@@ -119,17 +102,14 @@
     font-size: 0.85rem; 
     font-weight: 600; 
 }
-
 .modern-form { padding: 2.5rem; }
 .form-section { margin-bottom: 3rem; }
-
 .security-bg { 
     background: #f9fafb; 
     padding: 2rem; 
     border-radius: 16px; 
     border: 1px solid var(--border);
 }
-
 .section-title {
     font-size: 0.9rem;
     font-weight: 700;
@@ -141,20 +121,15 @@
     align-items: center;
     gap: 12px;
 }
-
 .section-hint { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
-
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
 }
-
 .full-width { grid-column: span 2; }
-
 .form-group { display: flex; flex-direction: column; gap: 0.6rem; }
 .form-group label { font-size: 0.875rem; font-weight: 600; color: var(--text-main); }
-
 /* Field Input Styling */
 .form-group input, 
 .form-group select {
@@ -166,15 +141,12 @@
     transition: all 0.2s;
     color: var(--text-main);
 }
-
 .form-group input:focus, .form-group select:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
-
 .error-msg { color: var(--danger); font-size: 0.8rem; font-weight: 500; margin-top: 4px; }
-
 /* Toggle Switch Styling */
 .status-control {
     margin-top: 2rem;
@@ -184,7 +156,6 @@
     padding-top: 1.5rem;
     border-top: 1px solid var(--border);
 }
-
 .switch { position: relative; display: inline-block; width: 48px; height: 26px; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .slider {
@@ -201,7 +172,6 @@ input:checked + .slider:before { transform: translateX(22px); }
 .slider.round { border-radius: 34px; }
 .slider.round:before { border-radius: 50%; }
 .status-text { font-size: 0.95rem; font-weight: 600; color: var(--text-main); }
-
 /* Footer Styling */
 .form-footer {
     display: flex;
@@ -212,10 +182,8 @@ input:checked + .slider:before { transform: translateX(22px); }
     padding-top: 2rem;
     border-top: 1px solid var(--border);
 }
-
 .btn-cancel { text-decoration: none; color: var(--text-muted); font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
 .btn-cancel:hover { color: var(--danger); }
-
 .btn-save {
     background: var(--primary);
     color: white;
@@ -227,12 +195,10 @@ input:checked + .slider:before { transform: translateX(22px); }
     transition: all 0.3s;
 }
 .btn-save:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
-
 @keyframes slideUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
-
 @media (max-width: 640px) {
     .form-grid { grid-template-columns: 1fr; }
     .full-width { grid-column: 1; }

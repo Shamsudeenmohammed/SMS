@@ -1,14 +1,8 @@
 {% extends "accounts/base_dashboard.html" %}
 {% block title %}Manage Promotions{% endblock %}
 {% block header %}Student Promotions{% endblock %}
-
 {% block content %}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="promotion-container">
-    
     <div class="dashboard-stats">
         <div class="stat-tile">
             <div class="icon-box"><i class="fas fa-graduation-cap"></i></div>
@@ -25,16 +19,13 @@
             </div>
         </div>
     </div>
-
     <form method="post" id="promotionForm">
         {% csrf_token %}
-        
         <div class="sticky-toolbar">
             <div class="search-wrapper">
                 <i class="fas fa-search"></i>
                 <input type="text" id="searchInput" placeholder="Search students...">
             </div>
-            
             <div class="action-buttons">
                 <button type="submit" name="action" value="promote" class="btn-primary">
                     <i class="fas fa-rocket"></i> <span>Promote</span>
@@ -45,7 +36,6 @@
                 </button>
             </div>
         </div>
-
         <div class="mobile-select-bar">
             <label class="checkbox-container">
                 <input type="checkbox" class="select-all-trigger">
@@ -53,7 +43,6 @@
             </label>
             <span class="select-text">Select All Visible</span>
         </div>
-
         <div class="table-wrapper">
             <table class="responsive-table" id="studentTable">
                 <thead>
@@ -106,7 +95,6 @@
         </div>
     </form>
 </div>
-
 <style>
 :root {
     --brand: #4f46e5;
@@ -119,16 +107,13 @@
     --radius: 12px;
     --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
-
 body { background-color: var(--background); color: var(--text-primary); }
-
 .promotion-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 1rem;
     font-family: 'Inter', sans-serif;
 }
-
 /* Stats */
 .dashboard-stats {
     display: grid;
@@ -153,7 +138,6 @@ body { background-color: var(--background); color: var(--text-primary); }
 }
 .label { font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 2px; }
 .value { font-size: 1.4rem; font-weight: 700; margin: 0; }
-
 /* Sticky Toolbar */
 .sticky-toolbar {
     position: sticky;
@@ -175,7 +159,6 @@ body { background-color: var(--background); color: var(--text-primary); }
     border: 1px solid #e2e8f0; border-radius: 8px;
 }
 .action-buttons { display: flex; gap: 0.5rem; }
-
 /* Mobile Select Bar */
 .mobile-select-bar {
     display: none; /* Desktop hidden */
@@ -187,7 +170,6 @@ body { background-color: var(--background); color: var(--text-primary); }
     gap: 10px;
 }
 .select-text { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
-
 /* Buttons */
 [class^="btn-"] {
     padding: 0.7rem 1.2rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem;
@@ -195,13 +177,11 @@ body { background-color: var(--background); color: var(--text-primary); }
 }
 .btn-primary { background: var(--brand); color: white; }
 .btn-outline-danger { background: white; border-color: #fee2e2; color: var(--danger); }
-
 /* Table */
 .table-wrapper { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
 .responsive-table { width: 100%; border-collapse: collapse; }
 .responsive-table th { background: #f8fafc; padding: 1rem; text-align: left; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; border-bottom: 1px solid #f1f5f9; }
 .responsive-table td { padding: 1rem; border-bottom: 1px solid #f1f5f9; }
-
 /* Checkbox */
 .checkbox-container { position: relative; width: 22px; height: 22px; display: block; }
 .checkbox-container input { opacity: 0; width: 0; height: 0; }
@@ -209,21 +189,17 @@ body { background-color: var(--background); color: var(--text-primary); }
 .checkbox-container input:checked ~ .checkmark { background: var(--brand); }
 .checkmark:after { content: ""; position: absolute; display: none; left: 8px; top: 4px; width: 4px; height: 9px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
 .checkbox-container input:checked ~ .checkmark:after { display: block; }
-
 .id-tag { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-family: monospace; }
 .mobile-badges { display: none; gap: 5px; margin-top: 5px; }
 .badge { background: #eef2ff; color: var(--brand); font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
 .badge.outline { background: transparent; border: 1px solid #e2e8f0; color: var(--text-secondary); }
-
 /* RESPONSIVE LOGIC */
 @media (max-width: 768px) {
     .desktop-only { display: none; }
     .mobile-badges { display: flex; }
     .mobile-select-bar { display: flex; }
-    
     .action-buttons { width: 100%; }
     .action-buttons button { flex: 1; justify-content: center; }
-    
     .responsive-table thead { display: none; }
     .student-row { display: flex; align-items: flex-start; padding: 1rem; border-bottom: 4px solid var(--background); }
     .col-check { padding: 0 1rem 0 0 !important; border: none !important; }
@@ -231,22 +207,18 @@ body { background-color: var(--background); color: var(--text-primary); }
     .student-name { font-size: 1rem; font-weight: 700; }
 }
 </style>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const selectTriggers = document.querySelectorAll(".select-all-trigger");
     const checkboxes = document.querySelectorAll(".student-check");
     const searchInput = document.getElementById("searchInput");
     const rows = document.querySelectorAll(".student-row");
-
     // Unified Select All (Syncs both desktop and mobile checkboxes)
     selectTriggers.forEach(trigger => {
         trigger.addEventListener("change", (e) => {
             const isChecked = e.target.checked;
-            
             // Sync all "Select All" boxes
             selectTriggers.forEach(t => t.checked = isChecked);
-
             // Apply to visible rows only
             rows.forEach(row => {
                 if (row.style.display !== 'none') {
@@ -257,14 +229,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
-
     // Search Filter
     searchInput.addEventListener("input", function() {
         const term = this.value.toLowerCase();
         rows.forEach(row => {
             const isMatch = row.innerText.toLowerCase().includes(term);
             row.style.display = isMatch ? "flex" : "none";
-            
             const cb = row.querySelector(".student-check");
             if (!isMatch) {
                 cb.checked = false;
@@ -274,7 +244,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
     // Individual Selection Feedback
     checkboxes.forEach(cb => {
         cb.addEventListener('change', function() {

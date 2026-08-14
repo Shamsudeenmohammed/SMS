@@ -1,12 +1,12 @@
 from django.contrib import admin
 from .models import ClassRoom, Subject, Enrollment
 
-admin.site.register(ClassRoom)
+@admin.register(ClassRoom)
 class ClassRoomAdmin(admin.ModelAdmin):
-    list_display = ("name", "section", "capacity")
-    list_filter = ("section",)
-    search_fields = ("name", "section")
-    ordering = ("name",)
+    list_display = ("name", "order", "description")
+    list_filter = ("order",)
+    search_fields = ("name",)
+    ordering = ("order",)
 
 
 

@@ -243,15 +243,12 @@ def view_my_results(request):
 
 
 
-from xhtml2pdf import pisa
-from collections import defaultdict
-
-from xhtml2pdf import pisa
-from collections import defaultdict
-from django.utils.text import slugify
-
 @login_required
 def download_result(request):
+    from xhtml2pdf import pisa
+    from collections import defaultdict
+    from django.utils.text import slugify
+
     student = request.user.student
     selected_session_id = request.GET.get("session")
 

@@ -1,14 +1,9 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}{{ title }}{% endblock %}
 {% block header %}{{ title }}{% endblock %}
-
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
 <div class="edit-container">
     <div class="form-card">
         <div class="card-header">
@@ -19,10 +14,8 @@
                 </p>
             </div>
         </div>
-
         <form method="POST" enctype="multipart/form-data" class="modern-form" novalidate>
             {% csrf_token %}
-
             {% if messages %}
             <div class="message-container">
                 {% for message in messages %}
@@ -30,7 +23,6 @@
                     <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
                     <div>{{ message|linebreaksbr }}</div>
                 </div>
-
                 {% if "added successfully" in message %}
                 <div class="login-info-box">
                     <h4><i class="fas fa-key"></i> Initial Login Credentials</h4>
@@ -42,7 +34,6 @@
                 {% endfor %}
             </div>
             {% endif %}
-
             <div class="form-section">
                 <h3 class="section-title"><i class="fas fa-lock"></i> Account Credentials</h3>
                 <div class="form-grid">
@@ -52,7 +43,6 @@
                                value="{{ form.username.value|default_if_none:'' }}" required>
                         {% for error in form.username.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
                     </div>
-
                     <div class="form-group">
                         <label for="id_email">Email Address</label>
                         <input type="email" name="email" id="id_email" placeholder="email@example.com"
@@ -61,7 +51,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="form-section">
                 <h3 class="section-title"><i class="fas fa-id-card"></i> Personal Information</h3>
                 <div class="form-grid">
@@ -71,24 +60,20 @@
                                value="{{ form.fullname.value|default_if_none:'' }}">
                         {% for error in form.fullname.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
                     </div>
-
                     <div class="form-group">
                         <label for="id_gender">Gender</label>
                         {{ form.gender }}
                         {% for error in form.gender.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
                     </div>
-
                     <div class="form-group">
                         <label for="id_relationship">Relationship to Student</label>
                         {{ form.relationship }}
                         {% for error in form.relationship.errors %}<span class="error-msg">{{ error }}</span>{% endfor %}
                     </div>
-
                     <div class="form-group">
                         <label for="id_occupation">Occupation</label>
                         {{ form.occupation }}
                     </div>
-
                     <div class="form-group">
                         <label for="id_photo">Profile Photo</label>
                         <div class="photo-upload-wrapper">
@@ -101,12 +86,10 @@
                             {% endif %}
                         </div>
                     </div>
-
                     <div class="form-group full-width">
                         <label for="id_address">Residential Address</label>
                         {{ form.address }}
                     </div>
-
                     <div class="form-group full-width">
                         <label for="id_children">Assign Children (Students)</label>
                         {{ form.children }}
@@ -114,7 +97,6 @@
                     </div>
                 </div>
             </div>
-
             {% if editing %}
             <div class="form-section security-bg">
                 <h3 class="section-title"><i class="fas fa-shield-alt"></i> Administrative Security</h3>
@@ -128,7 +110,6 @@
                 </div>
             </div>
             {% endif %}
-
             <div class="form-footer">
                 <a href="{% url 'manage_parents' %}" class="btn-cancel">Discard Changes</a>
                 <button type="submit" class="btn-save">
@@ -138,7 +119,6 @@
         </form>
     </div>
 </div>
-
 <style>
 :root {
     --primary: #4f46e5;
@@ -150,14 +130,12 @@
     --success: #10b981;
     --danger: #ef4444;
 }
-
 .edit-container {
     font-family: 'Inter', sans-serif;
     padding: 2rem 1rem;
     max-width: 900px;
     margin: 0 auto;
 }
-
 .form-card {
     background: #ffffff;
     border-radius: 20px;
@@ -166,27 +144,22 @@
     overflow: hidden;
     animation: slideUp 0.4s ease-out;
 }
-
 .card-header {
     padding: 2.5rem;
     background: #fcfcfd;
     border-bottom: 1px solid var(--border);
 }
-
 .header-info h2 { margin: 0; color: var(--text-main); font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 12px; }
 .header-info h2 i { color: var(--primary); }
 .section-hint { margin-top: 0.5rem; color: var(--text-muted); font-size: 0.9rem; }
-
 .modern-form { padding: 2.5rem; }
 .form-section { margin-bottom: 3rem; }
-
 .security-bg { 
     background: #f9fafb; 
     padding: 2rem; 
     border-radius: 16px; 
     border: 1px solid var(--border);
 }
-
 .section-title {
     font-size: 0.85rem;
     font-weight: 700;
@@ -198,18 +171,14 @@
     align-items: center;
     gap: 10px;
 }
-
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
 }
-
 .full-width { grid-column: span 2; }
-
 .form-group { display: flex; flex-direction: column; gap: 0.6rem; }
 .form-group label { font-size: 0.875rem; font-weight: 600; color: var(--text-main); }
-
 .form-group input, 
 .form-group select, 
 .form-group textarea {
@@ -220,20 +189,17 @@
     background: #fff;
     transition: all 0.2s;
 }
-
 .form-group input:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
-
 /* Photo Upload Styling */
 .photo-upload-wrapper {
     display: flex;
     align-items: center;
     gap: 15px;
 }
-
 .current-photo-badge {
     display: flex;
     align-items: center;
@@ -242,24 +208,20 @@
     padding: 4px 10px 4px 4px;
     border-radius: 30px;
 }
-
 .current-photo-badge img {
     width: 32px;
     height: 32px;
     border-radius: 50%;
     object-fit: cover;
 }
-
 .current-photo-badge span {
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--text-muted);
 }
-
 /* Helper Texts */
 .helper-text, .note-text { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
 .error-msg { color: var(--danger); font-size: 0.8rem; font-weight: 500; margin-top: 4px; }
-
 /* Alert Box */
 .message-container { margin-bottom: 2rem; }
 .alert {
@@ -273,7 +235,6 @@
 }
 .alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
 .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-
 .login-info-box {
     background: #eef2ff;
     border: 1px solid #c7d2fe;
@@ -283,7 +244,6 @@
 }
 .login-info-box h4 { margin: 0 0 0.5rem 0; font-size: 0.95rem; color: var(--primary-dark); }
 .login-info-box p { margin: 0.25rem 0; font-size: 0.9rem; }
-
 /* Select2 Customization to match UI */
 .select2-container--classic .select2-selection--multiple {
     border: 1.5px solid var(--border) !important;
@@ -291,7 +251,6 @@
     padding: 5px !important;
     background-image: none !important;
 }
-
 /* Footer Actions */
 .form-footer {
     display: flex;
@@ -302,10 +261,8 @@
     padding-top: 2rem;
     border-top: 1px solid var(--border);
 }
-
 .btn-cancel { text-decoration: none; color: var(--text-muted); font-size: 0.95rem; font-weight: 500; }
 .btn-cancel:hover { color: var(--danger); }
-
 .btn-save {
     background: var(--primary);
     color: white;
@@ -317,12 +274,10 @@
     transition: all 0.3s;
 }
 .btn-save:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
-
 @keyframes slideUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
-
 @media (max-width: 640px) {
     .form-grid { grid-template-columns: 1fr; }
     .full-width { grid-column: 1; }
@@ -331,10 +286,8 @@
     .btn-cancel { text-align: center; }
 }
 </style>
-
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
 <script>
 $(document).ready(function() {
     $('#id_children').select2({

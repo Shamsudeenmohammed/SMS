@@ -1,107 +1,96 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}Teacher Dashboard{% endblock %}
+{% block header %}<i class="fas fa-chalkboard-teacher"></i> Teacher Overview{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<div class="page-container animate-fade-in">
+    <div class="flex items-center justify-between" style="margin-bottom: 2rem;">
+        <p class="text-sm text-muted">{{ "now"|date:"l, d F Y" }}</p>
+    </div>
 
-<div class="dashboard-container">
-    <header class="dashboard-header">
-        <h2 class="page-title">
-            <div class="icon-circle"><i class="fas fa-chalkboard-teacher"></i></div>
-            Teacher Overview
-        </h2>
-        <div class="date-display">{{ "now"|date:"l, d F Y" }}</div>
-    </header>
-
-    <div class="stats-grid">
+    <!-- Stats -->
+    <div class="grid grid-auto" style="gap: 1.25rem; margin-bottom: 2rem;">
         <div class="stat-card">
-            <div class="stat-icon blue"><i class="fas fa-check-double"></i></div>
-            <div class="stat-content">
-                <h3>Total Results Marked</h3>
-                <div class="value">{{ total_results|default:"0" }}</div>
+            <div class="stat-icon stat-icon-primary"><i class="fas fa-check-double"></i></div>
+            <div>
+                <p class="stat-label">Total Results Marked</p>
+                <p class="stat-value">{{ total_results|default:"0" }}</p>
             </div>
         </div>
-
         <div class="stat-card">
-            <div class="stat-icon red"><i class="fas fa-exclamation-circle"></i></div>
-            <div class="stat-content">
-                <h3>Unmarked Scripts</h3>
-                <div class="value {% if unmarked_scripts|default:0 == 0 %}none{% endif %}">
+            <div class="stat-icon stat-icon-danger"><i class="fas fa-exclamation-circle"></i></div>
+            <div>
+                <p class="stat-label">Unmarked Scripts</p>
+                <p class="stat-value" style="{% if unmarked_scripts|default:0 == 0 %}color: var(--text-muted); font-size: 1.2rem;{% endif %}">
                     {{ unmarked_scripts|default:"None" }}
-                </div>
+                </p>
             </div>
         </div>
-
         <div class="stat-card">
-            <div class="stat-icon indigo"><i class="fas fa-book"></i></div>
-            <div class="stat-content">
-                <h3>Subjects</h3>
-                <div class="value">{{ total_subjects|default:"0" }}</div>
+            <div class="stat-icon" style="background: #f5f3ff; color: #4f46e5;"><i class="fas fa-book"></i></div>
+            <div>
+                <p class="stat-label">Subjects</p>
+                <p class="stat-value">{{ total_subjects|default:"0" }}</p>
             </div>
         </div>
-
         <div class="stat-card">
-            <div class="stat-icon green"><i class="fas fa-graduation-cap"></i></div>
-            <div class="stat-content">
-                <h3>Average Score</h3>
-                <div class="value">{{ avg_score|default:"0" }}%</div>
+            <div class="stat-icon stat-icon-success"><i class="fas fa-graduation-cap"></i></div>
+            <div>
+                <p class="stat-label">Average Score</p>
+                <p class="stat-value">{{ avg_score|default:"0" }}%</p>
             </div>
         </div>
     </div>
 
-    <div class="visual-section">
-        <div class="surface chart-surface">
-            <div class="surface-header">
-                <div class="title-accent">📊 Performance Trend</div>
-            </div>
-            <div class="chart-container">
+    <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <!-- Chart -->
+        <div class="card" style="grid-column: 1 / -1;">
+            <h4 class="flex items-center gap-sm" style="font-weight: 700; margin-bottom: 1rem;">
+                <i class="fas fa-chart-line"></i> Performance Trend
+            </h4>
+            <div style="height: 320px; position: relative;">
                 <canvas id="termChart"></canvas>
             </div>
         </div>
 
-        <div class="surface table-surface">
-            <div class="surface-header">
-                <div class="title-accent">🧾 Recent Results</div>
-            </div>
-            
-            <div class="responsive-container">
-                <table class="pro-table">
+        <!-- Recent Results -->
+        <div class="card" style="grid-column: 1 / -1;">
+            <h4 class="flex items-center gap-sm" style="font-weight: 700; margin-bottom: 1rem;">
+                <i class="fas fa-file-alt"></i> Recent Results
+            </h4>
+            <div class="table-wrapper">
+                <table>
                     <thead>
                         <tr>
                             <th>Student</th>
                             <th>Subject</th>
-                            <th class="hide-sm">Term</th>
-                            <th class="hide-md">Session</th>
+                            <th class="hide-mobile">Term</th>
+                            <th class="hide-tablet">Session</th>
                             <th>Total</th>
                             <th>Grade</th>
-                            <th class="text-right">Date</th>
+                            <th class="text-right hide-tablet">Date</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for r in recent_results %}
                         {% if r.total_score > 0 %}
-                        <tr class="table-row">
-                            <td data-label="Student">
-                                <div class="student-name">{{ r.student }}</div>
-                            </td>
-                            <td data-label="Subject">
-                                <span class="subject-tag">{{ r.subject }}</span>
-                            </td>
-                            <td data-label="Term" class="hide-sm">{{ r.term }}</td>
-                            <td data-label="Session" class="hide-md">{{ r.session }}</td>
-                            <td data-label="Total"><strong>{{ r.total_score }}</strong></td>
-                            <td data-label="Grade">
-                                <span class="grade-pill" data-grade="{{ r.grade }}">
+                        <tr>
+                            <td><strong>{{ r.student }}</strong></td>
+                            <td><span class="badge badge-primary">{{ r.subject }}</span></td>
+                            <td class="hide-mobile">{{ r.term }}</td>
+                            <td class="hide-tablet">{{ r.session }}</td>
+                            <td><strong>{{ r.total_score }}</strong></td>
+                            <td>
+                                <span class="badge {% if r.grade == 'A' %}badge-success{% elif r.grade == 'F' %}badge-danger{% else %}badge-info{% endif %}">
                                     {{ r.grade }}
                                 </span>
                             </td>
-                            <td data-label="Date" class="text-right date-cell">{{ r.date_recorded|date:"M d, Y" }}</td>
+                            <td class="text-right hide-tablet text-sm text-muted">{{ r.date_recorded|date:"M d, Y" }}</td>
                         </tr>
                         {% endif %}
                         {% empty %}
-                        <tr><td colspan="7" class="empty-state">No marked results found.</td></tr>
+                        <tr><td colspan="7" class="empty-state"><p class="text-muted">No marked results found.</p></td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -111,163 +100,18 @@
 </div>
 
 <style>
-:root {
-    --primary: #4f46e5;
-    --primary-light: #eef2ff;
-    --success: #16a34a;
-    --danger: #dc2626;
-    --slate-900: #0f172a;
-    --slate-600: #475569;
-    --slate-400: #94a3b8;
-    --border: #e2e8f0;
-    --surface: #ffffff;
-}
-
-.dashboard-container {
-    font-family: 'Inter', sans-serif;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 1.5rem;
-}
-
-/* Header */
-.dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-.page-title {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: var(--slate-900);
-    margin: 0;
-}
-.icon-circle {
-    width: 45px; height: 45px;
-    background: var(--primary);
-    color: white;
-    border-radius: 12px;
-    display: grid; place-items: center; font-size: 1.2rem;
-}
-.date-display { color: var(--slate-400); font-weight: 500; font-size: 0.9rem; }
-
-/* Stats Grid */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-.stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -10px rgba(0,0,0,0.1); }
-
-.stat-icon {
-    width: 54px; height: 54px;
-    border-radius: 14px;
-    display: grid; place-items: center; font-size: 1.4rem;
-}
-.stat-icon.blue { background: #eff6ff; color: #2563eb; }
-.stat-icon.red { background: #fff1f2; color: #e11d48; }
-.stat-icon.indigo { background: #f5f3ff; color: #4f46e5; }
-.stat-icon.green { background: #f0fdf4; color: #16a34a; }
-
-.stat-content h3 { font-size: 0.8rem; font-weight: 700; color: var(--slate-400); text-transform: uppercase; margin: 0; letter-spacing: 0.025em; }
-.stat-content .value { font-size: 1.75rem; font-weight: 800; color: var(--slate-900); }
-.value.none { color: var(--slate-400); font-size: 1.2rem; }
-
-/* Surface Styling */
-.surface {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-}
-.surface-header { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #f8fafc; }
-.title-accent { font-weight: 700; color: var(--slate-900); font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
-
-/* Table Logic */
-.responsive-container { overflow-x: visible; }
-.pro-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-top: -8px; }
-.pro-table th { padding: 0.75rem 1rem; font-size: 0.75rem; text-transform: uppercase; color: var(--slate-400); font-weight: 700; }
-.table-row { transition: 0.2s; }
-.table-row td { 
-    padding: 1rem; background: #fff; 
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    font-size: 0.9rem;
-}
-.table-row td:first-child { border-left: 1px solid var(--border); border-radius: 12px 0 0 12px; }
-.table-row td:last-child { border-right: 1px solid var(--border); border-radius: 0 12px 12px 0; }
-.table-row:hover td { background: var(--slate-50); border-color: var(--slate-200); }
-
-.subject-tag { background: var(--primary-light); color: var(--primary); padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 0.75rem; }
-.grade-pill { padding: 4px 12px; border-radius: 20px; font-weight: 800; font-size: 0.75rem; }
-.grade-pill[data-grade="A"] { background: #dcfce7; color: #166534; }
-.grade-pill[data-grade="F"] { background: #fee2e2; color: #991b1b; }
-.grade-pill:not([data-grade="A"]):not([data-grade="F"]) { background: #dbeafe; color: #1e40af; }
-
-/* Charts */
-.chart-container { height: 350px; position: relative; }
-
-/* MOBILE BREAKPOINT LOGIC */
-@media (max-width: 768px) {
-    .dashboard-header { flex-direction: column; text-align: center; gap: 10px; }
-    .page-title { flex-direction: column; }
-    
-    .hide-sm { display: none; }
-    
-    /* The Magic Table-to-Card Flip */
-    .pro-table, .pro-table thead, .pro-table tbody, .pro-table th, .pro-table td, .pro-table tr { 
-        display: block; 
-    }
-    .pro-table thead { display: none; }
-    .table-row { margin-bottom: 1.5rem; }
-    .table-row td { 
-        display: flex; justify-content: space-between; align-items: center; 
-        border: none !important; border-bottom: 1px solid #f1f5f9 !important;
-        padding: 0.75rem 1rem; border-radius: 0 !important;
-    }
-    .table-row td:last-child { border-bottom: none !important; border-radius: 0 0 12px 12px !important; }
-    .table-row td:first-child { 
-        background: var(--primary-light); 
-        border-radius: 12px 12px 0 0 !important;
-        color: var(--primary); font-weight: 700;
-    }
-    .table-row td::before {
-        content: attr(data-label);
-        font-weight: 800; font-size: 0.7rem; color: var(--slate-400); text-transform: uppercase;
-    }
-    .table-row td:first-child::before { color: var(--primary); }
-    .text-right { text-align: left; }
-}
-
-@media (max-width: 1024px) { .hide-md { display: none; } }
+  @media (max-width: 768px) {
+      table thead { display: none; }
+      table tr { display: block; margin-bottom: 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.75rem; }
+      table td { display: flex; justify-content: space-between; align-items: center; border: none !important; padding: 0.5rem 0 !important; }
+      table td::before { content: attr(data-label); font-weight: 700; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+  }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('termChart').getContext('2d');
-    
-    // Create a beautiful gradient for the line chart
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(79, 70, 229, 0.2)');
-    gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
-
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -275,13 +119,12 @@ document.addEventListener('DOMContentLoaded', function() {
             datasets: [{
                 data: {{ avg_scores|safe }},
                 borderColor: '#4f46e5',
-                borderWidth: 4,
-                backgroundColor: gradient,
+                borderWidth: 3,
+                backgroundColor: 'rgba(79,70,229,0.08)',
                 fill: true,
                 tension: 0.4,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                pointBackgroundColor: '#ffffff',
+                pointRadius: 5,
+                pointBackgroundColor: '#fff',
                 pointBorderColor: '#4f46e5',
                 pointBorderWidth: 2
             }]
@@ -291,16 +134,8 @@ document.addEventListener('DOMContentLoaded', function() {
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-                y: { 
-                    beginAtZero: true, 
-                    max: 100,
-                    grid: { color: '#f1f5f9', drawBorder: false },
-                    ticks: { color: '#94a3b8', font: { family: 'Inter', weight: 600 } }
-                },
-                x: { 
-                    grid: { display: false },
-                    ticks: { color: '#94a3b8', font: { family: 'Inter', weight: 600 } }
-                }
+                y: { beginAtZero: true, max: 100, grid: { color: '#f1f5f9' }, ticks: { color: '#94a3b8' } },
+                x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
             }
         }
     });

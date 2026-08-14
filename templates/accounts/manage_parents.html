@@ -1,16 +1,9 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}Manage Parents{% endblock %}
 {% block header %}👨‍👩‍👧 Parent Directory{% endblock %}
-
 {% block content %}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="directory-container">
-    
     <div class="top-bar">
         <form method="get" class="search-wrapper">
             <i class="fas fa-search search-icon"></i>
@@ -23,11 +16,9 @@
             <i class="fas fa-plus"></i> <span>Register Parent</span>
         </a>
     </div>
-
     <div class="meta-info">
         Total Registered Parents: <span class="count-badge">{{ parents.count }}</span>
     </div>
-
     <div class="content-surface">
         <table class="responsive-table">
             <thead>
@@ -54,7 +45,6 @@
                             <div class="profile-details">
                                 <span class="full-name">{{ parent.user.get_full_name|default:parent.user.username }}</span>
                                 <span class="email-text"><i class="far fa-envelope"></i> {{ parent.user.email|default:"No email" }}</span>
-                                
                                 <div class="mobile-only-details">
                                     <span class="m-tag"><i class="fas fa-briefcase"></i> {{ parent.occupation|default:"Not specified" }}</span>
                                     <span class="m-relationship-badge">{{ parent.relationship }}</span>
@@ -62,7 +52,6 @@
                             </div>
                         </div>
                     </td>
-
                     <td class="hide-mobile">
                         <div class="occup-info">
                             <i class="fas fa-briefcase"></i> {{ parent.occupation|default:"Not specified" }}
@@ -80,7 +69,6 @@
                             {% endfor %}
                         </div>
                     </td>
-
                     <td class="action-cell">
                         <div class="button-group">
                             <a href="{% url 'edit_parent' parent.pk %}" class="btn-action edit" aria-label="Edit">
@@ -105,7 +93,6 @@
         </table>
     </div>
 </div>
-
 <style>
 :root {
     --indigo: #4f46e5;
@@ -119,7 +106,6 @@
     --border: #e2e8f0;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
-
 .directory-container {
     padding: 1.5rem;
     max-width: 1200px;
@@ -127,7 +113,6 @@
     font-family: 'Inter', sans-serif;
     color: var(--slate-900);
 }
-
 /* Action Bar Styles */
 .top-bar {
     display: flex;
@@ -135,12 +120,10 @@
     margin-bottom: 1.5rem;
     align-items: center;
 }
-
 .search-wrapper {
     position: relative;
     flex: 1;
 }
-
 .search-icon {
     position: absolute;
     left: 14px;
@@ -148,7 +131,6 @@
     transform: translateY(-50%);
     color: var(--slate-400);
 }
-
 .search-wrapper input {
     width: 100%;
     padding: 0.75rem 1rem 0.75rem 2.75rem;
@@ -158,13 +140,11 @@
     font-size: 0.95rem;
     transition: 0.2s;
 }
-
 .search-wrapper input:focus {
     outline: none;
     border-color: var(--indigo);
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
-
 .btn-primary {
     background: var(--indigo);
     color: var(--white);
@@ -178,11 +158,9 @@
     transition: 0.2s;
     white-space: nowrap;
 }
-
 /* Data Table Surface */
 .meta-info { margin-bottom: 1rem; font-size: 0.9rem; color: var(--slate-600); }
 .count-badge { font-weight: 700; color: var(--indigo); }
-
 .content-surface {
     background: var(--white);
     border: 1px solid var(--border);
@@ -190,7 +168,6 @@
     overflow: hidden;
     box-shadow: var(--shadow);
 }
-
 .responsive-table { width: 100%; border-collapse: collapse; }
 .responsive-table th {
     background: #f1f5f9;
@@ -201,11 +178,9 @@
     letter-spacing: 0.05em;
     color: var(--slate-600);
 }
-
 .data-row { border-bottom: 1px solid var(--border); transition: 0.2s; }
 .data-row:hover { background: #fafafa; }
 .data-row td { padding: 1rem 1.5rem; vertical-align: middle; }
-
 /* Profile Layout */
 .profile-card { display: flex; align-items: center; gap: 1rem; }
 .avatar-wrapper { flex-shrink: 0; }
@@ -215,22 +190,18 @@
     background: linear-gradient(135deg, var(--indigo), #818cf8);
     color: white; display: grid; place-items: center; font-weight: 700;
 }
-
 .full-name { display: block; font-weight: 700; font-size: 1rem; }
 .email-text { font-size: 0.8rem; color: var(--slate-400); display: flex; align-items: center; gap: 4px; }
-
 /* Chips and Badges */
 .rel-badge {
     background: var(--indigo-soft); color: var(--indigo);
     padding: 4px 12px; border-radius: 8px; font-weight: 700; font-size: 0.75rem;
 }
-
 .student-pill-stack { display: flex; flex-wrap: wrap; gap: 6px; }
 .student-pill {
     background: #f1f5f9; color: var(--slate-600);
     padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;
 }
-
 /* Actions */
 .button-group { display: flex; gap: 8px; justify-content: flex-end; }
 .btn-action {
@@ -239,30 +210,22 @@
 }
 .btn-action.edit { background: var(--indigo-soft); color: var(--indigo); }
 .btn-action.delete { background: #fee2e2; color: var(--red); }
-
 /* MOBILE RESPONSIVENESS (The "Senior" Part) */
 .mobile-only-details { display: none; flex-direction: column; gap: 4px; margin-top: 6px; }
-
 @media (max-width: 768px) {
     .hide-mobile { display: none; }
     .mobile-only-details { display: flex; }
-    
     .top-bar { flex-direction: column; align-items: stretch; }
     .btn-primary span { display: inline; } /* Keep text on mobile for clear CTA */
-    
     .data-row { display: block; position: relative; padding: 1rem; }
     .data-row td { display: block; padding: 0; border: none; }
-    
     .identity-cell { padding-right: 90px !important; } /* Make room for absolute buttons */
-    
     .action-cell {
         position: absolute;
         top: 1.25rem;
         right: 1rem;
     }
-    
     .button-group { flex-direction: column; gap: 10px; }
-    
     .m-tag { font-size: 0.75rem; color: var(--slate-600); font-weight: 500; }
     .m-relationship-badge {
         align-self: flex-start;

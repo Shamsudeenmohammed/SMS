@@ -1,6 +1,6 @@
 from django.contrib import admin
-from django.urls import path, include
-from django.conf.urls.static import static
+from django.urls import path, include, re_path
+from django.views.static import serve
 from django.conf import settings
 
 urlpatterns = [
@@ -21,6 +21,7 @@ urlpatterns = [
     path('reportcard/', include('reportcard.urls')),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# Serve media files (static() only works when DEBUG=True, so use serve() directly)
+urlpatterns += [
+    re_path(r'^%s(?P<path>.*)$' % settings.MEDIA_URL.lstrip('/'), serve, {'document_root': settings.MEDIA_ROOT}),
+]

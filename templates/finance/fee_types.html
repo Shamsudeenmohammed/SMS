@@ -1,16 +1,10 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}Fee Types{% endblock %}
 {% block header %}🧾 Fee Configuration{% endblock %}
-
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="app-container">
     <div class="responsive-layout">
-        
         <!-- CONFIGURATION PANEL -->
         <aside class="config-sidebar">
             <div class="card shadow-sm">
@@ -21,7 +15,6 @@
                         <small class="text-muted">Set up student billing types</small>
                     </div>
                 </div>
-                
                 <form method="post" class="p-4">
                     {% csrf_token %}
                     <div class="stack-gap">
@@ -41,7 +34,6 @@
                 </form>
             </div>
         </aside>
-
         <!-- DATA MANAGEMENT PANEL -->
         <main class="data-main">
             <div class="card shadow-sm overflow-hidden">
@@ -49,7 +41,6 @@
                     <h5 class="m-0">Defined Structures</h5>
                     <span class="count-chip">{{ fees|length }} Items</span>
                 </div>
-                
                 <div class="responsive-view">
                     <table class="smart-table">
                         <thead>
@@ -103,7 +94,6 @@
         </main>
     </div>
 </div>
-
 <style>
 /* CORE VARS */
 :root {
@@ -116,9 +106,7 @@
     --border: #e2e8f0;
     --radius: 12px;
 }
-
 .app-container { font-family: 'Inter', sans-serif; padding: clamp(10px, 3vw, 30px); background: #f8fafc; min-height: 100vh; }
-
 .responsive-layout {
     display: grid;
     grid-template-columns: 1fr;
@@ -126,7 +114,6 @@
     max-width: 1200px;
     margin: 0 auto;
 }
-
 /* TABLE-TO-CARD LOGIC FOR MOBILE */
 @media (max-width: 768px) {
     .smart-table thead { display: none; }
@@ -144,55 +131,44 @@
     }
     .status-col, .actions-col { width: 100% !important; text-align: left !important; }
 }
-
 @media (min-width: 1024px) {
     .responsive-layout { grid-template-columns: 340px 1fr; align-items: start; }
 }
-
 /* CARDS & COMPONENTS */
 .card { background: white; border-radius: var(--radius); border: 1px solid var(--border); }
 .card-header-alt { padding: 20px; display: flex; gap: 12px; align-items: center; border-bottom: 1px solid var(--border); }
 .card-header-alt i { font-size: 1.4rem; color: var(--primary); }
-
 .stack-gap { display: flex; flex-direction: column; gap: 15px; }
 .small-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--slate-500); margin-bottom: 5px; display: block; }
-
 /* DYNAMIC DJANGO FIELD STYLING */
 input, select {
     width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); 
     border-radius: 8px; font-size: 0.95rem; transition: 0.2s;
 }
 input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
-
 .btn-primary-pro {
     width: 100%; background: var(--primary); color: white; border: none; 
     padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s;
 }
 .btn-primary-pro:hover { background: #4338ca; transform: translateY(-1px); }
-
 /* TABLE REFINEMENTS */
 .smart-table { width: 100%; border-collapse: collapse; }
 .table-info-bar { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
 .smart-table th { background: #fcfdfe; padding: 12px 20px; text-align: left; font-size: 0.75rem; color: var(--slate-500); border-bottom: 1px solid var(--border); }
 .smart-table td { padding: 16px 20px; border-bottom: 1px solid var(--border); }
-
 .fee-name { font-weight: 600; color: var(--slate-800); }
 .amount-badge { font-weight: 700; color: var(--primary); background: #eef2ff; padding: 4px 8px; border-radius: 6px; }
-
 .dot-indicator { font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
 .dot-indicator::before { content: ''; width: 8px; height: 8px; border-radius: 50%; display: block; }
 .success::before { background: var(--success); }
 .neutral::before { background: var(--slate-500); }
-
 .btn-group-sm { display: flex; gap: 10px; justify-content: flex-end; }
 .btn-link-edit, .btn-link-delete { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 8px; transition: 0.2s; }
 .btn-link-edit { background: #f1f5f9; color: var(--primary); }
 .btn-link-delete { background: #fef2f2; color: var(--danger); }
 .btn-link-edit:hover { background: var(--primary); color: white; }
-
 .empty-state-container { text-align: center; padding: 60px !important; color: var(--slate-500); }
 .empty-state-container i { font-size: 2rem; opacity: 0.3; }
-
 .text-end { text-align: right; }
 .m-0 { margin: 0; }
 .mt-4 { margin-top: 1.5rem; }

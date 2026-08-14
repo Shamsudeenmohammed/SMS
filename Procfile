@@ -1,1 +1,1 @@
-web: gunicorn SMS.wsgi
+web: gunicorn SMS.wsgi --workers=4 --worker-class=sync --timeout=120 --access-logfile=-

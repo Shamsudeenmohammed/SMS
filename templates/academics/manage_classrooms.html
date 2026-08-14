@@ -1,14 +1,8 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}Manage Classrooms{% endblock %}
 {% block header %}🏫 Classrooms Directory{% endblock %}
-
 {% block content %}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="directory-container">
     <header class="directory-header">
         <div class="header-content">
@@ -20,7 +14,6 @@
             <span>Create New Class</span>
         </a>
     </header>
-
     <div class="surface-card">
         <div class="grid-table-header">
             <div class="col-rank">Rank</div>
@@ -28,14 +21,12 @@
             <div class="col-desc">Description</div>
             <div class="col-ops">Management</div>
         </div>
-
         <div class="grid-table-body">
             {% for classroom in classrooms %}
             <div class="grid-table-row">
                 <div class="col-rank" data-label="Priority">
                     <span class="rank-id">#{{ classroom.order }}</span>
                 </div>
-
                 <div class="col-name" data-label="Classroom">
                     <div class="identity-flex">
                         <div class="icon-sq">
@@ -44,13 +35,11 @@
                         <span class="text-bold">{{ classroom.name }}</span>
                     </div>
                 </div>
-
                 <div class="col-desc" data-label="About">
                     <span class="text-muted">
                         {{ classroom.description|default:"No description provided" }}
                     </span>
                 </div>
-
                 <div class="col-ops" data-label="Actions">
                     <div class="btn-group">
                         <a href="{% url 'edit_classroom' classroom.id %}" class="tool-btn edit" title="Edit">
@@ -74,7 +63,6 @@
         </div>
     </div>
 </div>
-
 <style>
 :root {
     --indigo: #4f46e5;
@@ -86,14 +74,12 @@
     --border: #e2e8f0;
     --white: #ffffff;
 }
-
 .directory-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 1.5rem;
     font-family: 'Inter', sans-serif;
 }
-
 /* Header */
 .directory-header {
     display: flex;
@@ -102,10 +88,8 @@
     margin-bottom: 2rem;
     gap: 1rem;
 }
-
 .header-content h2 { margin: 0; font-size: 1.6rem; font-weight: 800; color: var(--slate-900); }
 .header-content p { margin: 4px 0 0; color: var(--slate-600); font-size: 0.9rem; }
-
 .btn-primary-action {
     background: var(--indigo);
     color: white;
@@ -118,7 +102,6 @@
     align-items: center;
     gap: 8px;
 }
-
 /* THE GRID SYSTEM - Anchored Left */
 .surface-card {
     background: var(--white);
@@ -126,7 +109,6 @@
     border-radius: 14px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
-
 .grid-table-header, .grid-table-row {
     display: grid;
     /* Fixed rank, medium name, large description, fixed management */
@@ -134,7 +116,6 @@
     align-items: center;
     padding: 0 1.5rem;
 }
-
 .grid-table-header {
     height: 50px;
     background: #fcfdfe;
@@ -146,28 +127,23 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
-
 .grid-table-row {
     height: 75px;
     border-bottom: 1px solid var(--border);
     transition: background 0.15s ease;
 }
-
 .grid-table-row:last-child { border-bottom: none; }
 .grid-table-row:hover { background: #fafafa; }
-
 /* Alignment logic: Most columns stay left by default */
 .col-ops {
     justify-self: end; /* Management column stays right for layout balance */
 }
-
 /* Row Specifics */
 .rank-id {
     font-weight: 700;
     color: var(--slate-600);
     font-size: 0.85rem;
 }
-
 .identity-flex { display: flex; align-items: center; gap: 12px; }
 .icon-sq {
     width: 38px; height: 38px;
@@ -177,7 +153,6 @@
     display: grid; place-items: center;
     flex-shrink: 0;
 }
-
 .text-bold { font-weight: 700; color: var(--slate-900); }
 .text-muted { 
     color: var(--slate-600); 
@@ -189,7 +164,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
 .btn-group { display: flex; gap: 8px; }
 .tool-btn {
     width: 36px; height: 36px; border-radius: 8px;
@@ -199,7 +173,6 @@
 .tool-btn.edit { background: #eff6ff; color: #2563eb; }
 .tool-btn.delete { background: #fff1f2; color: #e11d48; }
 .tool-btn:hover { transform: scale(1.05); }
-
 /* Mobile Logic */
 @media (max-width: 992px) {
     .grid-table-header { display: none; }
@@ -228,7 +201,6 @@
     .col-name { border-bottom: 1px solid var(--border); padding-bottom: 8px; }
     .col-name::before { display: none; }
 }
-
 .empty-placeholder { padding: 4rem; text-align: center; }
 .empty-placeholder i { font-size: 3rem; color: var(--border); margin-bottom: 1rem; display: block; }
 </style>

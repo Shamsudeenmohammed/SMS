@@ -125,7 +125,7 @@ def redirect_user_based_on_role(user, request=None):
 
 def custom_logout(request):
     logout(request)
-    return redirect("custom_login")
+    return render(request, "registration/logged_out.html")
 
 
 # ==========================================

@@ -1,23 +1,16 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}{{ action }}{% endblock %}
 {% block header %}{{ action }}{% endblock %}
-
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
 <div class="form-wrapper">
     <div class="form-container">
         <div class="form-intro">
             <p>Define the subject name, unique identifier code, and assign it to a classroom and instructor.</p>
         </div>
-
         <form method="POST" class="modern-form">
             {% csrf_token %}
-
             <div class="form-grid">
                 <div class="form-field-group">
                     <label for="id_name">Subject Name <span class="required">*</span></label>
@@ -25,14 +18,12 @@
                         <input type="text" name="name" id="id_name" value="{{ subject.name|default:'' }}" placeholder="e.g. Advanced Mathematics" required>
                     </div>
                 </div>
-
                 <div class="form-field-group">
                     <label for="id_code">Subject Code <span class="required">*</span></label>
                     <div class="input-wrapper">
                         <input type="text" name="code" id="id_code" value="{{ subject.code|default:'' }}" placeholder="e.g. MATH-101" required>
                     </div>
                 </div>
-
                 <div class="form-field-group">
                     <label for="id_classroom">Classroom Assignment <span class="required">*</span></label>
                     <div class="input-wrapper">
@@ -46,7 +37,6 @@
                         </select>
                     </div>
                 </div>
-
                 <div class="form-field-group">
                     <label for="id_teacher">Subject Instructor (Optional)</label>
                     <div class="input-wrapper">
@@ -62,7 +52,6 @@
                     <small class="help-text">Teachers must have an active staff account to appear here.</small>
                 </div>
             </div>
-
             <div class="form-actions">
                 <a href="{% url 'subject_list' %}" class="btn-cancel">
                     <i class="fas fa-arrow-left"></i> Back to List
@@ -74,7 +63,6 @@
         </form>
     </div>
 </div>
-
 <style>
 :root {
     --primary: #4f46e5;
@@ -84,13 +72,11 @@
     --border: #e2e8f0;
     --error: #ef4444;
 }
-
 .form-wrapper {
     font-family: 'Inter', sans-serif;
     padding: 1.5rem;
     animation: fadeIn 0.4s ease-out;
 }
-
 .form-container {
     width: 100%;
     max-width: 650px;
@@ -101,27 +87,20 @@
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
     margin: 0 auto;
 }
-
 .form-intro {
     margin-bottom: 2rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--border);
 }
-
 .form-intro p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; }
-
 .form-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-
 .form-field-group { display: flex; flex-direction: column; gap: 0.6rem; }
-
 .form-field-group label {
     font-size: 0.85rem;
     font-weight: 700;
     color: var(--text-main);
 }
-
 .required { color: var(--error); }
-
 .modern-form input, 
 .modern-form select {
     width: 100%;
@@ -132,16 +111,13 @@
     background: #fff;
     transition: all 0.2s;
 }
-
 .modern-form input:focus, 
 .modern-form select:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
-
 .help-text { font-size: 0.8rem; color: var(--text-muted); }
-
 /* Form Actions */
 .form-actions {
     margin-top: 2.5rem;
@@ -151,7 +127,6 @@
     padding-top: 1.5rem;
     border-top: 1px solid var(--border);
 }
-
 .btn-save {
     background: var(--primary);
     color: white;
@@ -166,9 +141,7 @@
     gap: 8px;
     transition: 0.2s;
 }
-
 .btn-save:hover { background: var(--primary-dark); transform: translateY(-1px); }
-
 .btn-cancel {
     text-decoration: none;
     color: var(--text-muted);
@@ -176,9 +149,7 @@
     font-size: 0.9rem;
     transition: 0.2s;
 }
-
 .btn-cancel:hover { color: var(--text-main); }
-
 /* Custom Select2 Overrides */
 .select2-container--default .select2-selection--single {
     border: 1.5px solid var(--border) !important;
@@ -186,17 +157,13 @@
     border-radius: 10px !important;
     padding: 8px 10px !important;
 }
-
 .select2-container--default .select2-selection--single .select2-selection__arrow {
     height: 43px !important;
 }
-
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
-
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
 <script>
 $(document).ready(function() {
     $('#id_teacher').select2({
@@ -204,7 +171,6 @@ $(document).ready(function() {
         allowClear: true,
         width: '100%'
     });
-
     $('#id_classroom').select2({
         width: '100%'
     });

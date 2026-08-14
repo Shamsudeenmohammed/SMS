@@ -1,13 +1,8 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}Bulk Fee Creation{% endblock %}
 {% block header %}🧮 Bulk Ledger Generation{% endblock %}
-
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="form-wrapper">
     <div class="form-container">
         <div class="info-banner">
@@ -19,10 +14,8 @@
                 <p>This action will generate new fee records for <strong>all active students</strong> in the system based on the selected criteria.</p>
             </div>
         </div>
-
         <form method="post" class="modern-form">
             {% csrf_token %}
-            
             <div class="form-grid">
                 {% for field in form %}
                 <div class="form-field-group {% if field.errors %}has-error{% endif %}">
@@ -30,7 +23,6 @@
                         {{ field.label }}
                         {% if field.field.required %}<span class="required">*</span>{% endif %}
                     </label>
-                    
                     <div class="input-wrapper">
                         {{ field }}
                         {% if field.errors %}
@@ -40,14 +32,12 @@
                             </div>
                         {% endif %}
                     </div>
-                    
                     {% if field.help_text %}
                         <small class="help-text">{{ field.help_text }}</small>
                     {% endif %}
                 </div>
                 {% endfor %}
             </div>
-
             <div class="form-actions">
                 <button type="submit" class="btn-generate">
                     <i class="fas fa-cogs"></i> Run Bulk Generation
@@ -59,7 +49,6 @@
         </form>
     </div>
 </div>
-
 <style>
 :root {
     --primary: #4f46e5;
@@ -70,13 +59,11 @@
     --warning-bg: #fff7ed;
     --warning-text: #9a3412;
 }
-
 .form-wrapper {
     font-family: 'Inter', sans-serif;
     padding: 2rem 1rem;
     animation: fadeIn 0.4s ease-out;
 }
-
 .form-container {
     width: 100%;
     max-width: 580px;
@@ -87,7 +74,6 @@
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
     margin: 0 auto;
 }
-
 /* Info Banner */
 .info-banner {
     background: var(--warning-bg);
@@ -98,48 +84,40 @@
     gap: 1rem;
     margin-bottom: 2rem;
 }
-
 .banner-icon {
     color: #f97316;
     font-size: 1.25rem;
     margin-top: 2px;
 }
-
 .banner-text h4 {
     color: var(--warning-text);
     font-size: 0.95rem;
     font-weight: 700;
     margin-bottom: 4px;
 }
-
 .banner-text p {
     color: #c2410c;
     font-size: 0.85rem;
     line-height: 1.5;
     margin: 0;
 }
-
 /* Form Styles */
 .form-grid {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
-
 .form-field-group {
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
 }
-
 .form-field-group label {
     font-size: 0.85rem;
     font-weight: 700;
     color: var(--text-main);
 }
-
 .required { color: #ef4444; }
-
 .modern-form select, 
 .modern-form input {
     width: 100%;
@@ -155,7 +133,6 @@
     background-position: right 1rem center;
     background-size: 1.2em;
 }
-
 .modern-form select:focus, 
 .modern-form input:focus {
     outline: none;
@@ -163,7 +140,6 @@
     background-color: #fff;
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
-
 .error-message {
     color: #ef4444;
     font-size: 0.8rem;
@@ -172,7 +148,6 @@
     align-items: center;
     gap: 4px;
 }
-
 /* Actions */
 .form-actions {
     margin-top: 2.5rem;
@@ -181,7 +156,6 @@
     gap: 1rem;
     text-align: center;
 }
-
 .btn-generate {
     background: var(--primary);
     color: white;
@@ -198,13 +172,11 @@
     transition: 0.2s;
     box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
 }
-
 .btn-generate:hover {
     background: var(--primary-dark);
     transform: translateY(-1px);
     box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2);
 }
-
 .btn-cancel {
     text-decoration: none;
     color: var(--text-muted);
@@ -213,11 +185,8 @@
     padding: 0.5rem;
     transition: 0.2s;
 }
-
 .btn-cancel:hover { color: var(--text-main); }
-
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
 @media (max-width: 480px) {
     .form-container { padding: 1.5rem; }
 }

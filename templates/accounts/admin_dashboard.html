@@ -1,239 +1,87 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}Admin Dashboard{% endblock %}
-{% block header %}🧑‍💼 Admin Dashboard{% endblock %}
-
+{% block header %}<i class="fas fa-user-tie"></i> Admin Dashboard{% endblock %}
 
 {% block content %}
-{% block extra_css %}
-<link rel="preload" href="{% static 'css/admin_dashboard.css' %}" as="style">
-<link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+<div class="page-container animate-fade-in" style="max-width: 1200px;">
 
-<style>
-  /* SENIOR FIX: Prevent FOUC by hiding the wrapper until CSS/Animation kicks in */
-  .dashboard-wrapper {
-    max-width: 1200px;
-    margin: auto;
-    padding: 30px 25px;
-    background: linear-gradient(145deg, #f9fafb, #eef2ff);
-    border-radius: 16px;
-    opacity: 0; /* Hidden by default */
-  }
-
-  .fade-in {
-    animation: fadeIn 0.6s ease-in forwards; /* 'forwards' ensures it stays visible */
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .summary-grid, .cards-grid, .charts-section {
-    display: grid;
-    gap: 22px;
-  }
-
-  .chart-card canvas { height: 260px !important; }
-
-  .greeting {
-    font-size: 1.9rem;
-    color: #111827;
-    font-weight: 700;
-    margin-bottom: 10px;
-    letter-spacing: -0.3px;
-  }
-
-  .subtitle {
-    color: #6b7280;
-    margin-bottom: 35px;
-    font-size: 1rem;
-  }
-
-  .section-title {
-    margin: 40px 0 15px;
-    color: #1e293b;
-    font-weight: 700;
-    font-size: 1.3rem;
-    position: relative;
-  }
-  .section-title::after {
-    content: "";
-    display: block;
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(90deg, #2563eb, #06b6d4);
-    margin-top: 8px;
-    border-radius: 2px;
-  }
-
-  .summary-grid {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    margin-bottom: 45px;
-  }
-
-  .summary-card {
-    padding: 25px 20px;
-    color: #fff;
-    border-radius: 16px;
-    text-align: center;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-    transition: all 0.35s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .summary-card:hover {
-    transform: translateY(-6px) scale(1.03);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.18);
-  }
-
-  .summary-card h4 { font-size: 1.05rem; margin-bottom: 10px; font-weight: 500; }
-  .summary-card p { font-size: 1.8rem; font-weight: 700; }
-
-  .cards-grid {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    margin-bottom: 50px;
-  }
-
-  .card {
-    padding: 25px;
-    color: white;
-    border-radius: 18px;
-    text-align: center;
-    text-decoration: none;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    transition: all 0.35s ease;
-  }
-
-  .card:hover {
-    transform: translateY(-5px) scale(1.02);
-  }
-
-  .charts-section {
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    margin-bottom: 40px;
-  }
-
-  .glass-card {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.3);
-  }
-
-  .chart-card {
-    background: #ffffffaa;
-    border-radius: 16px;
-    padding: 22px;
-    box-shadow: 0 5px 18px rgba(0,0,0,0.08);
-  }
-
-  .gradient-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
-  .gradient-green { background: linear-gradient(135deg, #10b981, #047857); }
-  .gradient-purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
-  .gradient-orange { background: linear-gradient(135deg, #f59e0b, #b45309); }
-  .gradient-red { background: linear-gradient(135deg, #ef4444, #b91c1c); }
-  .gradient-gray { background: linear-gradient(135deg, #6b7280, #374151); }
-
-  /* Responsive Fixes */
-  @media (max-width: 768px) {
-    .dashboard-wrapper { padding: 15px 12px; }
-    .summary-grid, .cards-grid, .charts-section { grid-template-columns: 1fr !important; }
-    .chart-card canvas { width: 100% !important; min-height: 240px; }
-  }
-</style>
-{% endblock %}
-<div class="dashboard-wrapper fade-in">
-
-  <h2 class="greeting">
-    Welcome back, {{ user.get_full_name|default:user.username }} 👋
-  </h2>
-  <p class="subtitle">
-    Here’s an overview of your school’s financial and academic performance.
-  </p>
-
-  <!-- ===== SUMMARY GRID ===== -->
-  <div class="summary-grid">
-    <div class="summary-card gradient-blue">
-      <h4>Total Students</h4>
-      <p id="total_students">0</p>
-    </div>
-
-    <div class="summary-card gradient-purple">
-      <h4>Students with Fees</h4>
-      <p id="students_with_fees">0</p>
-    </div>
-
-    <div class="summary-card gradient-green">
-      <h4>Total Invoices</h4>
-      <p id="total_invoices">{{ total_invoices }}</p>
-    </div>
-
-    <div class="summary-card gradient-green">
-      <h4>Fees Due</h4>
-      <p id="total_fees_due">₵{{ total_fees_due }}</p>
-    </div>
-
-    <div class="summary-card gradient-purple">
-      <h4>Total Fees Paid</h4>
-      <p id="total_fees_paid">₵{{ total_fees_paid }}</p>
-    </div>
-
-    <div class="summary-card gradient-orange">
-      <h4>Pending Fees</h4>
-      <p id="pending_fees">₵{{ pending_fees }}</p>
-    </div>
-
-    <div class="summary-card gradient-red">
-      <h4>Unpaid Fees</h4>
-      <p id="unpaid_fees">₵{{ unpaid_fees }}</p>
-    </div>
-
-    <div class="summary-card gradient-gray">
-      <h4>Total Teachers</h4>
-      <p>{{ total_teachers|default:"0" }}</p>
+  <div class="flex items-center justify-between" style="margin-bottom: 2rem;">
+    <div>
+      <h1 class="h2" style="margin-bottom: 0.25rem;">Welcome back, {{ user.get_full_name|default:user.username }}</h1>
+      <p class="text-muted text-sm">Here's an overview of your school's performance.</p>
     </div>
   </div>
 
-  <!-- ===== QUICK LINKS ===== -->
+  <!-- Summary Grid -->
+  <div class="grid grid-auto" style="gap: 1.25rem; margin-bottom: 2.5rem;">
+    <div class="card" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; border: none;">
+      <p class="text-sm" style="opacity: 0.85;">Total Students</p>
+      <p class="h2" id="total_students">0</p>
+    </div>
+    <div class="card" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; border: none;">
+      <p class="text-sm" style="opacity: 0.85;">Students with Fees</p>
+      <p class="h2" id="students_with_fees">0</p>
+    </div>
+    <div class="card" style="background: linear-gradient(135deg, #10b981, #047857); color: #fff; border: none;">
+      <p class="text-sm" style="opacity: 0.85;">Total Invoices</p>
+      <p class="h2" id="total_invoices">{{ total_invoices }}</p>
+    </div>
+    <div class="card" style="background: linear-gradient(135deg, #f59e0b, #b45309); color: #fff; border: none;">
+      <p class="text-sm" style="opacity: 0.85;">Fees Due</p>
+      <p class="h2">₵{{ total_fees_due }}</p>
+    </div>
+    <div class="card" style="background: linear-gradient(135deg, #10b981, #047857); color: #fff; border: none;">
+      <p class="text-sm" style="opacity: 0.85;">Total Fees Paid</p>
+      <p class="h2">₵{{ total_fees_paid }}</p>
+    </div>
+    <div class="card" style="background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff; border: none;">
+      <p class="text-sm" style="opacity: 0.85;">Unpaid Fees</p>
+      <p class="h2">₵{{ unpaid_fees }}</p>
+    </div>
+    <div class="card" style="background: linear-gradient(135deg, #6b7280, #374151); color: #fff; border: none;">
+      <p class="text-sm" style="opacity: 0.85;">Total Teachers</p>
+      <p class="h2">{{ total_teachers|default:"0" }}</p>
+    </div>
+  </div>
+
+  <!-- Quick Links -->
   <h3 class="section-title">Quick Management</h3>
-  <div class="cards-grid">
-    <a href="{% url 'subject_list' %}" class="card gradient-blue">
-      <h3>📚 Manage Courses</h3>
-      <p>View, add, or update courses</p>
+  <div class="grid grid-auto" style="gap: 1.25rem; margin-bottom: 2.5rem;">
+    <a href="{% url 'subject_list' %}" class="card" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #fff; border: none; text-decoration: none;">
+      <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">📚</h3>
+      <h4 style="font-weight: 700;">Manage Courses</h4>
+      <p class="text-sm" style="opacity: 0.85;">View, add, or update courses</p>
     </a>
-    <a href="{% url 'manage_teachers' %}" class="card gradient-green">
-      <h3>👩‍🏫 Manage Teachers</h3>
-      <p>Assign roles and manage records</p>
+    <a href="{% url 'manage_teachers' %}" class="card" style="background: linear-gradient(135deg, #10b981, #047857); color: #fff; border: none; text-decoration: none;">
+      <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">👩‍🏫</h3>
+      <h4 style="font-weight: 700;">Manage Teachers</h4>
+      <p class="text-sm" style="opacity: 0.85;">Assign roles and manage records</p>
     </a>
-    <a href="{% url 'manage_students' %}" class="card gradient-purple">
-      <h3>🎓 Manage Students</h3>
-      <p>Enroll, update, and monitor progress</p>
+    <a href="{% url 'manage_students' %}" class="card" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; border: none; text-decoration: none;">
+      <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">🎓</h3>
+      <h4 style="font-weight: 700;">Manage Students</h4>
+      <p class="text-sm" style="opacity: 0.85;">Enroll, update, and monitor progress</p>
     </a>
   </div>
 
-  <!-- ===== CHARTS ===== -->
+  <!-- Charts -->
   <h3 class="section-title">Analytics & Insights</h3>
-  <div class="charts-section">
-    <div class="chart-card glass-card">
-      <h3>📊 Fee Collection Overview</h3>
-      <canvas id="feeChart"></canvas>
+  <div class="grid grid-2" style="gap: 1.5rem; margin-bottom: 2rem;">
+    <div class="card">
+      <h4 style="font-weight: 700; margin-bottom: 1rem;">📊 Fee Collection Overview</h4>
+      <canvas id="feeChart" height="260"></canvas>
     </div>
-    <div class="chart-card glass-card">
-      <h3>📈 Monthly Revenue Trend</h3>
-      <canvas id="revenueChart"></canvas>
+    <div class="card">
+      <h4 style="font-weight: 700; margin-bottom: 1rem;">📈 Monthly Revenue Trend</h4>
+      <canvas id="revenueChart" height="260"></canvas>
     </div>
   </div>
 </div>
 
-<!-- ===== SCRIPTS ===== -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-
 <script defer>
 document.addEventListener("DOMContentLoaded", () => {
-  // 1. Initialize Charts
   new Chart(document.getElementById("feeChart"), {
     type: "bar",
     data: {
@@ -244,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
         borderRadius: 8
       }]
     },
-    options: { responsive: true, plugins: { legend: { display: false } } }
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
   });
 
   new Chart(document.getElementById("revenueChart"), {
@@ -254,26 +102,22 @@ document.addEventListener("DOMContentLoaded", () => {
       datasets: [{
         data: {{ monthly_revenue|safe }},
         borderColor: "#2563eb",
-        backgroundColor: "rgba(37,99,235,0.25)",
+        backgroundColor: "rgba(37,99,235,0.15)",
         fill: true,
         tension: 0.4
       }]
     },
-    options: { responsive: true, plugins: { legend: { display: false } } }
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
   });
 
-  // 2. Fetch Live Financial Data (Immediately)
   fetch("{% url 'finance_summary_json' %}")
     .then(res => res.json())
     .then(data => {
       document.getElementById("total_students").textContent = data.total_students;
       document.getElementById("students_with_fees").textContent = data.students_with_fees;
       document.getElementById("total_invoices").textContent = data.total_invoices;
-      document.getElementById("total_fees_paid").textContent = "₵" + data.total_paid;
-      document.getElementById("pending_fees").textContent = "₵" + data.pending_total;
-      document.getElementById("unpaid_fees").textContent = "₵" + data.total_balance;
     })
-    .catch(err => console.error("Error loading dashboard data:", err));
+    .catch(() => {});
 });
 </script>
 {% endblock %}

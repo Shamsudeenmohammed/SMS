@@ -1,22 +1,16 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}Add New Student{% endblock %}
 {% block header %}Add Student{% endblock %}
-
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
 <div class="form-wrapper">
     <div class="form-card">
         <div class="card-header">
             <h2>Enroll New Student</h2>
             <p>Create a user account and student profile simultaneously.</p>
         </div>
-
         <form method="post" enctype="multipart/form-data" class="modern-form">
             {% csrf_token %}
-
             <div class="form-section">
                 <h3 class="section-title"><i class="fas fa-user-circle"></i> Account Information</h3>
                 <div class="form-grid">
@@ -34,17 +28,13 @@
                     {% endfor %}
                 </div>
             </div>
-
             <hr class="divider">
-
             <div class="form-section">
                 <h3 class="section-title"><i class="fas fa-graduation-cap"></i> Academic Profile</h3>
-                
                 <div class="info-banner">
                     <i class="fas fa-magic"></i>
                     <span>Student ID will be auto-generated (e.g., <strong>20250001</strong>).</span>
                 </div>
-
                 <div class="form-grid">
                     {% for field in student_form %}
                         <div class="form-group {% if forloop.last and not forloop.counter|divisibleby:2 %}full-width{% endif %}">
@@ -60,7 +50,6 @@
                     {% endfor %}
                 </div>
             </div>
-
             <div class="form-actions">
                 <a href="{% url 'manage_students' %}" class="btn-cancel">Cancel</a>
                 <button type="submit" class="btn-submit">Register Student</button>
@@ -68,7 +57,6 @@
         </form>
     </div>
 </div>
-
 <style>
 :root {
     --primary: #4f46e5;
@@ -78,14 +66,12 @@
     --text-muted: #64748b;
     --bg-field: #f8fafc;
 }
-
 .form-wrapper {
     font-family: 'Inter', sans-serif;
     padding: 2rem 1rem;
     max-width: 900px;
     margin: 0 auto;
 }
-
 .form-card {
     background: #ffffff;
     border-radius: 20px;
@@ -93,21 +79,16 @@
     box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
     overflow: hidden;
 }
-
 .card-header {
     padding: 2rem;
     background: #fcfcfd;
     border-bottom: 1px solid var(--border);
     text-align: left;
 }
-
 .card-header h2 { margin: 0; color: var(--text-main); font-size: 1.5rem; font-weight: 700; }
 .card-header p { margin: 0.5rem 0 0; color: var(--text-muted); font-size: 0.9rem; }
-
 .modern-form { padding: 2.5rem; }
-
 .form-section { margin-bottom: 2.5rem; }
-
 .section-title {
     font-size: 1rem;
     font-weight: 700;
@@ -117,18 +98,14 @@
     align-items: center;
     gap: 10px;
 }
-
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.25rem 1.5rem;
 }
-
 .full-width { grid-column: span 2; }
-
 .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
 .form-group label { font-size: 0.875rem; font-weight: 600; color: var(--text-main); }
-
 /* Customizing Django-rendered inputs */
 .form-group input, 
 .form-group select, 
@@ -141,14 +118,12 @@
     background: var(--bg-field);
     width: 100%;
 }
-
 .form-group input:focus {
     outline: none;
     border-color: var(--primary);
     background: #fff;
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
-
 .info-banner {
     background: #eef2ff;
     border: 1px solid #c7d2fe;
@@ -161,12 +136,9 @@
     align-items: center;
     gap: 10px;
 }
-
 .divider { border: 0; border-top: 1px solid var(--border); margin: 2rem 0; }
-
 .help-text { font-size: 0.75rem; color: var(--text-muted); }
 .error-text { font-size: 0.75rem; color: #dc2626; font-weight: 500; }
-
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -176,10 +148,8 @@
     padding-top: 2rem;
     border-top: 1px solid var(--border);
 }
-
 .btn-cancel { text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 0.95rem; }
 .btn-cancel:hover { color: #dc2626; }
-
 .btn-submit {
     background: var(--primary);
     color: white;
@@ -190,9 +160,7 @@
     cursor: pointer;
     transition: all 0.2s;
 }
-
 .btn-submit:hover { background: var(--primary-dark); transform: translateY(-1px); }
-
 @media (max-width: 600px) {
     .form-grid { grid-template-columns: 1fr; }
     .full-width { grid-column: 1; }

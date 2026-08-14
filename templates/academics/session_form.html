@@ -1,22 +1,15 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}{{ title }}{% endblock %}
 {% block header %}{{ title }}{% endblock %}
-
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="form-wrapper">
     <div class="form-container">
         <div class="form-intro">
             <p>Please provide the necessary details below to update the system configuration.</p>
         </div>
-
         <form method="POST" class="modern-form">
             {% csrf_token %}
-            
             <div class="form-grid">
                 {% for field in form %}
                 <div class="form-field-group {% if field.errors %}has-error{% endif %}">
@@ -24,7 +17,6 @@
                         {{ field.label }}
                         {% if field.field.required %}<span class="required">*</span>{% endif %}
                     </label>
-                    
                     <div class="input-wrapper">
                         {{ field }}
                         {% if field.errors %}
@@ -33,14 +25,12 @@
                             </div>
                         {% endif %}
                     </div>
-                    
                     {% if field.help_text %}
                         <small class="help-text">{{ field.help_text }}</small>
                     {% endif %}
                 </div>
                 {% endfor %}
             </div>
-
             <div class="form-actions">
                 <a href="{% url 'manage_sessions' %}" class="btn-cancel">
                     <i class="fas fa-times"></i> Discard
@@ -52,7 +42,6 @@
         </form>
     </div>
 </div>
-
 <style>
 :root {
     --primary: #4f46e5;
@@ -63,7 +52,6 @@
     --border: #e2e8f0;
     --error: #ef4444;
 }
-
 .form-wrapper {
     font-family: 'Inter', sans-serif;
     display: flex;
@@ -71,7 +59,6 @@
     padding: 1rem;
     animation: fadeIn 0.4s ease-out;
 }
-
 .form-container {
     width: 100%;
     max-width: 650px;
@@ -81,31 +68,26 @@
     padding: 2.5rem;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
 }
-
 .form-intro {
     margin-bottom: 2rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--border);
 }
-
 .form-intro p {
     color: var(--text-muted);
     font-size: 0.95rem;
 }
-
 /* Form Grid & Fields */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.5rem;
 }
-
 .form-field-group {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
-
 .form-field-group label {
     font-size: 0.85rem;
     font-weight: 700;
@@ -114,9 +96,7 @@
     align-items: center;
     gap: 4px;
 }
-
 .required { color: var(--error); }
-
 /* Styling individual Django inputs via CSS selectors */
 .modern-form input, 
 .modern-form select, 
@@ -130,14 +110,12 @@
     color: var(--text-main);
     transition: all 0.2s;
 }
-
 .modern-form input:focus, 
 .modern-form select:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
-
 /* Checkbox specific layout */
 .modern-form input[type="checkbox"] {
     width: auto;
@@ -145,7 +123,6 @@
     cursor: pointer;
     transform: scale(1.2);
 }
-
 /* Error States */
 .has-error input { border-color: var(--error); }
 .error-message {
@@ -154,12 +131,10 @@
     margin-top: 4px;
     font-weight: 500;
 }
-
 .help-text {
     font-size: 0.8rem;
     color: var(--text-muted);
 }
-
 /* Form Actions */
 .form-actions {
     margin-top: 3rem;
@@ -169,7 +144,6 @@
     padding-top: 1.5rem;
     border-top: 1px solid var(--border);
 }
-
 .btn-save {
     background: var(--primary);
     color: white;
@@ -184,9 +158,7 @@
     gap: 8px;
     transition: 0.2s;
 }
-
 .btn-save:hover { background: var(--primary-dark); transform: translateY(-1px); }
-
 .btn-cancel {
     text-decoration: none;
     color: var(--text-muted);
@@ -199,11 +171,8 @@
     gap: 8px;
     transition: 0.2s;
 }
-
 .btn-cancel:hover { background: #f1f5f9; color: var(--text-main); }
-
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
 @media (max-width: 600px) {
     .form-container { padding: 1.5rem; }
     .form-actions { flex-direction: column; }

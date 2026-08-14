@@ -1,21 +1,15 @@
 {% extends "accounts/base_dashboard.html" %}
-
 {% block title %}Add New Teacher{% endblock %}
 {% block header %}Faculty Registration{% endblock %}
-
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
 <div class="registration-wrapper">
     <div class="form-card">
         <div class="card-header">
             <h2>New Faculty Account</h2>
             <p>Onboarding a new teacher will create their system login and profile.</p>
         </div>
-
         <form method="POST" class="modern-form" novalidate>
             {% csrf_token %}
-
             <div class="form-section">
                 <h3 class="section-title"><i class="fas fa-lock"></i> Account Credentials</h3>
                 <div class="form-grid">
@@ -31,9 +25,7 @@
                     {% endfor %}
                 </div>
             </div>
-
             <hr class="section-divider">
-
             <div class="form-section">
                 <h3 class="section-title"><i class="fas fa-briefcase"></i> Professional Profile</h3>
                 <div class="form-grid">
@@ -46,7 +38,6 @@
                     {% endfor %}
                 </div>
             </div>
-
             <div class="form-actions">
                 <a href="{% url 'manage_teachers' %}" class="btn-secondary">Back to List</a>
                 <button type="submit" class="btn-primary">Create Faculty Account</button>
@@ -54,7 +45,6 @@
         </form>
     </div>
 </div>
-
 <style>
 :root {
     --primary: #4f46e5;
@@ -64,14 +54,12 @@
     --text-main: #1e293b;
     --text-muted: #64748b;
 }
-
 .registration-wrapper {
     font-family: 'Inter', sans-serif;
     padding: 2.5rem 1rem;
     max-width: 850px;
     margin: 0 auto;
 }
-
 .form-card {
     background: #ffffff;
     border-radius: 20px;
@@ -80,20 +68,15 @@
     overflow: hidden;
     animation: fadeIn 0.4s ease-out;
 }
-
 .card-header {
     padding: 2.5rem;
     background: linear-gradient(to right, #fcfcfd, #fff);
     border-bottom: 1px solid var(--border);
 }
-
 .card-header h2 { margin: 0; color: var(--text-main); font-size: 1.6rem; font-weight: 700; }
 .card-header p { margin: 0.5rem 0 0; color: var(--text-muted); font-size: 0.9rem; }
-
 .modern-form { padding: 2.5rem; }
-
 .form-section { margin-bottom: 2rem; }
-
 .section-title {
     font-size: 0.95rem;
     font-weight: 700;
@@ -105,18 +88,14 @@
     align-items: center;
     gap: 10px;
 }
-
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
 }
-
 .full-width { grid-column: span 2; }
-
 .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
 .form-group label { font-size: 0.875rem; font-weight: 600; color: var(--text-main); }
-
 /* Customizing Django-rendered inputs */
 .form-group input, 
 .form-group select, 
@@ -129,19 +108,15 @@
     transition: all 0.2s;
     width: 100%;
 }
-
 .form-group input:focus {
     outline: none;
     border-color: var(--primary);
     background: #fff;
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
-
 .section-divider { border: 0; border-top: 1px solid var(--border); margin: 2.5rem 0; }
-
 .field-help { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 .error-text { font-size: 0.75rem; color: #dc2626; font-weight: 500; }
-
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -149,10 +124,8 @@
     gap: 2rem;
     margin-top: 1rem;
 }
-
 .btn-secondary { text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 0.95rem; }
 .btn-secondary:hover { color: var(--primary); }
-
 .btn-primary {
     background: var(--primary);
     color: white;
@@ -163,14 +136,11 @@
     cursor: pointer;
     transition: 0.2s;
 }
-
 .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
-
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
 }
-
 @media (max-width: 600px) {
     .form-grid { grid-template-columns: 1fr; }
     .full-width { grid-column: 1; }

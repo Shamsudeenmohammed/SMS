@@ -1,271 +1,90 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}My Profile{% endblock %}
-{% block header %}👤 My Profile{% endblock %}
+{% block header %}<i class="fas fa-user"></i> My Profile{% endblock %}
 
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<div class="profile-wrapper">
-    <div class="profile-card">
-        <div class="profile-header">
-            <div class="avatar-container">
-                {# Global Fix Applied Here: using the user.profile_photo property #}
-                <img src="{{ user.profile_photo }}" alt="{{ user.username }}" class="main-avatar">
-                <div class="status-indicator"></div>
+<div class="page-container" style="max-width: 800px;">
+    <div class="card" style="overflow: hidden;">
+        <div style="text-align: center; padding: 3rem 2rem 2rem; border-bottom: 1px solid var(--border);">
+            <div style="position: relative; width: 120px; height: 120px; margin: 0 auto 1.25rem;">
+                <img src="{{ user.profile_photo }}" alt="{{ user.username }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid var(--surface); box-shadow: var(--shadow-lg);">
+                <span style="position: absolute; bottom: 6px; right: 6px; width: 16px; height: 16px; background: var(--success); border: 3px solid var(--surface); border-radius: 50%;"></span>
             </div>
-            <h2 class="user-display-name">{{ user.get_full_name|default:user.username }}</h2>
-            <span class="role-badge">{{ user.get_role_display|default:role }}</span>
+            <h2 style="font-weight: 800; margin-bottom: 0.5rem;">{{ user.get_full_name|default:user.username }}</h2>
+            <span class="badge badge-primary">{{ user.get_role_display|default:role }}</span>
         </div>
 
-        <div class="profile-body">
-            <div class="info-section">
-                <h3 class="group-title">Account Information</h3>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-envelope"></i> Email Address</span>
-                        <span class="info-value">{{ user.email|default:"Not provided" }}</span>
+        <div style="padding: 2rem;">
+            <div style="margin-bottom: 2rem;">
+                <h3 class="text-xs text-muted" style="font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                    Account Information
+                </h3>
+                <div class="grid grid-2" style="gap: 1.5rem;">
+                    <div>
+                        <p class="text-xs text-muted" style="font-weight: 600; margin-bottom: 0.25rem;"><i class="fas fa-envelope"></i> Email</p>
+                        <p style="font-weight: 500;">{{ user.email|default:"Not provided" }}</p>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-user-tag"></i> Username</span>
-                        <span class="info-value">@{{ user.username }}</span>
+                    <div>
+                        <p class="text-xs text-muted" style="font-weight: 600; margin-bottom: 0.25rem;"><i class="fas fa-user-tag"></i> Username</p>
+                        <p style="font-weight: 500;">@{{ user.username }}</p>
                     </div>
                 </div>
             </div>
 
             {% if profile_data %}
-            <div class="info-section">
-                <h3 class="group-title">Personal Details</h3>
-                <div class="info-grid">
+            <div style="margin-bottom: 2rem;">
+                <h3 class="text-xs text-muted" style="font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                    Personal Details
+                </h3>
+                <div class="grid grid-2" style="gap: 1.5rem;">
                     {% if profile_data.date_of_birth %}
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-calendar-alt"></i> Date of Birth</span>
-                        <span class="info-value">{{ profile_data.date_of_birth }}</span>
+                    <div>
+                        <p class="text-xs text-muted" style="font-weight: 600; margin-bottom: 0.25rem;"><i class="fas fa-calendar-alt"></i> Date of Birth</p>
+                        <p style="font-weight: 500;">{{ profile_data.date_of_birth }}</p>
                     </div>
                     {% endif %}
-                    
                     {% if profile_data.gender %}
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-venus-mars"></i> Gender</span>
-                        <span class="info-value">{{ profile_data.gender }}</span>
+                    <div>
+                        <p class="text-xs text-muted" style="font-weight: 600; margin-bottom: 0.25rem;"><i class="fas fa-venus-mars"></i> Gender</p>
+                        <p style="font-weight: 500;">{{ profile_data.gender }}</p>
                     </div>
                     {% endif %}
-
                     {% if profile_data.address %}
-                    <div class="info-item full-width">
-                        <span class="info-label"><i class="fas fa-map-marker-alt"></i> Residential Address</span>
-                        <span class="info-value">{{ profile_data.address }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            {% if role == "Parent" %}
-            <div class="info-section parent-special">
-                <h3 class="group-title">Guardian Details</h3>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-briefcase"></i> Occupation</span>
-                        <span class="info-value">{{ profile_data.occupation|default:"N/A" }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label"><i class="fas fa-users"></i> Relationship</span>
-                        <span class="info-value">{{ profile_data.relationship }}</span>
-                    </div>
-                    
-                    {% if profile_data.children.exists %}
-                    <div class="info-item full-width">
-                        <span class="info-label"><i class="fas fa-child"></i> Linked Students</span>
-                        <div class="children-tags">
-                            {% for child in profile_data.children.all %}
-                                <span class="child-tag">{{ child.user.get_full_name }}</span>
-                            {% endfor %}
-                        </div>
+                    <div style="grid-column: 1 / -1;">
+                        <p class="text-xs text-muted" style="font-weight: 600; margin-bottom: 0.25rem;"><i class="fas fa-map-marker-alt"></i> Address</p>
+                        <p style="font-weight: 500;">{{ profile_data.address }}</p>
                     </div>
                     {% endif %}
                 </div>
             </div>
             {% endif %}
+
+            {% if role == "Parent" and profile_data %}
+            <div>
+                <h3 class="text-xs text-muted" style="font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                    Guardian Details
+                </h3>
+                <div class="grid" style="gap: 1rem;">
+                    <p class="text-sm"><strong>Occupation:</strong> {{ profile_data.occupation|default:"N/A" }}</p>
+                    <p class="text-sm"><strong>Relationship:</strong> {{ profile_data.relationship }}</p>
+                    {% if profile_data.children.exists %}
+                    <div class="flex gap-sm flex-wrap">
+                        {% for child in profile_data.children.all %}
+                        <span class="badge badge-info">{{ child.user.get_full_name }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
             {% endif %}
         </div>
 
-        <div class="profile-footer">
-            <a href="{% url 'edit_profile' %}" class="btn-edit">
+        <div style="padding: 1.5rem 2rem; background: var(--bg-primary); text-align: center;">
+            <a href="{% url 'edit_profile' %}" class="btn btn-primary">
                 <i class="fas fa-user-edit"></i> Update My Profile
             </a>
         </div>
     </div>
 </div>
-
-<style>
-:root {
-    --primary: #4f46e5;
-    --primary-soft: #eef2ff;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
-    --border: #e2e8f0;
-    --white: #ffffff;
-}
-
-.profile-wrapper {
-    font-family: 'Inter', sans-serif;
-    padding: 3rem 1rem;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.profile-card {
-    background: var(--white);
-    border-radius: 24px;
-    border: 1px solid var(--border);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-    animation: fadeInUp 0.5s ease-out;
-}
-
-/* Header Section */
-.profile-header {
-    background: linear-gradient(to bottom, #f8fafc, #ffffff);
-    padding: 3rem 2rem 2rem;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-}
-
-.avatar-container {
-    position: relative;
-    width: 130px;
-    height: 130px;
-    margin: 0 auto 1.5rem;
-}
-
-.main-avatar {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid var(--white);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.status-indicator {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-    width: 18px;
-    height: 18px;
-    background: #10b981;
-    border: 3px solid var(--white);
-    border-radius: 50%;
-}
-
-.user-display-name {
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: var(--text-main);
-    margin: 0 0 0.5rem;
-}
-
-.role-badge {
-    display: inline-block;
-    padding: 6px 16px;
-    background: var(--primary-soft);
-    color: var(--primary);
-    border-radius: 99px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-}
-
-/* Body Content */
-.profile-body { padding: 2.5rem; }
-
-.info-section { margin-bottom: 2.5rem; }
-.info-section:last-child { margin-bottom: 0; }
-
-.group-title {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-muted);
-    margin-bottom: 1.25rem;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 0.5rem;
-}
-
-.info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-}
-
-.full-width { grid-column: span 2; }
-
-.info-item { display: flex; flex-direction: column; gap: 0.4rem; }
-
-.info-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.info-value {
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--text-main);
-}
-
-.children-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
-.child-tag {
-    background: #f1f5f9;
-    padding: 4px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #475569;
-}
-
-/* Footer Actions */
-.profile-footer {
-    padding: 2rem 2.5rem;
-    background: #f8fafc;
-    display: flex;
-    justify-content: center;
-}
-
-.btn-edit {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--primary);
-    color: var(--white);
-    padding: 0.8rem 2rem;
-    border-radius: 12px;
-    text-decoration: none;
-    font-weight: 700;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-edit:hover {
-    background: #4338ca;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
-}
-
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@media (max-width: 640px) {
-    .info-grid { grid-template-columns: 1fr; }
-    .full-width { grid-column: 1; }
-    .profile-body { padding: 1.5rem; }
-}
-</style>
 {% endblock %}

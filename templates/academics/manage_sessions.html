@@ -1,14 +1,8 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}Manage Academic Sessions{% endblock %}
 {% block header %}📘 Academic Sessions{% endblock %}
-
 {% block content %}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="manage-container">
     <div class="page-action-bar">
         <div class="title-meta">
@@ -19,7 +13,6 @@
             <i class="fas fa-plus"></i> <span>New Session</span>
         </a>
     </div>
-
     <div class="surface-card">
         <table class="session-table">
             <thead>
@@ -41,7 +34,6 @@
                             <span class="name-text">{{ s.name }}</span>
                         </div>
                     </td>
-                    
                     <td data-label="Duration" class="timeline-cell">
                         <div class="timeline-pill">
                             <span class="date">{{ s.start_date|date:"M Y" }}</span>
@@ -49,7 +41,6 @@
                             <span class="date">{{ s.end_date|date:"M Y" }}</span>
                         </div>
                     </td>
-
                     <td data-label="Status" class="status-cell text-center">
                         {% if s.is_current %}
                             <span class="badge active">
@@ -59,7 +50,6 @@
                             <span class="badge draft">Inactive</span>
                         {% endif %}
                     </td>
-
                     <td class="action-cell">
                         <div class="button-set">
                             <a href="{% url 'edit_session' s.id %}" class="btn-tool edit" title="Edit Session">
@@ -88,7 +78,6 @@
         </table>
     </div>
 </div>
-
 <style>
 :root {
     --brand: #4f46e5;
@@ -103,14 +92,12 @@
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
-
 .manage-container {
     padding: 1.5rem;
     max-width: 1100px;
     margin: 0 auto;
     font-family: 'Inter', sans-serif;
 }
-
 /* Header Styling */
 .page-action-bar {
     display: flex;
@@ -119,10 +106,8 @@
     margin-bottom: 2rem;
     gap: 1rem;
 }
-
 .title-meta h2 { margin: 0; font-size: 1.5rem; font-weight: 800; color: var(--slate-900); }
 .title-meta p { margin: 4px 0 0; color: var(--slate-600); font-size: 0.9rem; }
-
 .btn-create {
     background: var(--brand);
     color: var(--white);
@@ -138,9 +123,7 @@
     box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
     white-space: nowrap;
 }
-
 .btn-create:hover { background: #4338ca; transform: translateY(-1px); }
-
 /* Table Surface */
 .surface-card {
     background: var(--white);
@@ -149,7 +132,6 @@
     overflow: hidden;
     box-shadow: var(--shadow-sm);
 }
-
 .session-table { width: 100%; border-collapse: collapse; }
 .session-table th {
     background: #f8fafc;
@@ -162,11 +144,9 @@
     letter-spacing: 0.05em;
     border-bottom: 1px solid var(--border);
 }
-
 .session-row { transition: background 0.2s; border-bottom: 1px solid var(--border); }
 .session-row:hover { background: #fafafa; }
 .session-row td { padding: 1.25rem 1.5rem; vertical-align: middle; }
-
 /* Content Elements */
 .session-info { display: flex; align-items: center; gap: 12px; }
 .icon-box {
@@ -175,14 +155,12 @@
     display: grid; place-items: center; font-size: 0.9rem;
 }
 .name-text { font-weight: 700; color: var(--slate-900); }
-
 .timeline-pill {
     display: inline-flex; align-items: center; gap: 12px;
     background: #f1f5f9; padding: 6px 12px; border-radius: 8px;
     font-size: 0.85rem; font-weight: 500; color: var(--slate-600);
 }
 .timeline-pill i { font-size: 0.75rem; color: var(--slate-400); }
-
 /* Badges */
 .badge {
     display: inline-flex; align-items: center; gap: 6px;
@@ -190,12 +168,10 @@
 }
 .badge.active { background: var(--success-soft); color: var(--success); }
 .badge.draft { background: #f1f5f9; color: var(--slate-400); }
-
 .pulse-dot {
     width: 6px; height: 6px; background: var(--success); border-radius: 50%;
     animation: pulse-ring 2s infinite;
 }
-
 /* Actions */
 .button-set { display: flex; justify-content: flex-end; gap: 8px; }
 .btn-tool {
@@ -205,46 +181,37 @@
 .btn-tool.edit { background: #eff6ff; color: #2563eb; }
 .btn-tool.delete { background: #fef2f2; color: #dc2626; }
 .btn-tool:hover { filter: brightness(0.9); }
-
 /* Empty State */
 .empty-layout { padding: 5rem !important; text-align: center; }
 .empty-content i { font-size: 3rem; color: var(--border); margin-bottom: 1rem; }
 .empty-content h3 { margin: 0; color: var(--slate-900); }
 .empty-content p { color: var(--slate-400); margin-top: 0.5rem; }
-
 /* ANIMATIONS */
 @keyframes pulse-ring {
     0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
     70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
     100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
-
 /* MOBILE RESPONSIVE ENGINE */
 @media (max-width: 768px) {
     .page-action-bar { flex-direction: column; align-items: stretch; text-align: center; }
     .btn-create { justify-content: center; }
-
     .session-table thead { display: none; }
-    
     .session-row { 
         display: block; padding: 1.25rem; 
         position: relative; border-bottom: 4px solid var(--border);
     }
-    
     .session-row td { 
         display: flex; justify-content: space-between; align-items: center; 
         padding: 0.5rem 0; border: none; width: 100%;
     }
-
     .session-row td::before {
         content: attr(data-label);
         font-size: 0.7rem; font-weight: 800; color: var(--slate-400);
         text-transform: uppercase;
     }
-
     .name-cell { border-bottom: 1px solid var(--border) !important; padding-bottom: 1rem !important; margin-bottom: 0.5rem; }
     .name-cell::before { display: none; } /* Hide label for the main name */
-    
     .action-cell { margin-top: 0.5rem; border-top: 1px solid var(--border) !important; padding-top: 1rem !important; }
     .action-cell::before { content: "Manage Session"; }
 }

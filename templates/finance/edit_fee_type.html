@@ -1,22 +1,15 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}Edit Fee Type{% endblock %}
 {% block header %}✏️ Edit Fee Configuration{% endblock %}
-
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="edit-wrapper">
     <div class="form-card">
         <div class="card-header">
             <p class="subtitle">Adjust the parameters for <strong>{{ form.name.value|default:"this fee type" }}</strong>. Changes will apply to all future records generated with this type.</p>
         </div>
-
         <form method="POST" class="modern-form">
             {% csrf_token %}
-            
             <div class="form-stack">
                 <div class="field-group">
                     <label for="id_name">Fee Description</label>
@@ -25,7 +18,6 @@
                         {{ form.name }}
                     </div>
                 </div>
-
                 <div class="field-group">
                     <label for="id_amount">Base Amount (₵)</label>
                     <div class="input-container">
@@ -33,12 +25,10 @@
                         {{ form.amount }}
                     </div>
                 </div>
-
                 <div class="field-group">
                     <label for="id_description">Detailed Remarks</label>
                     {{ form.description }}
                 </div>
-
                 <div class="status-card">
                     <div class="status-info">
                         <span class="status-label">Availability Status</span>
@@ -50,7 +40,6 @@
                     </label>
                 </div>
             </div>
-
             <div class="form-footer">
                 <a href="{% url 'fee_types' %}" class="btn-link">Discard Changes</a>
                 <button type="submit" class="btn-update">
@@ -60,7 +49,6 @@
         </form>
     </div>
 </div>
-
 <style>
 :root {
     --primary: #4f46e5;
@@ -69,13 +57,11 @@
     --text-muted: #64748b;
     --border: #e2e8f0;
 }
-
 .edit-wrapper {
     font-family: 'Inter', sans-serif;
     padding: 2rem 1rem;
     animation: fadeIn 0.4s ease-out;
 }
-
 .form-card {
     max-width: 550px;
     margin: 0 auto;
@@ -85,32 +71,27 @@
     padding: 2.5rem;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
 }
-
 .card-header {
     margin-bottom: 2rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--border);
 }
-
 .subtitle {
     color: var(--text-muted);
     font-size: 0.9rem;
     line-height: 1.6;
 }
-
 /* Form Styling */
 .form-stack {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
-
 .field-group {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
-
 .field-group label {
     font-size: 0.8rem;
     font-weight: 700;
@@ -118,20 +99,17 @@
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
-
 .input-container {
     position: relative;
     display: flex;
     align-items: center;
 }
-
 .icon-addon {
     position: absolute;
     left: 14px;
     color: var(--text-muted);
     font-size: 0.9rem;
 }
-
 .modern-form input:not([type="checkbox"]), 
 .modern-form textarea {
     width: 100%;
@@ -142,9 +120,7 @@
     transition: all 0.2s;
     background: #f8fafc;
 }
-
 .input-container input { padding-left: 40px !important; }
-
 .modern-form input:focus, 
 .modern-form textarea:focus {
     outline: none;
@@ -152,7 +128,6 @@
     background: white;
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
-
 /* Status Card & Toggle */
 .status-card {
     background: #f1f5f9;
@@ -162,19 +137,15 @@
     justify-content: space-between;
     align-items: center;
 }
-
 .status-label { font-weight: 700; color: var(--text-main); font-size: 0.9rem; }
 .status-info p { font-size: 0.75rem; color: var(--text-muted); margin: 2px 0 0 0; }
-
 .toggle-switch {
     position: relative;
     display: inline-block;
     width: 46px;
     height: 24px;
 }
-
 .toggle-switch input { opacity: 0; width: 0; height: 0; }
-
 .slider {
     position: absolute;
     cursor: pointer;
@@ -183,7 +154,6 @@
     transition: .4s;
     border-radius: 24px;
 }
-
 .slider:before {
     position: absolute;
     content: "";
@@ -193,10 +163,8 @@
     transition: .4s;
     border-radius: 50%;
 }
-
 input:checked + .slider { background-color: var(--primary); }
 input:checked + .slider:before { transform: translateX(22px); }
-
 /* Footer */
 .form-footer {
     margin-top: 2.5rem;
@@ -207,7 +175,6 @@ input:checked + .slider:before { transform: translateX(22px); }
     align-items: center;
     gap: 1.5rem;
 }
-
 .btn-link {
     text-decoration: none;
     color: var(--text-muted);
@@ -215,9 +182,7 @@ input:checked + .slider:before { transform: translateX(22px); }
     font-weight: 600;
     transition: 0.2s;
 }
-
 .btn-link:hover { color: var(--text-main); }
-
 .btn-update {
     background: var(--primary);
     color: white;
@@ -233,11 +198,8 @@ input:checked + .slider:before { transform: translateX(22px); }
     transition: 0.2s;
     box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
 }
-
 .btn-update:hover { background: var(--primary-dark); transform: translateY(-1px); }
-
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
 @media (max-width: 480px) {
     .form-card { padding: 1.5rem; }
     .form-footer { flex-direction: column-reverse; gap: 1rem; }

@@ -1,23 +1,16 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}Bulk Report Cards{% endblock %}
 {% block header %}📄 Bulk Assessment Engine{% endblock %}
-
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="config-wrapper">
     <div class="config-card">
         <div class="card-intro">
             <h3>Batch Processing</h3>
             <p>Select a class and specify students to generate report cards in bulk.</p>
         </div>
-
         <form method="POST" class="modern-form">
             {% csrf_token %}
-
             <div class="form-section">
                 <label for="class_dropdown"><i class="fas fa-chalkboard-user"></i> Target Class</label>
                 <select name="class_id" id="class_dropdown" class="modern-select" required>
@@ -29,7 +22,6 @@
                     {% endfor %}
                 </select>
             </div>
-
             {% if students %}
             <div class="form-section">
                 <div class="selection-header">
@@ -39,7 +31,6 @@
                         <span>Select All</span>
                     </label>
                 </div>
-                
                 <div class="checkbox-list-container">
                     {% for student in students %}
                     <div class="student-checkbox-item">
@@ -57,13 +48,11 @@
                 <i class="fas fa-info-circle"></i> Select a class above to load student records.
             </div>
             {% endif %}
-
             <div class="meta-grid">
                 <div class="form-section">
                     <label><i class="fas fa-calendar-check"></i> Session</label>
                     <div class="readonly-box">{{ active_session }}</div>
                 </div>
-
                 <div class="form-section">
                     <label for="term_select"><i class="fas fa-layer-group"></i> Term</label>
                     <select name="term" id="term_select" class="modern-select" required>
@@ -74,7 +63,6 @@
                     </select>
                 </div>
             </div>
-
             <div class="form-actions">
                 <button type="submit" class="btn-generate">
                     <i class="fas fa-gears"></i> Process Bulk Generation
@@ -83,7 +71,6 @@
         </form>
     </div>
 </div>
-
 <style>
 :root {
     --primary: #1a73e8;
@@ -93,13 +80,11 @@
     --border: #e2e8f0;
     --bg-light: #f8fafc;
 }
-
 .config-wrapper {
     font-family: 'Inter', sans-serif;
     padding: 2rem 1rem;
     animation: fadeIn 0.4s ease-out;
 }
-
 .config-card {
     max-width: 550px;
     margin: 0 auto;
@@ -109,11 +94,9 @@
     padding: 2.5rem;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
 }
-
 .card-intro { margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.2rem; }
 .card-intro h3 { font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
 .card-intro p { font-size: 0.85rem; color: var(--text-muted); }
-
 .form-section { margin-bottom: 1.5rem; }
 .form-section label {
     display: block;
@@ -125,7 +108,6 @@
     margin-bottom: 8px;
 }
 .form-section label i { width: 20px; color: var(--primary); }
-
 /* Inputs & Selects */
 .modern-select, .readonly-box {
     width: 100%;
@@ -144,7 +126,6 @@
     background-size: 1em;
 }
 .readonly-box { background: #f1f5f9; color: var(--text-muted); font-weight: 600; cursor: not-allowed; }
-
 /* Student Checklist */
 .selection-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .select-all-pill {
@@ -159,7 +140,6 @@
     font-size: 0.75rem !important;
     text-transform: none !important;
 }
-
 .checkbox-list-container {
     max-height: 240px;
     overflow-y: auto;
@@ -180,10 +160,8 @@
 .tap-indicator { font-size: 0.7rem; color: var(--text-muted); font-weight: normal; }
 .student-checkbox-item:hover { background: #f1f5f9; }
 .student-checkbox-item:has(input:checked) { background: #eef2ff; }
-
 /* Grid for Meta Data */
 .meta-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1rem; }
-
 .info-alert {
     background: #fff9eb;
     border: 1px solid #ffeeba;
@@ -196,7 +174,6 @@
     gap: 10px;
     margin-bottom: 1.5rem;
 }
-
 .form-actions { margin-top: 1rem; }
 .btn-generate {
     width: 100%;
@@ -215,15 +192,12 @@
     transition: 0.2s;
 }
 .btn-generate:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2); }
-
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
 @media (max-width: 480px) {
     .config-card { padding: 1.5rem; }
     .meta-grid { grid-template-columns: 1fr; gap: 0; }
 }
 </style>
-
 <script>
 // Class auto-reload
 document.getElementById("class_dropdown").addEventListener("change", function () {
@@ -232,18 +206,15 @@ document.getElementById("class_dropdown").addEventListener("change", function ()
         window.location.href = "?class_id=" + classId;
     }
 });
-
 // Select All logic
 const selectAllBtn = document.getElementById("select_all_checkbox");
 const studentChecks = document.querySelectorAll(".student-item-check");
-
 if (selectAllBtn) {
     selectAllBtn.addEventListener("change", function() {
         studentChecks.forEach(check => {
             check.checked = this.checked;
         });
     });
-
     studentChecks.forEach(check => {
         check.addEventListener("change", function() {
             const allChecked = Array.from(studentChecks).every(c => c.checked);

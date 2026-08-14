@@ -64,7 +64,6 @@ class TeacherAdmin(BaseProfileAdmin):
     list_filter = ("department", "qualification")
 
 
-# academics/admin.py
 from django.contrib import admin
 from accounts.models import Student
 

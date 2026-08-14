@@ -1,159 +1,64 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
 {% block title %}Parent Dashboard{% endblock %}
-{% block header %}👨‍👩‍👧 Parent Dashboard{% endblock %}
+{% block header %}<i class="fas fa-users"></i> Parent Dashboard{% endblock %}
 
 {% block content %}
-<style>
-/* === General Layout === */
-.dashboard-wrapper {
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-/* === Child Cards === */
-.child-card {
-  background: linear-gradient(145deg, #ffffff, #f1f7ff);
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  padding: 1.5rem;
-  transition: transform 0.3s ease;
-}
-.child-card:hover { transform: translateY(-4px); }
-
-.child-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
-}
-.child-name {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #1e3a8a;
-}
-.child-class {
-  color: #555;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-/* === Summary Grid === */
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-.summary-item {
-  background: #1976d2;
-  color: #fff;
-  border-radius: 12px;
-  text-align: center;
-  padding: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-.summary-item h4 {
-  font-size: 0.9rem;
-  font-weight: 400;
-}
-.summary-item p {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin: 0.3rem 0 0;
-}
-
-/* === Payment Section === */
-.payment-box {
-  background: #fef9c3;
-  border-left: 5px solid #facc15;
-  padding: 1rem;
-  border-radius: 10px;
-  margin-top: 1rem;
-  font-size: 0.95rem;
-  color: #6b4f00;
-}
-
-/* === Empty State === */
-.empty-state {
-  text-align: center;
-  margin-top: 3rem;
-  color: #666;
-  font-size: 1.1rem;
-}
-
-/* === Header Card === */
-.welcome-card {
-  background: linear-gradient(135deg, #42a5f5, #1976d2);
-  color: white;
-  padding: 1.8rem;
-  border-radius: 16px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-  text-align: center;
-}
-</style>
-
-<div class="dashboard-wrapper">
-  <div class="welcome-card">
-    <h2>Hello, {{ parent.user.get_full_name|default:parent.user.username }} 👋</h2>
-    <p style="margin-top:0.4rem;">Here’s an overview of your children’s academic and financial performance.</p>
-  </div>
-
-  {% if dashboard_data %}
-    {% for data in dashboard_data %}
-      <div class="child-card">
-        <div class="child-header">
-          <div>
-            <h3 class="child-name">{{ data.child.user.get_full_name }}</h3>
-            <p class="child-class">{{ data.child.classroom.name }}</p>
-          </div>
-        </div>
-
-        <!-- Summary Section -->
-        <div class="summary-grid">
-          <div class="summary-item">
-            <h4>Latest Grade</h4>
-            <p>{{ data.grade }}</p>
-          </div>
-          <div class="summary-item">
-            <h4>Score</h4>
-            <p>{{ data.score }}</p>
-          </div>
-          <div class="summary-item">
-            <h4>Total Fee</h4>
-            <p>₵{{ data.total_fee|floatformat:2 }}</p>
-          </div>
-          <div class="summary-item">
-            <h4>Total Paid</h4>
-            <p>₵{{ data.total_paid|floatformat:2 }}</p>
-          </div>
-          <div class="summary-item" style="background:#ef4444;">
-            <h4>Pending</h4>
-            <p>₵{{ data.pending_balance|floatformat:2 }}</p>
-          </div>
-        </div>
-
-        <!-- Last Payment -->
-        {% if data.last_payment %}
-          <div class="payment-box">
-            💳 Last Payment: ₵{{ data.last_payment.amount|floatformat:2 }}
-            ({{ data.last_payment.get_payment_method_display }}) on
-            {{ data.last_payment.date_paid|date:"M d, Y" }}
-          </div>
-        {% else %}
-          <div class="payment-box" style="background:#fee2e2; border-left-color:#dc2626;">
-            ❗ No payments made yet for this term.
-          </div>
-        {% endif %}
-      </div>
-    {% endfor %}
-  {% else %}
-    <div class="empty-state">
-      <p>No children records found for your account yet.</p>
+<div class="page-container animate-fade-in">
+    <div class="card" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; border: none; margin-bottom: 2rem;">
+        <h2 style="font-weight: 700;">Hello, {{ parent.user.get_full_name|default:parent.user.username }}</h2>
+        <p class="text-sm" style="opacity: 0.85; margin-top: 0.25rem;">Here's an overview of your children's academic and financial performance.</p>
     </div>
-  {% endif %}
+
+    {% if dashboard_data %}
+        {% for data in dashboard_data %}
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="flex items-center justify-between" style="margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                    <h3 style="font-weight: 700; color: var(--primary);">{{ data.child.user.get_full_name }}</h3>
+                    <p class="text-sm text-muted">{{ data.child.classroom.name }}</p>
+                </div>
+            </div>
+
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem;">
+                <div class="card" style="background: #f0fdf4; border-color: #bbf7d0;">
+                    <p class="text-xs text-muted" style="font-weight: 700; text-transform: uppercase;">Latest Grade</p>
+                    <p class="h3" style="color: var(--success-dark);">{{ data.grade }}</p>
+                </div>
+                <div class="card" style="background: #f0f9ff; border-color: #bae6fd;">
+                    <p class="text-xs text-muted" style="font-weight: 700; text-transform: uppercase;">Score</p>
+                    <p class="h3" style="color: #0369a1;">{{ data.score }}</p>
+                </div>
+                <div class="card" style="background: #fefce8; border-color: #fde68a;">
+                    <p class="text-xs text-muted" style="font-weight: 700; text-transform: uppercase;">Total Fee</p>
+                    <p class="h3" style="color: #a16207;">₵{{ data.total_fee|floatformat:2 }}</p>
+                </div>
+                <div class="card" style="background: #f0fdf4; border-color: #bbf7d0;">
+                    <p class="text-xs text-muted" style="font-weight: 700; text-transform: uppercase;">Total Paid</p>
+                    <p class="h3" style="color: var(--success-dark);">₵{{ data.total_paid|floatformat:2 }}</p>
+                </div>
+                <div class="card" style="background: #fef2f2; border-color: #fecaca;">
+                    <p class="text-xs text-muted" style="font-weight: 700; text-transform: uppercase;">Pending</p>
+                    <p class="h3" style="color: var(--danger-dark);">₵{{ data.pending_balance|floatformat:2 }}</p>
+                </div>
+            </div>
+
+            {% if data.last_payment %}
+            <div class="alert alert-success" style="margin-top: 1rem;">
+                <i class="fas fa-credit-card"></i> Last Payment: ₵{{ data.last_payment.amount|floatformat:2 }}
+                ({{ data.last_payment.get_payment_method_display }}) on {{ data.last_payment.date_paid|date:"M d, Y" }}
+            </div>
+            {% else %}
+            <div class="alert alert-danger" style="margin-top: 1rem;">
+                <i class="fas fa-exclamation-circle"></i> No payments made yet for this term.
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="card text-center" style="padding: 4rem 2rem;">
+            <p class="h3" style="color: var(--text-muted);">No children records found for your account yet.</p>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

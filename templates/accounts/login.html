@@ -1,148 +1,128 @@
 {% extends "core/base_public.html" %}
 {% load static %}
-
-{% block title %}Login | School Management System{% endblock %}
+{% block title %}Login | SMS{% endblock %}
 
 {% block extra_css %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
-  /* Use a unique ID to prevent CSS bleeding into your Nav/Footer */
   #login-page-scope {
-    --primary-color: #4f46e5;
-    --primary-hover: #4338ca;
-    --text-dark: #1e293b;
-    --text-muted: #64748b;
-    
-    font-family: 'Inter', sans-serif;
-    min-height: calc(100vh - 80px); /* Adjust based on your Nav height */
+    min-height: calc(100vh - 64px);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
-    /* Subtle background image that doesn't distract */
-    background: linear-gradient(rgba(248, 250, 252, 0.9), rgba(248, 250, 252, 0.9)), 
-                url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop');
-    background-size: cover;
-    background-position: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #f0f0ff 0%, #eef2ff 50%, #f8fafc 100%);
   }
 
   .login-card {
     width: 100%;
     max-width: 420px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 1.5rem;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    padding: 3rem 2.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    padding: 2.5rem;
     animation: fadeIn 0.4s ease-out;
   }
 
   .brand-icon {
-    font-size: 2.5rem;
-    color: var(--primary-color);
-    margin-bottom: 1.5rem;
-    display: inline-block;
+    width: 56px;
+    height: 56px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin: 0 auto 1.5rem;
   }
 
   .login-card h2 {
-    font-weight: 700;
-    color: var(--text-dark);
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.025em;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    text-align: center;
+    font-size: 1.5rem;
   }
 
   .login-card .subtitle {
     color: var(--text-muted);
-    font-size: 0.95rem;
+    font-size: 0.875rem;
     margin-bottom: 2rem;
+    text-align: center;
   }
 
-  .custom-form-group {
+  .form-group-custom {
     margin-bottom: 1.25rem;
-    text-align: left;
   }
 
-  .custom-form-group label {
+  .form-group-custom label {
     display: block;
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--text-dark);
+    color: var(--text-secondary);
     margin-bottom: 0.5rem;
   }
 
-  .input-field-wrapper {
+  .input-wrapper {
     position: relative;
   }
 
-  .input-field-wrapper i {
+  .input-wrapper i {
     position: absolute;
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: #94a3b8;
+    color: var(--text-muted);
   }
 
-  .custom-form-group input {
+  .form-group-custom input {
     width: 100%;
     padding: 0.75rem 1rem 0.75rem 2.75rem;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 0.75rem;
-    font-size: 1rem;
-    transition: all 0.2s;
-    background-color: #fcfdfe;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    transition: var(--transition);
+    background: var(--bg-primary);
+    color: var(--text-primary);
   }
 
-  .custom-form-group input:focus {
+  .form-group-custom input:focus {
     outline: none;
-    border-color: var(--primary-color);
-    background-color: #fff;
+    border-color: var(--primary);
+    background: var(--surface);
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
   }
 
   .btn-submit {
     width: 100%;
     padding: 0.875rem;
-    background-color: var(--primary-color);
-    color: white;
+    background: var(--primary);
+    color: #fff;
     border: none;
-    border-radius: 0.75rem;
+    border-radius: var(--radius-md);
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
-    margin-top: 1rem;
-  }
-
-  .btn-submit:hover {
-    background-color: var(--primary-hover);
-  }
-
-  .alert-box {
-    background-color: #fef2f2;
-    border: 1px solid #fecaca;
-    color: #b91c1c;
-    padding: 0.75rem 1rem;
-    border-radius: 0.75rem;
-    margin-bottom: 1.5rem;
-    font-size: 0.875rem;
+    transition: var(--transition);
+    margin-top: 0.5rem;
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .btn-submit:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
   }
 
   .login-footer {
-    margin-top: 2.5rem;
+    margin-top: 2rem;
+    text-align: center;
     font-size: 0.8rem;
     color: var(--text-muted);
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid var(--border-light);
     padding-top: 1.5rem;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
   }
 </style>
 {% endblock %}
@@ -154,11 +134,11 @@
       <i class="fas fa-university"></i>
     </div>
     <h2>Sign In</h2>
-    <p class="subtitle">Access your school dashboard (Principal,Teacher,Parent, or Student)</p>
+    <p class="subtitle">Access your school dashboard</p>
 
     {% if messages %}
       {% for message in messages %}
-        <div class="alert-box">
+        <div class="alert alert-danger">
           <i class="fas fa-circle-exclamation"></i> {{ message }}
         </div>
       {% endfor %}
@@ -167,27 +147,29 @@
     <form method="POST" action="{% url 'custom_login' %}">
       {% csrf_token %}
 
-      <div class="custom-form-group">
+      <div class="form-group-custom">
         <label>Username</label>
-        <div class="input-field-wrapper">
+        <div class="input-wrapper">
           <i class="fas fa-user"></i>
-          <input type="text" name="username" placeholder="johndoe" required>
+          <input type="text" name="username" placeholder="Enter your username" required>
         </div>
       </div>
 
-      <div class="custom-form-group">
+      <div class="form-group-custom">
         <label>Password</label>
-        <div class="input-field-wrapper">
+        <div class="input-wrapper">
           <i class="fas fa-lock"></i>
-          <input type="password" name="password" placeholder="••••••••" required>
+          <input type="password" name="password" placeholder="Enter your password" required>
         </div>
       </div>
 
-      <button type="submit" class="btn-submit">Login to Account</button>
+      <button type="submit" class="btn-submit">
+        <i class="fas fa-arrow-right-to-bracket"></i> Login to Account
+      </button>
     </form>
 
     <div class="login-footer">
-      &copy; {{ now|date:"Y" }} Shamsudeen. All Rights Reserved.
+      &copy; {% now "Y" %} School Management System
     </div>
   </div>
 </main>

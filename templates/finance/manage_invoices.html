@@ -1,13 +1,8 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}Manage Invoices{% endblock %}
 {% block header %}🧾 Invoice Ledger{% endblock %}
-
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="manage-wrapper">
     <div class="metrics-grid">
         <div class="metric-card">
@@ -26,7 +21,6 @@
             <div class="m-bar"><div class="bar-inner orange"></div></div>
         </div>
     </div>
-
     <div class="content-card">
         <div class="card-header">
             <h3>Invoice History</h3>
@@ -36,7 +30,6 @@
                 </button>
             </div>
         </div>
-
         <div class="table-responsive">
             <table class="modern-table">
                 <thead>
@@ -110,7 +103,6 @@
         </div>
     </div>
 </div>
-
 <style>
 :root {
     --primary: #4f46e5;
@@ -121,7 +113,6 @@
     --text-muted: #64748b;
     --border: #e2e8f0;
 }
-
 .manage-wrapper {
     font-family: 'Inter', sans-serif;
     max-width: 1250px;
@@ -129,7 +120,6 @@
     padding: 1rem;
     animation: fadeIn 0.4s ease-out;
 }
-
 /* Metrics Dashboard */
 .metrics-grid {
     display: grid;
@@ -137,7 +127,6 @@
     gap: 1.5rem;
     margin-bottom: 2rem;
 }
-
 .metric-card {
     background: white;
     padding: 1.5rem;
@@ -145,7 +134,6 @@
     border: 1px solid var(--border);
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
 }
-
 .m-label { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
 .m-value { font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin: 0.5rem 0; }
 .m-bar { height: 6px; background: #f1f5f9; border-radius: 10px; overflow: hidden; }
@@ -153,7 +141,6 @@
 .bar-inner.blue { background: var(--primary); width: 70%; }
 .bar-inner.green { background: var(--success); width: 40%; }
 .bar-inner.orange { background: var(--warning); width: 30%; }
-
 /* Table Section */
 .content-card {
     background: white;
@@ -161,7 +148,6 @@
     border-radius: 20px;
     overflow: hidden;
 }
-
 .card-header {
     padding: 1.5rem;
     display: flex;
@@ -169,9 +155,7 @@
     align-items: center;
     border-bottom: 1px solid var(--border);
 }
-
 .card-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
-
 .btn-refresh {
     background: var(--primary-soft);
     border: none;
@@ -183,7 +167,6 @@
     transition: 0.2s;
 }
 .btn-refresh:hover { transform: rotate(180deg); }
-
 .modern-table { width: 100%; border-collapse: collapse; }
 .modern-table th {
     background: #f8fafc;
@@ -194,20 +177,16 @@
     color: var(--text-muted);
     text-transform: uppercase;
 }
-
 .modern-table td { padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-
 /* Cell Details */
 .id-tag { font-weight: 700; color: var(--primary); font-family: 'JetBrains Mono', monospace; }
 .s-name { font-weight: 600; color: var(--text-main); }
 .period-info { display: flex; flex-direction: column; }
 .p-term { font-size: 0.75rem; color: var(--text-muted); }
-
 .amount-stack { display: flex; flex-direction: column; }
 .amt-due { font-weight: 700; color: var(--text-main); }
 .amt-paid { font-size: 0.75rem; color: var(--success); }
 .balance-text.debt { color: var(--danger); font-weight: 700; }
-
 /* Badges */
 .badge {
     padding: 4px 10px;
@@ -217,7 +196,6 @@
 }
 .b-paid { background: #dcfce7; color: #15803d; }
 .b-pending { background: #fef3c7; color: #92400e; }
-
 /* Actions */
 .action-flex { display: flex; gap: 8px; justify-content: flex-end; }
 .act-btn {
@@ -235,9 +213,7 @@
 .act-btn.edit { background: #fff7ed; color: var(--warning); }
 .act-btn.delete { background: #fef2f2; color: var(--danger); }
 .act-btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
-
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
 @media (max-width: 768px) {
     .metrics-grid { grid-template-columns: 1fr; }
     .modern-table thead { display: none; }
@@ -246,32 +222,26 @@
     .modern-table td::before { content: attr(data-label); font-weight: 700; color: var(--text-muted); font-size: 0.7rem; }
 }
 </style>
-
 <script>
 async function fetchInvoicesAndRender() {
     try {
         const res = await fetch("{% url 'invoices_json' %}");
         if (!res.ok) throw new Error("Network response not ok");
         const data = await res.json();
-
         // Update Summary Bar
         document.getElementById("summary-due").innerText = `₵${Number(data.summary.total_due).toFixed(2)}`;
         document.getElementById("summary-paid").innerText = `₵${Number(data.summary.total_paid).toFixed(2)}`;
         document.getElementById("summary-balance").innerText = `₵${Number(data.summary.total_balance).toFixed(2)}`;
-
         const tbody = document.getElementById("invoice-tbody");
         if (!tbody) return;
-
         if (!data.invoices || data.invoices.length === 0) {
             tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No records found.</td></tr>`;
             return;
         }
-
         tbody.innerHTML = data.invoices.map((inv) => {
             const statusClass = inv.is_paid ? 'b-paid' : 'b-pending';
             const statusText = inv.is_paid ? 'Fully Paid' : 'Outstanding';
             const balanceClass = inv.balance > 0 ? 'debt' : '';
-
             return `
                 <tr>
                     <td><span class="id-tag">#${inv.invoice_number || ""}</span></td>
@@ -302,7 +272,6 @@ async function fetchInvoicesAndRender() {
         }).join("");
     } catch (err) { console.error("Poll Error:", err); }
 }
-
 setInterval(fetchInvoicesAndRender, 30000);
 </script>
 {% endblock %}

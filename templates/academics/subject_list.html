@@ -1,13 +1,8 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}Manage Subjects{% endblock %}
 {% block header %}📚 Subject Curriculum{% endblock %}
-
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="manage-wrapper">
     <!-- TOOLBAR: Strategic Search and Add -->
     <div class="toolbar-row">
@@ -15,7 +10,6 @@
             <i class="fas fa-search"></i>
             <input type="text" id="subjectSearch" placeholder="Filter subjects or codes..." onkeyup="filterTable()">
         </div>
-        
         <div class="toolbar-actions">
             <div class="stats-pill">
                 <span class="label">Total:</span>
@@ -26,7 +20,6 @@
             </a>
         </div>
     </div>
-
     <!-- MAIN DATA CONTAINER -->
     <div class="data-surface">
         <div class="table-responsive">
@@ -101,21 +94,18 @@
         </div>
     </div>
 </div>
-
 <script>
     // Simple client-side filtering for better UX
     function filterTable() {
         let input = document.getElementById("subjectSearch");
         let filter = input.value.toUpperCase();
         let rows = document.querySelectorAll(".subject-row");
-
         rows.forEach(row => {
             let text = row.innerText.toUpperCase();
             row.style.display = text.includes(filter) ? "" : "none";
         });
     }
 </script>
-
 <style>
 :root {
     --brand: #4f46e5;
@@ -128,14 +118,12 @@
     --warning: #f59e0b;
     --danger: #ef4444;
 }
-
 .manage-wrapper {
     font-family: 'Inter', system-ui, sans-serif;
     padding: clamp(1rem, 3vw, 2.5rem);
     max-width: 1400px;
     margin: 0 auto;
 }
-
 /* Toolbar Styling */
 .toolbar-row {
     display: flex;
@@ -145,13 +133,11 @@
     margin-bottom: 2rem;
     flex-wrap: wrap;
 }
-
 .search-box {
     position: relative;
     flex: 1;
     min-width: 280px;
 }
-
 .search-box i {
     position: absolute;
     left: 14px;
@@ -159,7 +145,6 @@
     transform: translateY(-50%);
     color: var(--text-low);
 }
-
 .search-box input {
     width: 100%;
     padding: 0.75rem 0.75rem 0.75rem 2.5rem;
@@ -169,19 +154,16 @@
     transition: 0.2s;
     font-size: 0.9rem;
 }
-
 .search-box input:focus {
     outline: none;
     border-color: var(--brand);
     box-shadow: 0 0 0 4px var(--brand-glow);
 }
-
 .toolbar-actions {
     display: flex;
     align-items: center;
     gap: 1rem;
 }
-
 .stats-pill {
     background: var(--surface);
     padding: 0.5rem 1rem;
@@ -189,10 +171,8 @@
     border: 1px solid var(--border);
     font-size: 0.85rem;
 }
-
 .stats-pill .label { color: var(--text-low); margin-right: 4px; }
 .stats-pill .value { font-weight: 700; color: var(--brand); }
-
 .btn-primary-action {
     background: var(--brand);
     color: white;
@@ -205,13 +185,11 @@
     gap: 8px;
     transition: 0.2s;
 }
-
 .btn-primary-action:hover {
     background: #4338ca;
     transform: translateY(-2px);
     box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2);
 }
-
 /* Professional Table Styling */
 .data-surface {
     background: var(--surface);
@@ -219,12 +197,10 @@
     border-radius: 16px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
-
 .pro-table {
     width: 100%;
     border-collapse: collapse;
 }
-
 .pro-table th {
     background: #fcfdfe;
     padding: 1rem 1.5rem;
@@ -236,13 +212,11 @@
     letter-spacing: 0.05em;
     border-bottom: 1px solid var(--border);
 }
-
 .pro-table td {
     padding: 1.25rem 1.5rem;
     border-bottom: 1px solid var(--border);
     vertical-align: middle;
 }
-
 /* Subject Meta Styling */
 .subject-meta { display: flex; align-items: center; gap: 1rem; }
 .icon-avatar {
@@ -259,7 +233,6 @@
 .name-stack { display: flex; flex-direction: column; }
 .primary-name { font-weight: 700; color: var(--text-high); font-size: 0.95rem; }
 .secondary-code { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--brand); font-weight: 600; }
-
 .badge-classroom {
     background: #f1f5f9;
     padding: 4px 10px;
@@ -271,7 +244,6 @@
     gap: 6px;
     font-weight: 500;
 }
-
 /* User Pill Styling */
 .user-pill {
     display: flex;
@@ -283,7 +255,6 @@
     border: 1px solid var(--border);
     width: fit-content;
 }
-
 .user-init {
     width: 24px;
     height: 24px;
@@ -296,9 +267,7 @@
     justify-content: center;
     font-weight: 700;
 }
-
 .user-name { font-size: 0.85rem; font-weight: 600; color: var(--text-high); }
-
 .status-indicator.warning {
     color: #b45309;
     background: #fffbeb;
@@ -307,7 +276,6 @@
     font-size: 0.8rem;
     font-weight: 600;
 }
-
 /* Actions Styling */
 .action-orbit { display: flex; justify-content: center; gap: 10px; }
 .orbit-link {
@@ -323,7 +291,6 @@
 .orbit-link.edit { background: #eef2ff; color: var(--brand); }
 .orbit-link.delete { background: #fef2f2; color: var(--danger); }
 .orbit-link:hover { transform: scale(1.1); filter: brightness(0.95); }
-
 /* Card-style Mobile View (Sincere Senior Approach) */
 @media (max-width: 992px) {
     .pro-table thead { display: none; }
@@ -350,7 +317,6 @@
     .action-orbit { justify-content: flex-end; margin-top: 1rem; }
     .user-pill { margin-left: auto; }
 }
-
 /* Empty State Styling */
 .empty-state-card { text-align: center; padding: 5rem 2rem !important; }
 .empty-svg-wrapper { font-size: 4rem; color: var(--border); margin-bottom: 1.5rem; }

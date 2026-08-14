@@ -1,13 +1,8 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}Generate Report Card{% endblock %}
 {% block header %}✍️ Academic Assessment{% endblock %}
-
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="generation-wrapper">
     {# SAFETY CHECK: Ensure we only show content if student is active #}
     {% if student.is_active %}
@@ -25,12 +20,9 @@
                 </div>
             </div>
         </div>
-
         <hr class="divider">
-
         <form method="post" enctype="multipart/form-data" class="modern-form">
             {% csrf_token %}
-
             <div class="form-section">
                 <label for="teacher_remark">
                     <i class="fas fa-comment-dots"></i> Teacher's Remarks
@@ -38,7 +30,6 @@
                 <p class="field-desc">Provide a professional assessment of the student's academic and behavioral performance.</p>
                 <textarea name="teacher_remark" id="teacher_remark" rows="5" placeholder="Enter performance review..." required></textarea>
             </div>
-
             <div class="form-section">
                 <label for="teacher_signature">
                     <i class="fas fa-file-signature"></i> Official Signature
@@ -52,7 +43,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="form-actions">
                 <a href="{% url 'select_report_options' %}" class="btn-back">Cancel</a>
                 <button type="submit" class="btn-generate">
@@ -70,7 +60,6 @@
     </div>
     {% endif %}
 </div>
-
 <style>
 /* ... (Your existing CSS remains exactly the same) ... */
 :root {
@@ -80,13 +69,11 @@
     --text-muted: #64748b;
     --border: #e2e8f0;
 }
-
 .generation-wrapper {
     font-family: 'Inter', sans-serif;
     padding: 2rem 1.5rem;
     animation: fadeIn 0.4s ease-out;
 }
-
 .generation-card {
     max-width: 650px;
     margin: 0 auto;
@@ -96,14 +83,12 @@
     padding: 2.5rem;
     box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
 }
-
 .student-profile-header {
     display: flex;
     align-items: center;
     gap: 1.5rem;
     margin-bottom: 2rem;
 }
-
 .profile-avatar {
     width: 64px;
     height: 64px;
@@ -115,9 +100,7 @@
     justify-content: center;
     font-size: 1.5rem;
 }
-
 .profile-info h2 { font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 6px; }
-
 .period-badges { display: flex; gap: 10px; }
 .badge-item {
     font-size: 0.75rem;
@@ -130,9 +113,7 @@
     align-items: center;
     gap: 5px;
 }
-
 .divider { border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0 2rem 0; }
-
 .form-section { margin-bottom: 2rem; }
 .form-section label {
     display: flex;
@@ -143,9 +124,7 @@
     color: var(--text-main);
     margin-bottom: 4px;
 }
-
 .field-desc { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; }
-
 textarea {
     width: 100%;
     padding: 1rem;
@@ -157,14 +136,12 @@ textarea {
     transition: 0.2s;
     resize: vertical;
 }
-
 textarea:focus {
     outline: none;
     border-color: var(--primary);
     background: white;
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
-
 .file-upload-wrapper {
     position: relative;
     height: 100px;
@@ -176,7 +153,6 @@ textarea:focus {
     background: #f8fafc;
     transition: 0.2s;
 }
-
 .file-input {
     position: absolute;
     width: 100%;
@@ -184,17 +160,13 @@ textarea:focus {
     opacity: 0;
     cursor: pointer;
 }
-
 .file-dummy {
     text-align: center;
     color: var(--text-muted);
 }
-
 .file-dummy i { font-size: 1.5rem; display: block; margin-bottom: 8px; }
 .file-dummy span { font-size: 0.85rem; font-weight: 500; }
-
 .file-upload-wrapper:hover { border-color: var(--primary); background: #eef2ff; }
-
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -202,14 +174,12 @@ textarea:focus {
     gap: 1.5rem;
     padding-top: 1rem;
 }
-
 .btn-back {
     text-decoration: none;
     color: var(--text-muted);
     font-weight: 600;
     font-size: 0.9rem;
 }
-
 .btn-generate {
     background: var(--primary);
     color: white;
@@ -225,18 +195,14 @@ textarea:focus {
     transition: 0.2s;
     text-decoration: none;
 }
-
 .btn-generate:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
-
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
 @media (max-width: 600px) {
     .generation-card { padding: 1.5rem; }
     .form-actions { flex-direction: column-reverse; width: 100%; }
     .btn-generate { width: 100%; justify-content: center; }
 }
 </style>
-
 <script>
     document.getElementById('teacher_signature').onchange = function() {
         const dummy = this.nextElementSibling.querySelector('span');

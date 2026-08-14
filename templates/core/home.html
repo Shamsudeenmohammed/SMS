@@ -1,17 +1,10 @@
 {% extends "core/base_public.html" %}
 {% load static %}
-
-{% block title %}Home | Student Management System{% endblock %}
+{% block title %}Home | SMS{% endblock %}
 
 {% block content %}
-
-<!-- ===== IMAGE PRELOAD ===== -->
-<link rel="preload" as="image" href="{% static 'images/sch.webp' %}">
-<link rel="preload" as="image" href="{% static 'images/stud.jpeg' %}">
-<link rel="preload" as="image" href="{% static 'images/CAMPUS-1.jpg' %}">
-
 {% if latest_update %}
-<div class="floating-update">
+<div class="update-banner">
     <strong>📢 Latest Update:</strong>
     {% if latest_update.link %}
         <a href="{{ latest_update.link }}" target="_blank">{{ latest_update.title }}</a>
@@ -21,192 +14,340 @@
 </div>
 {% endif %}
 
-<!-- ===== HERO SLIDER ===== -->
-<header class="hero-slider">
-    <div class="slides">
-        <div class="slide active" style="background-image:url('{% static 'images/CAMPUS-1.jpg' %}')"></div>
-        <div class="slide" style="background-image:url('{% static 'images/sch.webp' %}')"></div>
-        <div class="slide" style="background-image:url('{% static 'images/stud.jpeg' %}')"></div>
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-slides">
+        <div class="hero-slide active" style="background-image:url('{% static 'images/CAMPUS-1.jpg' %}')"></div>
+        <div class="hero-slide" style="background-image:url('{% static 'images/sch.webp' %}')"></div>
+        <div class="hero-slide" style="background-image:url('{% static 'images/stud.jpeg' %}')"></div>
     </div>
-
-    <div class="hero-content active">
+    <div class="hero-overlay">
         <h1>Your School Name Academy</h1>
         <p>Empowering Schools with Smart, Secure & Intelligent Digital Solutions</p>
-        <div class="actions">
-            <a href="{% url 'custom_login' %}" class="btn">Access Portal</a>
-            <a href="{% url 'core:admissions' %}" class="btn outline">Admissions</a>
+        <div class="hero-actions">
+            <a href="{% url 'custom_login' %}" class="btn-hero btn-hero-primary">Access Portal</a>
+            <a href="{% url 'core:admissions' %}" class="btn-hero btn-hero-outline">Admissions</a>
         </div>
-    </div>
-</header>
-
-<!-- ===== FEATURES ===== -->
-<section>
-    <h2>Our Core Modules</h2>
-    <div class="features">
-        <div class="card"><h3>Academics</h3><p>Subjects, grading systems, analytics, and performance monitoring.</p></div>
-        <div class="card"><h3>Attendance</h3><p>Real-time attendance tracking with automated summaries.</p></div>
-        <div class="card"><h3>Finance</h3><p>Fees management, payments, balances and financial reports.</p></div>
-        <div class="card"><h3>Results</h3><p>Instant report cards, transcripts and academic history.</p></div>
     </div>
 </section>
 
-<!-- ===== ABOUT ===== -->
-<section>
-    <h2>About Our Institution</h2>
-    <div class="about">
-        <div>
-            <p>
-                Our Student Management System modernizes school administration,
-                streamlines academic operations, and enhances communication through
-                secure digital solutions.
-            </p>
+<!-- Features -->
+<section class="section">
+    <div class="container">
+        <h2 class="section-heading">Our Core Modules</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-icon">📚</span>
+                <h3>Academics</h3>
+                <p>Subjects, grading systems, analytics, and performance monitoring.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">🕒</span>
+                <h3>Attendance</h3>
+                <p>Real-time attendance tracking with automated summaries.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">💰</span>
+                <h3>Finance</h3>
+                <p>Fees management, payments, balances and financial reports.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">📊</span>
+                <h3>Results</h3>
+                <p>Instant report cards, transcripts and academic history.</p>
+            </div>
         </div>
-        <img src="{% static 'images/pyp-2.jpg' %}" loading="lazy" class="fade-in">
     </div>
 </section>
 
-<!-- ===== GALLERY ===== -->
-<section>
-    <h2>Campus Life</h2>
-    <div class="gallery">
-        <img src="{% static 'images/CAMPUS-1.jpg' %}" loading="lazy" class="fade-in">
-        <img src="{% static 'images/stud.jpeg' %}" loading="lazy" class="fade-in">
-        <img src="{% static 'images/children.webp' %}" loading="lazy" class="fade-in">
-        <img src="{% static 'images/pyp-2.jpg' %}" loading="lazy" class="fade-in">
+<!-- About -->
+<section class="section section-alt">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-text">
+                <h2 class="section-heading" style="text-align: left;">About Our Institution</h2>
+                <p class="about-desc">Our Student Management System modernizes school administration, streamlines academic operations, and enhances communication through secure digital solutions.</p>
+            </div>
+            <div class="about-image">
+                <img src="{% static 'images/pyp-2.jpg' %}" loading="lazy" alt="About our institution">
+            </div>
+        </div>
     </div>
 </section>
 
-<!-- ===== FOOTER ===== -->
-<footer>
-    <div class="footer-grid">
-        <div>
-            <h3>Student Management System</h3>
-            <p>A modern digital platform designed to simplify academic administration.</p>
-        </div>
-
-        <div>
-            <h3>Contact Us</h3>
-            <p>📍 Sanzirigu, Tamale–Salaga Road, Ghana</p>
-            <p>📞 +233 247 213 850</p>
-            <p>✉ mohammedshamsudeen@310gmail.com</p>
-        </div>
-
-        <div>
-            <h3>Live Statistics</h3>
-            <p>🎓 Students: <strong>{{ total_students }}</strong></p>
-            <p>👩‍🏫 Teachers: <strong>{{ total_teachers }}</strong></p>
-            <p>👨‍👩‍👧 Parents: <strong>{{ total_parents }}</strong></p>
+<!-- Gallery -->
+<section class="section">
+    <div class="container">
+        <h2 class="section-heading">Campus Life</h2>
+        <div class="gallery-grid">
+            <div class="gallery-item">
+                <img src="{% static 'images/CAMPUS-1.jpg' %}" loading="lazy" alt="Campus">
+            </div>
+            <div class="gallery-item">
+                <img src="{% static 'images/stud.jpeg' %}" loading="lazy" alt="Students">
+            </div>
+            <div class="gallery-item">
+                <img src="{% static 'images/children.webp' %}" loading="lazy" alt="Children">
+            </div>
+            <div class="gallery-item">
+                <img src="{% static 'images/pyp-2.jpg' %}" loading="lazy" alt="PYP">
+            </div>
         </div>
     </div>
-
-    <p class="copyright">
-        &copy; {{ year|default:2026 }} Student Management System • All Rights Reserved
-    </p>
-</footer>
+</section>
 
 <style>
-/* ===== RESET ===== */
-*{margin:0;padding:0;box-sizing:border-box;font-family:"Inter","Segoe UI",sans-serif}
-body{background:#f6f8fc;color:#1f2937;line-height:1.6}
-
-/* ===== FLOATING UPDATE ===== */
-.floating-update{
-    position:fixed;bottom:25px;right:25px;
-    background:linear-gradient(135deg,#2563eb,#1e40af);
-    color:#fff;padding:16px 20px;border-radius:16px;z-index:999;
-    animation:pulse 3s infinite
+/* ===== Floating Update Banner ===== */
+.update-banner {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-lg);
+    z-index: 999;
+    box-shadow: var(--shadow-xl);
+    font-size: 0.9rem;
+    max-width: 380px;
+    animation: updatePulse 3s infinite;
 }
-@keyframes pulse{0%{box-shadow:0 0 0}50%{box-shadow:0 0 25px rgba(37,99,235,.8)}100%{box-shadow:0 0 0}}
-
-/* ===== HERO SLIDER ===== */
-.hero-slider{position:relative;height:85vh;overflow:hidden}
-.slides{position:relative;width:100%;height:100%}
-.slide{
-    position:absolute;inset:0;
-    background-size:cover;
-    background-position:center;
-    opacity:0;
-    transition:opacity 1.0s ease-in-out;
-    z-index:1;
+.update-banner a { color: #fff; text-decoration: underline; }
+@keyframes updatePulse {
+    0% { box-shadow: 0 0 0 0 rgba(79,70,229,0.5); }
+    70% { box-shadow: 0 0 0 12px rgba(79,70,229,0); }
+    100% { box-shadow: 0 0 0 0 rgba(79,70,229,0); }
 }
-.slide.active{opacity:1;z-index:2}
 
-/* ===== HERO CONTENT ===== */
-.hero-content{
-    position:absolute;top:50%;left:50%;
-    transform:translate(-50%,-50%);
-    z-index:3;
-    text-align:center;
-    padding:30px 20px;
-    color:#fff;
-    background:rgba(0,0,0,0.35);
-    border-radius:16px;
-    opacity:0;
-    transition: all 1s ease-in-out;
+/* ===== Hero ===== */
+.hero {
+    position: relative;
+    height: 85vh;
+    min-height: 480px;
+    overflow: hidden;
 }
-.hero-content.active{opacity:1}
-.hero-content h1{font-size:3rem;margin-bottom:16px}
-.hero-content p{font-size:1.2rem;margin-bottom:24px}
-.actions{display:flex;gap:18px;justify-content:center}
-.btn{padding:14px 36px;border-radius:999px;background:#fff;color:#1e40af;font-weight:600;text-decoration:none;transition:0.3s}
-.btn:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.15)}
-.btn.outline{background:transparent;border:2px solid #fff;color:#fff}
-.btn.outline:hover{background:rgba(255,255,255,.15)}
+.hero-slides {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.hero-slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    z-index: 1;
+}
+.hero-slide.active { opacity: 1; z-index: 2; }
 
-/* ===== SECTIONS ===== */
-section{padding:60px 22px 80px;max-width:1200px;margin:auto}
-section:first-of-type{padding-top:40px}
-section h2{text-align:center;margin-bottom:40px;color:#1e3a8a;font-weight:600}
+.hero-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    text-align: center;
+    color: #fff;
+    padding: 2.5rem;
+    background: rgba(0,0,0,0.40);
+    backdrop-filter: blur(4px);
+    border-radius: var(--radius-xl);
+    width: min(90%, 720px);
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+.hero-overlay.active { opacity: 1; }
+.hero-overlay h1 {
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+}
+.hero-overlay p {
+    font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+    margin-bottom: 1.75rem;
+    opacity: 0.95;
+    line-height: 1.6;
+}
+.hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.btn-hero {
+    padding: 0.85rem 2.25rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.btn-hero-primary {
+    background: #200be2;
+    color: var(--primary);
+    border: 2px solid #fff;
+}
+.btn-hero-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+.btn-hero-outline {
+    background: transparent;
+    color: #fff;
+    border: 2px solid #fff;
+}
+.btn-hero-outline:hover {
+    background: rgba(255,255,255,0.12);
+    transform: translateY(-2px);
+}
 
-/* ===== FEATURES ===== */
-.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:30px}
-.card{background:#fff;padding:30px 25px;border-radius:18px;box-shadow:0 20px 40px rgba(0,0,0,.08);transition:0.3s}
-.card:hover{transform:translateY(-5px);box-shadow:0 25px 50px rgba(0,0,0,.12)}
-.card h3{color:#1e40af;margin-bottom:12px}
-.card p{color:#374151;line-height:1.5}
+/* ===== Sections ===== */
+.section {
+    padding: 4.5rem 1.5rem;
+}
+.section-alt {
+    background: var(--surface);
+}
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+.section-heading {
+    text-align: center;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 2.5rem;
+    letter-spacing: -0.02em;
+}
 
-/* ===== ABOUT ===== */
-.about{display:grid;grid-template-columns:1.1fr .9fr;gap:50px;align-items:center}
-.about img{width:100%;border-radius:20px;box-shadow:0 15px 30px rgba(0,0,0,.1)}
+/* ===== Features ===== */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+.feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    transition: var(--transition);
+}
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+}
+.feature-icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+.feature-card h3 {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+.feature-card p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
 
-/* ===== GALLERY ===== */
-.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
-.gallery img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:16px;transition:transform 0.3s ease, box-shadow 0.3s ease}
-.gallery img:hover{transform:scale(1.05);box-shadow:0 10px 20px rgba(0,0,0,.15)}
-@media (max-width:768px){.gallery img{aspect-ratio:4/3}}
+/* ===== About ===== */
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+}
+.about-desc {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.7;
+}
+.about-image img {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    transition: var(--transition);
+}
+.about-image img:hover {
+    transform: scale(1.02);
+}
 
-/* ===== FOOTER ===== */
-footer{background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#e5e7eb;padding:40px}
-.footer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:40px;max-width:1200px;margin:auto}
+/* ===== Gallery ===== */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+}
+.gallery-item {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+.gallery-item:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+.gallery-item img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+.gallery-item:hover img {
+    transform: scale(1.06);
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 768px) {
+    .hero { height: 60vh; min-height: 400px; }
+    .hero-overlay { padding: 1.5rem; }
+    .hero-overlay h1 { font-size: 1.5rem; }
+    .section { padding: 3rem 1rem; }
+    .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .about-text .section-heading { text-align: center; }
+    .features-grid { grid-template-columns: repeat(2, 1fr); }
+    .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+    .update-banner { left: 1rem; right: 1rem; max-width: none; bottom: 1rem; }
+}
+
+@media (max-width: 480px) {
+    .features-grid { grid-template-columns: 1fr; }
+    .gallery-grid { grid-template-columns: 1fr; }
+    .hero { height: 50vh; min-height: 360px; }
+    .btn-hero { padding: 0.7rem 1.5rem; font-size: 0.9rem; }
+}
 </style>
 
 <script>
-/* ===== HERO SLIDER SCRIPT ===== */
-const slides = document.querySelectorAll('.slide');
-const heroContent = document.querySelector('.hero-content');
-let currentIndex = 0;
-
-function showSlide(index){
-    slides.forEach((slide,i)=>{
-        slide.classList.remove('active');
-        slide.style.zIndex = 1;
-    });
-    slides[index].classList.add('active');
-    slides[index].style.zIndex = 2;
-
-    // Hero content animation
-    heroContent.classList.remove('active');
-    setTimeout(()=> heroContent.classList.add('active'), 400);
-}
-
-// Initial slide
-showSlide(currentIndex);
-
-// Change slide every 5s
-setInterval(()=>{
-    currentIndex = (currentIndex + 1) % slides.length;
-    showSlide(currentIndex);
-}, 5000);
+(function() {
+    const slides = document.querySelectorAll('.hero-slide');
+    const overlay = document.querySelector('.hero-overlay');
+    let idx = 0;
+    function show(i) {
+        slides.forEach((s, n) => {
+            s.classList.toggle('active', n === i);
+            s.style.zIndex = n === i ? 2 : 1;
+        });
+        overlay.classList.remove('active');
+        setTimeout(() => overlay.classList.add('active'), 300);
+    }
+    show(0);
+    setInterval(() => { idx = (idx + 1) % slides.length; show(idx); }, 5000);
+})();
 </script>
-
 {% endblock %}

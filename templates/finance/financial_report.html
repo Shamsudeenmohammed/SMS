@@ -1,14 +1,8 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}Financial Report{% endblock %}
 {% block header %}📊 Financial Analytics{% endblock %}
-
 {% block content %}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="report-wrapper">
     <header class="report-header">
         <div class="header-meta">
@@ -24,7 +18,6 @@
             </a>
         </div>
     </header>
-
     <section class="filter-section">
         <form method="GET" action="{% url 'financial_report' %}" class="filter-form">
             <div class="filter-inputs">
@@ -36,7 +29,6 @@
                         {% endfor %}
                     </select>
                 </div>
-
                 <div class="input-group">
                     <select name="term">
                         <option value="">All Terms</option>
@@ -45,7 +37,6 @@
                         <option value="3rd" {% if request.GET.term == '3rd' %}selected{% endif %}>3rd Term</option>
                     </select>
                 </div>
-
                 <div class="input-group">
                     <select name="status">
                         <option value="">Status</option>
@@ -54,20 +45,17 @@
                         <option value="Overpaid" {% if request.GET.status == 'Overpaid' %}selected{% endif %}>Overpaid</option>
                     </select>
                 </div>
-
                 <div class="input-group search">
                     <i class="fas fa-search"></i>
                     <input type="text" name="search" placeholder="Search Student ID..." value="{{ request.GET.search }}">
                 </div>
             </div>
-
             <div class="filter-buttons">
                 <button type="submit" class="btn-submit">Filter</button>
                 <a href="{% url 'financial_report' %}" class="btn-clear"><i class="fas fa-redo"></i></a>
             </div>
         </form>
     </section>
-
     <div class="table-container">
         <table class="report-table">
             <thead>
@@ -113,7 +101,6 @@
         </table>
     </div>
 </div>
-
 <style>
 :root {
     --primary: #4f46e5;
@@ -126,9 +113,7 @@
     --surface: #ffffff;
     --radius: 12px;
 }
-
 * { box-sizing: border-box; }
-
 .report-wrapper {
     font-family: 'Inter', sans-serif;
     max-width: 1200px;
@@ -136,7 +121,6 @@
     padding: 1rem;
     color: var(--text-dark);
 }
-
 /* Header & Export */
 .report-header {
     display: flex;
@@ -146,10 +130,8 @@
     margin-bottom: 2rem;
     flex-wrap: wrap;
 }
-
 .header-meta h2 { font-size: 1.75rem; font-weight: 800; margin: 0; letter-spacing: -0.02em; }
 .header-meta p { color: var(--text-light); margin: 0.25rem 0 0; }
-
 .export-actions { display: flex; gap: 0.75rem; }
 .btn-exp {
     padding: 0.6rem 1.25rem;
@@ -165,7 +147,6 @@
 .btn-exp.excel { background: #dcfce7; color: #15803d; }
 .btn-exp.pdf { background: #fee2e2; color: #b91c1c; }
 .btn-exp:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-
 /* Adaptive Filters */
 .filter-section {
     background: var(--surface);
@@ -175,19 +156,16 @@
     margin-bottom: 1.5rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
-
 .filter-form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
-
 .filter-inputs {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 0.75rem;
 }
-
 .input-group select, .input-group input {
     width: 100%;
     padding: 0.65rem 0.75rem;
@@ -197,15 +175,12 @@
     outline: none;
     background: #fcfcfd;
 }
-
 .input-group.search { position: relative; }
 .input-group.search i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-light); }
 .input-group.search input { padding-left: 2.25rem; }
-
 .filter-buttons { display: flex; gap: 0.5rem; }
 .btn-submit { background: var(--primary); color: white; border: none; flex: 1; border-radius: 8px; font-weight: 700; cursor: pointer; }
 .btn-clear { background: #f1f5f9; color: var(--text-light); width: 45px; height: 45px; display: grid; place-items: center; border-radius: 8px; text-decoration: none; }
-
 /* Responsive Table / Cards */
 .table-container {
     background: var(--surface);
@@ -213,7 +188,6 @@
     border: 1px solid var(--border);
     overflow: hidden;
 }
-
 .report-table { width: 100%; border-collapse: collapse; }
 .report-table th {
     background: #f8fafc;
@@ -225,9 +199,7 @@
     color: var(--text-light);
     border-bottom: 1px solid var(--border);
 }
-
 .report-table td { padding: 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-
 /* Status Badges */
 .badge {
     padding: 0.25rem 0.75rem;
@@ -239,7 +211,6 @@
 .badge.cleared { background: #dcfce7; color: #15803d; }
 .badge.owing { background: #fee2e2; color: #b91c1c; }
 .badge.overpaid { background: #e0f2fe; color: #0369a1; }
-
 /* Helpers */
 .mono { font-family: 'JetBrains Mono', monospace; }
 .text-right { text-align: right; }
@@ -251,25 +222,20 @@
 .period-box { display: flex; flex-direction: column; }
 .session-label { font-weight: 600; font-size: 0.85rem; }
 .term-label { font-size: 0.75rem; color: var(--text-light); }
-
 /* MOBILE TRANSFORMATION */
 @media (max-width: 768px) {
     .report-header { text-align: center; justify-content: center; }
     .export-actions { width: 100%; }
     .export-actions a { flex: 1; justify-content: center; }
-
     .report-table, .report-table thead, .report-table tbody, .report-table th, .report-table td, .report-table tr {
         display: block;
     }
-
     .report-table thead { display: none; }
-
     .report-row {
         padding: 1rem;
         border-bottom: 8px solid #f1f5f9;
         position: relative;
     }
-
     .report-table td {
         display: flex;
         justify-content: space-between;
@@ -278,7 +244,6 @@
         border: none;
         text-align: right;
     }
-
     .report-table td::before {
         content: attr(data-label);
         font-weight: 700;
@@ -287,14 +252,12 @@
         text-transform: uppercase;
         margin-right: 1rem;
     }
-
     .report-table td[data-label="Student"] {
         border-bottom: 1px solid var(--border);
         margin-bottom: 0.5rem;
         padding-bottom: 0.75rem;
     }
 }
-
 @media (min-width: 1024px) {
     .filter-form { flex-direction: row; align-items: flex-end; }
     .filter-inputs { flex: 1; }

@@ -1,11 +1,7 @@
 {% extends "accounts/base_dashboard.html" %}
 {% load static %}
-
 {% block title %}💰 Payment History{% endblock %}
-
 {% block content %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
 <style>
     :root {
         --primary-blue: #1e3a8a;
@@ -14,13 +10,11 @@
         --text-main: #1e293b;
         --text-muted: #64748b;
     }
-
     .dashboard-wrapper { 
         padding: 1rem; 
         background-color: #fdfdfd; 
         font-family: 'Inter', sans-serif;
     }
-    
     /* Header Section */
     .header-flex {
         display: flex;
@@ -31,7 +25,6 @@
         gap: 1rem;
     }
     .page-title { font-size: 1.5rem; color: var(--primary-blue); font-weight: 800; margin: 0; }
-
     /* Summary Hero Cards */
     .stats-grid {
         display: grid;
@@ -55,10 +48,8 @@
     }
     .blue-bg { background: #eff6ff; color: #2563eb; }
     .green-bg { background: #ecfdf5; color: #059669; }
-    
     .stat-label { color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
     .stat-value { font-size: 1.25rem; font-weight: 800; color: var(--primary-blue); }
-
     /* Tables & Containers */
     .content-card {
         background: white;
@@ -73,7 +64,6 @@
         border-bottom: 1px solid var(--border-slate);
     }
     .card-header h3 { margin: 0; font-size: 1rem; color: var(--primary-blue); font-weight: 700; }
-
     /* Table Logic */
     .table-responsive { width: 100%; }
     .styled-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
@@ -87,12 +77,10 @@
         text-transform: uppercase;
     }
     .styled-table td { padding: 1rem 1.25rem; border-bottom: 1px solid #f1f5f9; color: var(--text-main); }
-
     /* Badges */
     .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; }
     .method-badge { background: #f1f5f9; color: #475569; }
     .amount-text { font-weight: 800; color: var(--success-green); }
-
     /* Buttons */
     .btn-group { display: flex; gap: 0.5rem; }
     .btn-export {
@@ -102,16 +90,13 @@
         font-weight: 700; text-decoration: none; transition: 0.2s;
     }
     .btn-export:hover { background: #f1f5f9; }
-
     /* MOBILE TRANSFORMATION */
     @media (max-width: 768px) {
         .header-flex { flex-direction: column; align-items: flex-start; }
         .btn-group { width: 100%; }
         .btn-export { flex: 1; justify-content: center; }
-
         /* Summary by Child Tablet Layout */
         .child-summary-grid { grid-template-columns: 1fr !important; }
-
         /* Detailed Log Transformation */
         .styled-table.detailed-log thead { display: none; }
         .styled-table.detailed-log tr {
@@ -138,7 +123,6 @@
         .mobile-bold { font-weight: 800; color: var(--primary-blue); }
     }
 </style>
-
 <div class="dashboard-wrapper">
     <div class="header-flex">
         <h2 class="page-title">💰 Payment History</h2>
@@ -153,7 +137,6 @@
         </div>
         {% endif %}
     </div>
-
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-icon blue-bg"><i class="fas fa-list-ol"></i></div>
@@ -170,7 +153,6 @@
             </div>
         </div>
     </div>
-
     <div class="content-card">
         <div class="card-header"><h3>🧾 Summary by Child</h3></div>
         <div class="table-responsive">
@@ -192,7 +174,6 @@
             </table>
         </div>
     </div>
-
     <div class="content-card">
         <div class="card-header"><h3>📝 Detailed Transaction Log</h3></div>
         {% if payments %}

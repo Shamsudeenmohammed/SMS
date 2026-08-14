@@ -1,247 +1,76 @@
 {% extends "accounts/base_dashboard.html" %}
 {% block title %}Accountant Dashboard{% endblock %}
-{% block header %}💰 Accountant Dashboard{% endblock %}
+{% block header %}<i class="fas fa-coins"></i> Accountant Dashboard{% endblock %}
 
 {% block content %}
-<style>
-/* 🎨 ===== Modern Accountant Dashboard (Refined Layout) ===== */
-
-/* Overall container */
-.dashboard-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 2.5rem;
-  animation: fadeIn 0.6s ease-in-out;
-  padding: 1rem 0;
-}
-
-/* Header */
-.dashboard-header {
-  text-align: center;
-  margin-bottom: 0.5rem;
-}
-.dashboard-header h2 {
-  color: #0d47a1;
-  font-weight: 800;
-  font-size: 1.8rem;
-}
-.dashboard-header p {
-  color: #555;
-  font-size: 0.95rem;
-}
-
-/* 🌟 Summary Cards */
-.summary-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-}
-
-.card {
-  background: linear-gradient(145deg, #ffffff, #f3f6fa);
-  border-radius: 16px;
-  padding: 25px 20px;
-  text-align: center;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
-  transition: all 0.3s ease;
-  border: 1px solid rgba(0,0,0,0.05);
-}
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.1);
-}
-.card h3 {
-  color: #1a237e;
-  font-weight: 600;
-  margin-bottom: 6px;
-  font-size: 1rem;
-}
-.card p {
-  color: #0b6be0;
-  font-size: 1.8rem;
-  font-weight: 800;
-}
-
-/* 📈 Charts Section */
-.charts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-  gap: 1.5rem;
-}
-.chart-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-  border: 1px solid rgba(0,0,0,0.04);
-}
-.chart-card h3 {
-  color: #1a237e;
-  font-weight: 600;
-  margin-bottom: 12px;
-  font-size: 1rem;
-}
-
-/* 📊 Payment Table */
-.table-section {
-  background: #fff;
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-}
-.table-section h3 {
-  color: #0d47a1;
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 15px;
-}
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  overflow: hidden;
-  border-radius: 10px;
-}
-.table th, .table td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #e0e7ff;
-}
-.table th {
-  background: #0b6be0;
-  color: white;
-  font-weight: 600;
-}
-.table tr:hover {
-  background-color: #f3f6fa;
-}
-
-/* ⚡ Quick Actions */
-.quick-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
-}
-.quick-actions a {
-  background: linear-gradient(135deg, #1565c0, #42a5f5);
-  color: #fff;
-  padding: 12px 20px;
-  border-radius: 12px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: 0.3s ease;
-  box-shadow: 0 6px 16px rgba(21,101,192,0.3);
-}
-.quick-actions a:hover {
-  background: linear-gradient(135deg, #1e88e5, #1565c0);
-  transform: translateY(-2px);
-}
-
-/* ✨ Animations */
-@keyframes fadeIn {
-  from {opacity: 0; transform: translateY(10px);}
-  to {opacity: 1; transform: translateY(0);}
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .dashboard-header h2 { font-size: 1.5rem; }
-  .card p { font-size: 1.4rem; }
-  .charts-grid { grid-template-columns: 1fr; }
-}
-</style>
-
-<div class="dashboard-wrapper">
-
-  <!-- 👋 Header -->
-  <div class="dashboard-header">
-    <h2>Welcome, {{ user.get_full_name|default:user.username }}</h2>
-    <p>Track fees, payments, and financial performance in real-time.</p>
+<div class="page-container animate-fade-in">
+  <div style="margin-bottom: 2rem;">
+    <h2 class="h2" style="margin-bottom: 0.25rem;">Welcome, {{ user.get_full_name|default:user.username }}</h2>
+    <p class="text-muted text-sm">Track fees, payments, and financial performance in real-time.</p>
   </div>
 
-  <!-- 💳 Summary Cards -->
-  <div class="summary-cards">
-    <div class="card"><h3>Total Students</h3><p>{{ total_students }}</p></div>
-    <div class="card"><h3>Total Invoices</h3><p>{{ total_invoices }}</p></div>
-    <div class="card"><h3>Total Fees Paid</h3><p>₵{{ total_paid }}</p></div>
-    <div class="card"><h3>Fees Due</h3><p>₵{{ total_due }}</p></div>
-    <div class="card"><h3>Pending Balance</h3><p>₵{{ total_balance }}</p></div>
-  </div>
-
-  <!-- 📊 Payment Overview -->
-  <div class="table-section">
-    <h3>Payment Status Overview</h3>
-    <table class="table">
-      <tr><th>Status</th><th>Count</th><th>Amount (₵)</th></tr>
-      <tr><td>✅ Fully Paid</td><td>{{ fully_paid }}</td><td>{{ total_paid }}</td></tr>
-      <tr><td>🟡 Partially Paid</td><td>{{ partially_paid }}</td><td>{{ pending_total }}</td></tr>
-      <tr><td>❌ Unpaid</td><td>{{ unpaid }}</td><td>₵{{ total_due }}</td></tr>
-    </table>
-  </div>
-
-  <!-- 📈 Charts -->
-  <div class="charts-grid">
-    <div class="chart-card">
-      <h3>📊 Fee Collection Overview</h3>
-      <canvas id="feeChart"></canvas>
+  <div class="grid grid-auto" style="gap: 1.25rem; margin-bottom: 2rem;">
+    <div class="stat-card">
+      <div class="stat-icon stat-icon-primary"><i class="fas fa-user-graduate"></i></div>
+      <div><p class="stat-label">Total Students</p><p class="stat-value">{{ total_students }}</p></div>
     </div>
-    <div class="chart-card">
-      <h3>📈 Monthly Revenue Trend</h3>
-      <canvas id="revenueChart"></canvas>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon-warning"><i class="fas fa-file-invoice"></i></div>
+      <div><p class="stat-label">Total Invoices</p><p class="stat-value">{{ total_invoices }}</p></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon-success"><i class="fas fa-wallet"></i></div>
+      <div><p class="stat-label">Fees Paid</p><p class="stat-value">₵{{ total_paid }}</p></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon stat-icon-danger"><i class="fas fa-exclamation-triangle"></i></div>
+      <div><p class="stat-label">Pending Balance</p><p class="stat-value">₵{{ total_balance }}</p></div>
     </div>
   </div>
 
-  <!-- ⚙️ Quick Actions -->
-  <div class="quick-actions">
-    <a href="{% url 'record_payment' %}">➕ Record Payment</a>
-    {% comment %} <a href="#">🧾 Generate Invoice</a> {% endcomment %}
-    <a href="{% url 'conversation_list' %}">📤 Send Reminder</a>
-    <a href="{% url 'financial_report' %}">📊 View Reports</a>
+  <div class="card" style="margin-bottom: 2rem;">
+    <h4 class="flex items-center gap-sm" style="font-weight: 700; margin-bottom: 1rem;">
+      <i class="fas fa-table"></i> Payment Status Overview
+    </h4>
+    <div class="table-wrapper">
+      <table>
+        <thead><tr><th>Status</th><th>Count</th><th>Amount (₵)</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-success">Fully Paid</span></td><td>{{ fully_paid }}</td><td>{{ total_paid }}</td></tr>
+          <tr><td><span class="badge badge-warning">Partially Paid</span></td><td>{{ partially_paid }}</td><td>{{ pending_total }}</td></tr>
+          <tr><td><span class="badge badge-danger">Unpaid</span></td><td>{{ unpaid }}</td><td>₵{{ total_due }}</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
+  <div class="grid grid-2" style="gap: 1.5rem; margin-bottom: 2rem;">
+    <div class="card"><h4 style="font-weight: 700; margin-bottom: 1rem;">📊 Fee Collection</h4><canvas id="feeChart" height="250"></canvas></div>
+    <div class="card"><h4 style="font-weight: 700; margin-bottom: 1rem;">📈 Monthly Revenue</h4><canvas id="revenueChart" height="250"></canvas></div>
+  </div>
+
+  <div class="toolbar">
+    <span class="font-bold">Quick Actions</span>
+    <div class="flex gap-sm">
+      <a href="{% url 'record_payment' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Record Payment</a>
+      <a href="{% url 'financial_report' %}" class="btn btn-outline btn-sm"><i class="fas fa-chart-bar"></i> Reports</a>
+    </div>
+  </div>
 </div>
 
-<!-- ✅ Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {{ monthly_labels|json_script:"monthlyLabels" }}
 {{ monthly_revenue|json_script:"monthlyRevenue" }}
 <script>
   const monthlyLabels = JSON.parse(document.getElementById("monthlyLabels").textContent);
   const monthlyRevenue = JSON.parse(document.getElementById("monthlyRevenue").textContent);
-
   new Chart(document.getElementById("revenueChart"), {
-    type: 'line',
-    data: {
-      labels: monthlyLabels,
-      datasets: [{
-        label: "Monthly Revenue (₵)",
-        data: monthlyRevenue,
-        borderColor: "#1565c0",
-        backgroundColor: "rgba(21,101,192,0.15)",
-        tension: 0.4,
-        fill: true
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true } }
-    }
+    type: 'line', data: { labels: monthlyLabels, datasets: [{ data: monthlyRevenue, borderColor: "#4f46e5", backgroundColor: "rgba(79,70,229,0.1)", tension: 0.4, fill: true }] },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
   });
-
   new Chart(document.getElementById("feeChart"), {
-    type: 'bar',
-    data: {
-      labels: ["Fully Paid", "Partially Paid", "Unpaid"],
-      datasets: [{
-        data: [{{ fully_paid|default:0 }}, {{ partially_paid|default:0 }}, {{ unpaid|default:0 }}],
-        backgroundColor: ["#00c853", "#ffca28", "#e53935"],
-      }]
-    },
-    options: {
-      plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true } }
-    }
+    type: 'bar', data: { labels: ["Fully Paid", "Partially Paid", "Unpaid"], datasets: [{ data: [{{ fully_paid|default:0 }}, {{ partially_paid|default:0 }}, {{ unpaid|default:0 }}], backgroundColor: ["#10b981", "#f59e0b", "#ef4444"] }] },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
   });
 </script>
 {% endblock %}

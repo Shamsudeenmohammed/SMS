@@ -1,39 +1,30 @@
 {% extends "accounts/base_dashboard.html" %}
-
 {% block title %}Edit Student | {{ student.user.get_full_name }}{% endblock %}
 {% block header %}Edit Student Profile{% endblock %}
-
 {% block content %}
 <!-- Inter Font for modern typography -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
 <div class="edit-wrapper">
     <div class="form-card">
         <div class="card-header">
             <h2>{{ student.user.get_full_name }}</h2>
             <p class="text-muted">Student ID: #{{ student.id|default:"N/A" }}</p>
         </div>
-
         <form method="POST" class="modern-form" novalidate>
             {% csrf_token %}
-
             <!-- Core Identity Section -->
             <div class="form-group full-width">
                 <label for="full_name">Full Name</label>
                 <input type="text" name="full_name" id="full_name" value="{{ student.user.get_full_name }}" placeholder="e.g. John Doe" required>
             </div>
-
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" name="username" id="username" value="{{ student.user.username }}" placeholder="Login ID" required>
                 <small class="help-text">Used for logging into the portal</small>
             </div>
-
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input type="email" name="email" id="email" value="{{ student.user.email|default:'' }}" placeholder="email@example.com">
             </div>
-
             <div class="form-group full-width">
                 <label for="current_class">Assigned Class</label>
                 <input list="classrooms" name="current_class" id="current_class" value="{{ student.current_class.name }}" placeholder="Search or select class..." required>
@@ -43,11 +34,9 @@
                     {% endfor %}
                 </datalist>
             </div>
-
             <!-- Security Section -->
             <div class="security-section full-width">
                 <h4 class="section-title"><i class="fas fa-shield-alt"></i> Security & Access</h4>
-                
                 <div class="password-grid">
                     <div class="form-group">
                         <label for="new_password">New Password</label>
@@ -58,7 +47,6 @@
                         <input type="password" name="confirm_password" id="confirm_password" placeholder="Repeat new password">
                     </div>
                 </div>
-
                 <div class="status-control">
                     <label class="toggle-container">
                         <input type="checkbox" name="is_active" {% if student.is_active %}checked{% endif %}>
@@ -70,7 +58,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="form-footer full-width">
                 <a href="{% url 'manage_students' %}" class="btn-link">Cancel and Return</a>
                 <button type="submit" class="btn-save">Save Changes</button>
@@ -78,7 +65,6 @@
         </form>
     </div>
 </div>
-
 <style>
 :root {
     --primary: #4f46e5;
@@ -90,14 +76,12 @@
     --text-main: #1e293b;
     --text-muted: #64748b;
 }
-
 .edit-wrapper {
     font-family: 'Inter', sans-serif;
     padding: 2rem 1rem;
     max-width: 800px;
     margin: 0 auto;
 }
-
 .form-card {
     background: #ffffff;
     border-radius: 20px;
@@ -106,29 +90,23 @@
     overflow: hidden;
     animation: slideUp 0.4s ease-out;
 }
-
 .card-header {
     padding: 2rem 2.5rem;
     border-bottom: 1px solid var(--border);
     text-align: center;
     background: linear-gradient(to bottom, #ffffff, var(--bg-light));
 }
-
 .card-header h2 { margin: 0; color: var(--text-main); font-size: 1.5rem; font-weight: 700; }
 .text-muted { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
-
 .modern-form {
     padding: 2.5rem;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
 }
-
 .full-width { grid-column: span 2; }
-
 .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
 .form-group label { font-size: 0.875rem; font-weight: 600; color: var(--text-main); }
-
 .form-group input {
     padding: 0.75rem 1rem;
     border: 1.5px solid var(--border);
@@ -137,16 +115,13 @@
     transition: all 0.2s;
     background: var(--bg-light);
 }
-
 .form-group input:focus {
     outline: none;
     border-color: var(--primary);
     background: #fff;
     box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
-
 .help-text { font-size: 0.75rem; color: var(--text-muted); }
-
 /* Security Section */
 .security-section {
     margin-top: 1rem;
@@ -155,7 +130,6 @@
     border-radius: 12px;
     padding: 1.5rem;
 }
-
 .section-title {
     margin: 0 0 1.25rem 0;
     font-size: 0.9rem;
@@ -166,9 +140,7 @@
     align-items: center;
     gap: 8px;
 }
-
 .password-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-
 .status-control {
     margin-top: 1.5rem;
     padding-top: 1.25rem;
@@ -177,9 +149,7 @@
     align-items: flex-start;
     gap: 15px;
 }
-
 .toggle-text p { margin: 2px 0 0 0; line-height: 1.4; }
-
 /* Modern Toggle */
 .toggle-container {
     position: relative;
@@ -188,9 +158,7 @@
     height: 24px;
     flex-shrink: 0;
 }
-
 .toggle-container input { opacity: 0; width: 0; height: 0; }
-
 .toggle-slider {
     position: absolute;
     cursor: pointer;
@@ -199,7 +167,6 @@
     transition: .3s;
     border-radius: 24px;
 }
-
 .toggle-slider:before {
     position: absolute;
     content: "";
@@ -209,12 +176,9 @@
     transition: .3s;
     border-radius: 50%;
 }
-
 input:checked + .toggle-slider { background-color: var(--success); }
 input:checked + .toggle-slider:before { transform: translateX(20px); }
-
 .toggle-label { font-size: 0.95rem; font-weight: 600; color: var(--text-main); }
-
 /* Footer Actions */
 .form-footer {
     display: flex;
@@ -224,10 +188,8 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
     padding-top: 1.5rem;
     border-top: 1px solid var(--border);
 }
-
 .btn-link { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: 0.2s; }
 .btn-link:hover { color: var(--danger); }
-
 .btn-save {
     background: var(--primary);
     color: white;
@@ -239,19 +201,15 @@ input:checked + .toggle-slider:before { transform: translateX(20px); }
     transition: all 0.2s;
     box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
 }
-
 .btn-save:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); }
-
 @keyframes slideUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
-
 /* Responsive Overrides */
 @media (max-width: 768px) {
     .modern-form { padding: 1.5rem; }
 }
-
 @media (max-width: 600px) {
     .modern-form, .password-grid { grid-template-columns: 1fr; }
     .full-width { grid-column: 1; }
