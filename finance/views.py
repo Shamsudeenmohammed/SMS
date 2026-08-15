@@ -162,10 +162,10 @@ def finance_summary_json(request):
         "total_students": total_students,
         "students_with_fees": students_with_fees,
         "total_invoices": total_invoices,
-        "total_paid": float(total_paid),
-        "total_due": float(total_due),
-        "total_balance": float(total_balance),
-        "pending_total": float(pending_total),
+        "total_paid": round(float(total_paid), 5),
+        "total_due": round(float(total_due), 5),
+        "total_balance": round(float(total_balance), 5),
+        "pending_total": round(float(pending_total), 5),
     }
     return JsonResponse(data)
 

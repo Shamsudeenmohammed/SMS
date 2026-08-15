@@ -1,0 +1,66 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+  body, .app-main, .app-sidebar, .content-wrapper, .main-header, .main-footer,
+  .card, .btn, .form-control, .nav-link, .dropdown-item, .breadcrumb,
+  h1, h2, h3, h4, h5, h6, p, span, a, li, td, th, input, select, textarea {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  .content-header h1, .content-header h2, .content-header h3 { font-weight: 700; }
+  .card { border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .card-header { border-bottom: 1px solid #f1f5f9; background: transparent; }
+  .table thead th {
+    border-bottom: 2px solid #e2e8f0; color: #64748b;
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .table td { border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+  .btn { border-radius: 8px; font-weight: 600; }
+  .form-control { border-radius: 8px; border: 1.5px solid #e2e8f0; }
+  .form-control:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+  .module { border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; margin-bottom: 1.25rem; }
+  .module h2, .module caption {
+    background: #f8fafc; color: #0f172a; font-weight: 700;
+    font-size: 0.85rem; padding: 0.75rem 1rem; border-bottom: 1px solid #e2e8f0;
+  }
+  .submit-row { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem; margin-top: 1.25rem; }
+  .alert { border-radius: 10px; border: none; }
+  .pagination .page-link { border-radius: 8px; margin: 0 2px; border: 1px solid #e2e8f0; color: #4f46e5; }
+  .pagination .page-item.active .page-link { background: #4f46e5; border-color: #4f46e5; color: #fff; }
+  .errornote { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; border-radius: 8px; padding: 0.75rem 1rem; font-weight: 600; }
+  .success, .messagelist .success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; border-radius: 8px; padding: 0.75rem 1rem; font-weight: 500; }
+</style>
+{% endblock %}
+
+{% block extrajs %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Fix Bootstrap 5 tabs if they're not initialized
+  if (typeof bootstrap !== 'undefined') {
+    document.querySelectorAll('[data-bs-toggle="pill"]').forEach(function(el) {
+      if (!el._bsTab) {
+        new bootstrap.Tab(el);
+      }
+    });
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(function(el) {
+      if (!el._bsTab) {
+        new bootstrap.Tab(el);
+      }
+    });
+  }
+});
+
+// Ensure related widget links (add/change/view) get proper hrefs
+// after all JS (including Jazzmin) has finished initializing.
+// This is a defensive fix in case DOM ready timing issues prevent
+// Django's RelatedObjectLookups.js from replacing __fk__ placeholders.
+window.addEventListener('load', function() {
+  if (typeof django !== 'undefined' && django.jQuery) {
+    django.jQuery('.related-widget-wrapper select').trigger('change');
+  }
+});
+</script>
+{% endblock %}

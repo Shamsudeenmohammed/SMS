@@ -1,11 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 from accounts.models import Student
 from academics.models import Session, ClassRoom
 from finance.models import Invoice
 from results.models import ResultRecord
-from .services import calculate_subject_positions, generate_bulk_reports
+from .models import ReportCard, CONDUCT_FIELDS, CONDUCT_RATING_CHOICES
+from .services import calculate_subject_positions, generate_bulk_reports, calculate_attendance
 
 
 
@@ -120,6 +123,7 @@ def generate_report(request, student_id=None, session_id=None, term=None):
                 "session": session_obj,
                 "term": term,
                 "classroom": final_students.first().current_class,
+                "conduct_choices": CONDUCT_RATING_CHOICES,
             })
 
         except Exception as e:
@@ -169,12 +173,17 @@ def generate_report(request, student_id=None, session_id=None, term=None):
         raw_overall_position = class_positions.get(student.id)
         overall_position = ordinal(raw_overall_position) if raw_overall_position else "-"
 
+        report_obj = ReportCard.objects.filter(
+            student=student, session=session, term=term
+        ).first()
+
         return render(request, "reportcard/report_card.html", {
             "student": student,
             "session": session,
             "term": term,
             "classroom": classroom,
             "results": results,
+            "report": report_obj,
             "invoice": invoice,
             "avg_score": avg_score,
             "overall_position": overall_position,
@@ -183,7 +192,7 @@ def generate_report(request, student_id=None, session_id=None, term=None):
             "headmaster_remarks": "",
             "reopening_date": "",
             "cgpa": None,
-            "attendance": {},
+            "attendance": calculate_attendance(student, session, term),
         })
 
     except Exception as e:
@@ -270,3 +279,35 @@ def select_report_options(request):
     except Exception as e:
         messages.error(request, f"Unexpected error: {e}")
         return redirect("dashboard")
+
+
+# ==========================================================
+# 3️⃣ SAVE CONDUCT RATINGS — AJAX (dropdowns on report cards)
+# ==========================================================
+
+@login_required
+@require_POST
+def save_conduct_ratings(request):
+    """
+    Save the Conduct & Attitude dropdown ratings for one report card.
+    Called from the bulk report cards page via fetch().
+    """
+    report_id = request.POST.get("report_id")
+    if not report_id:
+        return JsonResponse({"status": "error", "message": "Missing report id."}, status=400)
+
+    report = get_object_or_404(ReportCard, id=report_id)
+    allowed = {v for v, _ in CONDUCT_RATING_CHOICES if v}
+    changed = False
+
+    for field in CONDUCT_FIELDS:
+        value = request.POST.get(field, "")
+        if value in allowed:
+            if getattr(report, field) != value:
+                setattr(report, field, value)
+                changed = True
+
+    if changed:
+        report.save(update_fields=CONDUCT_FIELDS)
+
+    return JsonResponse({"status": "ok"})

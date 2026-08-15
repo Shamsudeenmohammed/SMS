@@ -7,6 +7,7 @@ from finance.models import Invoice
 from results.models import ResultRecord
 from .models import ReportCard
 from accounts.models import Student
+from attendance.models import AttendanceRecord
 
 
 # -------------------------
@@ -101,6 +102,52 @@ def calculate_overall_class_positions(session, term, classroom):
 
 
 # -------------------------
+# Attendance summary
+# -------------------------
+def calculate_attendance(student, session, term):
+    """
+    Count attendance records for a student in the given session/term.
+    Attendance sessions are auto-tagged with the active academic session/term
+    when taken (see attendance.services.get_term_for_date).
+    'attended' includes late; percentage is based on days attended.
+    """
+    records = AttendanceRecord.objects.filter(
+        student=student,
+        session__session=session,
+        session__term=term,
+    )
+    total = records.count()
+    present = records.filter(status="present").count()
+    late = records.filter(status="late").count()
+    absent = records.filter(status="absent").count()
+    excused = records.filter(status="excused").count()
+    attended = present + late
+    percent = round(attended / total * 100) if total else 0
+
+    if not total:
+        # No attendance recorded yet -> templates render "-/- (-%)"
+        return {
+            "present": 0,
+            "attended": None,
+            "absent": 0,
+            "late": 0,
+            "excused": 0,
+            "total": None,
+            "percent": None,
+        }
+
+    return {
+        "present": present,
+        "attended": attended,
+        "absent": absent,
+        "late": late,
+        "excused": excused,
+        "total": total,
+        "percent": percent,
+    }
+
+
+# -------------------------
 # Generate per-student report (single)
 # -------------------------
 def generate_student_report(student, session, term):
@@ -187,7 +234,7 @@ def generate_student_report(student, session, term):
         "overall_position": overall_position,
         "total_students": len(overall_positions),
         "cgpa": None,
-        "attendance": {},
+        "attendance": calculate_attendance(student, session, term),
         "invoice": invoice,
     }
 

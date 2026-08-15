@@ -242,12 +242,10 @@
 
     <!-- HEADER -->
     <div class="school-header">
-        <img src="{% static 'img/logo.png' %}" width="80" style="vertical-align:middle; z-index:2;">
-        <div style="display:inline-block; vertical-align:middle; margin-left:8px; z-index:2;">
-            <div class="school-name">YOUR SCHOOL NAME</div>
-            <div class="school-subtitle">Excellence | Discipline | Integrity</div>
-            <div style="margin-top:6px; font-weight:600;">Terminal Report Card</div>
-        </div>
+        <img src="{% static 'img/logo.png' %}" width="80" style="display:block; margin:0 auto; z-index:2;">
+        <div class="school-name">YOUR SCHOOL NAME</div>
+        <div class="school-subtitle">Excellence | Discipline | Integrity</div>
+        <div style="margin-top:6px; font-weight:600;">Terminal Report Card</div>
     </div>
 
     <!-- STUDENT INFO (two-column compact) -->
@@ -264,7 +262,7 @@
     <div class="data-box small" style="margin-top:8px;">
         <div><b>Class Position:</b> {{ overall_position }} <span style="color:gray;">of {{ total_students }}</span></div>
         <div><b>CGPA:</b> {{ cgpa|default:"N/A" }}</div>
-        <div><b>Attendance (P/A):</b> {{ attendance.present|default:"-" }}/{{ attendance.absent|default:"-" }} ({{ attendance.percent|default:"-" }}%)</div>
+        <div><b>Attendance:</b> {{ attendance.attended|default:"-" }}/{{ attendance.total|default:"-" }} ({{ attendance.percent|default:"-" }}%)</div>
     </div>
 
     <!-- ACADEMIC TABLE -->
@@ -305,11 +303,11 @@
             <tr><th>Behaviour</th><th>Rating</th></tr>
         </thead>
         <tbody>
-            <tr><td>Punctuality</td><td>_________</td></tr>
-            <tr><td>Neatness</td><td>_________</td></tr>
-            <tr><td>Class Participation</td><td>_________</td></tr>
-            <tr><td>Respect & Discipline</td><td>_________</td></tr>
-            <tr><td>Homework</td><td>_________</td></tr>
+            <tr><td>Punctuality</td><td>{{ report.get_punctuality_rating_display|default:"_________" }}</td></tr>
+            <tr><td>Neatness</td><td>{{ report.get_neatness_rating_display|default:"_________" }}</td></tr>
+            <tr><td>Class Participation</td><td>{{ report.get_class_participation_rating_display|default:"_________" }}</td></tr>
+            <tr><td>Respect & Discipline</td><td>{{ report.get_respect_discipline_rating_display|default:"_________" }}</td></tr>
+            <tr><td>Homework</td><td>{{ report.get_homework_rating_display|default:"_________" }}</td></tr>
         </tbody>
     </table>
 

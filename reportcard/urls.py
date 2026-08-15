@@ -8,4 +8,5 @@ urlpatterns = [
         views.generate_report,
         name="generate_report"
     ),
+    path("conduct-ratings/save/", views.save_conduct_ratings, name="save_conduct_ratings"),
 ]

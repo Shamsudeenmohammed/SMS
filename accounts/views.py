@@ -16,8 +16,21 @@ from finance.models import Invoice, Payment, FinanceSummary, StudentFeeRecord
 from academics.models import Session, Subject
 from results.models import ResultRecord, ResultSummary
 from django.urls import resolve
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from .forms import TeacherProfileForm, UserForm, StudentForm, ParentProfileForm
+
+
+FIVE_DP = Decimal("0.00001")
+
+
+def round5(value):
+    """Round a monetary value to 5 decimal places."""
+    if value is None:
+        return Decimal("0.00000")
+    try:
+        return Decimal(str(value)).quantize(FIVE_DP, rounding=ROUND_HALF_UP)
+    except Exception:
+        return value
 
 
 
@@ -197,19 +210,19 @@ def admin_dashboard(request):
         total_due=Sum("total_due"),
     )
 
-    total_paid = invoice_stats["total_paid"] or Decimal("0")
-    total_due = invoice_stats["total_due"] or Decimal("0")
-    total_balance = total_due - total_paid
+    total_paid = round5(invoice_stats["total_paid"] or Decimal("0"))
+    total_due = round5(invoice_stats["total_due"] or Decimal("0"))
+    total_balance = round5(total_due - total_paid)
 
 
     fully_paid = Invoice.objects.filter(is_paid=True).count()
     partially_paid = Invoice.objects.filter(balance__gt=0, total_paid__gt=0).count()
     unpaid = Invoice.objects.filter(total_paid=0).count()
-    total_due = float(invoice_stats['total_due'] or 0)
+    total_due = float(total_due)
 
-    pending_total = Invoice.objects.filter(
+    pending_total = round5(Invoice.objects.filter(
         balance__gt=0, total_paid__gt=0
-    ).aggregate(total=Sum("balance"))["total"] or 0
+    ).aggregate(total=Sum("balance"))["total"] or 0)
 
     # Chart Data (Last 12 Months)
     today = timezone.now().date()
@@ -225,7 +238,7 @@ def admin_dashboard(request):
         ).aggregate(total=Sum("amount"))["total"] or 0
 
         months.append(label)
-        revenues.append(float(total))
+        revenues.append(round(float(total), 5))
 
     # Sync Finance Summary
     FinanceSummary.objects.update_or_create(
@@ -649,18 +662,18 @@ def accountant_dashboard(request):
         total_due=Sum('total_due'),
     )
 
-    total_paid = float(invoice_stats['total_paid'] or 0)
-    total_due = float(invoice_stats['total_due'] or 0)
-    total_balance = total_due - total_paid
+    total_paid = float(round5(invoice_stats['total_paid'] or 0))
+    total_due = float(round5(invoice_stats['total_due'] or 0))
+    total_balance = round(total_due - total_paid, 5)
 
 
     fully_paid = Invoice.objects.filter(is_paid=True).count()
     partially_paid = Invoice.objects.filter(balance__gt=0, total_paid__gt=0).count()
     unpaid = Invoice.objects.filter(total_paid=0).count()
     
-    pending_total = Invoice.objects.filter(balance__gt=0, total_paid__gt=0).aggregate(
+    pending_total = round5(Invoice.objects.filter(balance__gt=0, total_paid__gt=0).aggregate(
         total=Sum("balance")
-    )["total"] or 0
+    )["total"] or 0)
 
     # Last 6 months data
     today = timezone.now().date()
@@ -676,7 +689,7 @@ def accountant_dashboard(request):
         ).aggregate(total=Sum("amount"))["total"] or 0
         
         months.append(label)
-        revenues.append(float(total))
+        revenues.append(round(float(total), 5))
 
     # Update finance summary
     FinanceSummary.objects.update_or_create(

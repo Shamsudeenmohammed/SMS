@@ -1,16 +1,27 @@
 from django.db import models
 from django.utils.timezone import now
 from accounts.models import Teacher, Student
-from academics.models import Subject, ClassRoom
+from academics.models import Subject, ClassRoom, Session
 
 # ============================================================
 # 1️⃣ AttendanceSession – a single attendance event
 # ============================================================
 class AttendanceSession(models.Model):
+    TERM_CHOICES = [
+        ("1st", "1st Term"),
+        ("2nd", "2nd Term"),
+        ("3rd", "3rd Term"),
+    ]
+
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name="attendance_sessions")
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     classroom = models.ForeignKey(ClassRoom, on_delete=models.CASCADE)
     date = models.DateField(default=now)
+
+    # Auto-attributed to the active academic session (not teacher-selectable)
+    session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True, blank=True)
+    term = models.CharField(max_length=10, choices=TERM_CHOICES, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

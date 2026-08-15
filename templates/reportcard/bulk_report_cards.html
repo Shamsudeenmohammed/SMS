@@ -66,6 +66,22 @@
 .actions { text-align: center; margin: 20px 0; }
 .print-btn { padding: 9px 18px; background: #002b55; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
 
+/* Conduct rating dropdowns (screen only; print shows plain text) */
+.conduct-select {
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid #9aa;
+    border-radius: 4px;
+    font-size: 12.5px;
+    font-family: inherit;
+    background: #fff;
+    color: #002b55;
+}
+.conduct-value { display: none; }
+.conduct-save-status { display: none; margin-top: 6px; font-size: 12.5px; font-weight: 600; }
+.conduct-save-status.saved { color: #16a34a; }
+.conduct-save-status.error { color: #dc2626; }
+
 /* PRINT SPECIFIC STYLES */
 @media print {
     /* Hide everything except report cards */
@@ -117,6 +133,13 @@
         display: none !important;
     }
     
+    .conduct-select {
+        display: none !important;
+    }
+    .conduct-value {
+        display: inline !important;
+    }
+    
     @page {
         size: A4 portrait;
         margin: 15mm;
@@ -128,6 +151,8 @@
     <button onclick="window.print()" class="print-btn">Print All Report Cards</button>
 </div>
 
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
 <div class="print-container">
     {% for r in reports %}
     <div class="report-page">
@@ -136,7 +161,7 @@
 
         <!-- HEADER -->
         <div class="school-header">
-            <img src="{% static 'img/logo.png' %}" width="75">
+            <img src="{% static 'img/logo.png' %}" width="75" style="display:block; margin:0 auto;">
             <div class="school-name">YOUR SCHOOL NAME</div>
             <div class="school-subtitle">Excellence | Discipline | Integrity</div>
             <div style="margin-top:5px; font-weight:600;">Terminal Report Card</div>
@@ -156,7 +181,7 @@
         <div class="data-box">
             <p><b>Class Position:</b> {{ r.overall_position }} <span style="color:gray;">of {{ r.total_students }}</span></p>
             <p><b>CGPA:</b> {{ r.cgpa|default:"N/A" }}</p>
-            <p><b>Attendance:</b> {{ r.attendance.present|default:"-" }}/{{ r.attendance.absent|default:"-" }} ({{ r.attendance.percent|default:"-" }}%)</p>
+            <p><b>Attendance:</b> {{ r.attendance.attended|default:"-" }}/{{ r.attendance.total|default:"-" }} ({{ r.attendance.percent|default:"-" }}%)</p>
         </div>
 
         <!-- Academic Performance -->
@@ -184,14 +209,59 @@
 
         <!-- Conduct -->
         <div class="section-title">Conduct & Attitude</div>
-        <table class="conduct-table">
+        <table class="conduct-table" data-report-id="{{ r.report.id }}">
             <thead><tr><th>Behaviour</th><th>Rating</th></tr></thead>
             <tbody>
-                <tr><td>Punctuality</td><td></td></tr>
-                <tr><td>Neatness</td><td></td></tr>
-                <tr><td>Class Participation</td><td></td></tr>
-                <tr><td>Respect & Discipline</td><td></td></tr>
-                <tr><td>Homework</td><td></td></tr>
+                <tr><td>Punctuality</td>
+                    <td>
+                        <select class="conduct-select" data-field="punctuality_rating">
+                            {% for value, label in conduct_choices %}
+                            <option value="{{ value }}" {% if r.report.punctuality_rating == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="conduct-value">{{ r.report.get_punctuality_rating_display|default:"" }}</span>
+                    </td>
+                </tr>
+                <tr><td>Neatness</td>
+                    <td>
+                        <select class="conduct-select" data-field="neatness_rating">
+                            {% for value, label in conduct_choices %}
+                            <option value="{{ value }}" {% if r.report.neatness_rating == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="conduct-value">{{ r.report.get_neatness_rating_display|default:"" }}</span>
+                    </td>
+                </tr>
+                <tr><td>Class Participation</td>
+                    <td>
+                        <select class="conduct-select" data-field="class_participation_rating">
+                            {% for value, label in conduct_choices %}
+                            <option value="{{ value }}" {% if r.report.class_participation_rating == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="conduct-value">{{ r.report.get_class_participation_rating_display|default:"" }}</span>
+                    </td>
+                </tr>
+                <tr><td>Respect &amp; Discipline</td>
+                    <td>
+                        <select class="conduct-select" data-field="respect_discipline_rating">
+                            {% for value, label in conduct_choices %}
+                            <option value="{{ value }}" {% if r.report.respect_discipline_rating == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="conduct-value">{{ r.report.get_respect_discipline_rating_display|default:"" }}</span>
+                    </td>
+                </tr>
+                <tr><td>Homework</td>
+                    <td>
+                        <select class="conduct-select" data-field="homework_rating">
+                            {% for value, label in conduct_choices %}
+                            <option value="{{ value }}" {% if r.report.homework_rating == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="conduct-value">{{ r.report.get_homework_rating_display|default:"" }}</span>
+                    </td>
+                </tr>
             </tbody>
         </table>
 
@@ -233,4 +303,56 @@
     <button onclick="window.print()" class="print-btn">Print All Report Cards</button>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.querySelectorAll('.conduct-table').forEach(table => {
+
+        function syncValues() {
+            table.querySelectorAll('.conduct-select').forEach(sel => {
+                const span = sel.closest('td').querySelector('.conduct-value');
+                if (span) span.textContent = sel.value ? sel.options[sel.selectedIndex].text : '';
+            });
+        }
+
+        function showStatus(msg, ok) {
+            let status = table.querySelector('.conduct-save-status');
+            if (!status) {
+                status = document.createElement('div');
+                status.className = 'conduct-save-status';
+                table.insertAdjacentElement('afterend', status);
+            }
+            status.textContent = msg;
+            status.className = 'conduct-save-status ' + (ok ? 'saved' : 'error');
+            status.style.display = 'block';
+            clearTimeout(table._saveTimer);
+            table._saveTimer = setTimeout(() => { status.style.display = 'none'; }, 2500);
+        }
+
+        function saveRatings() {
+            const body = new URLSearchParams();
+            body.append('report_id', table.dataset.reportId);
+            body.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+            table.querySelectorAll('.conduct-select').forEach(sel => body.append(sel.dataset.field, sel.value));
+
+            fetch("{% url 'save_conduct_ratings' %}", {
+                method: 'POST',
+                body: body,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.json())
+            .then(data => showStatus(data.status === 'ok' ? 'Saved' : 'Save failed', data.status === 'ok'))
+            .catch(() => showStatus('Save failed', false));
+        }
+
+        syncValues();
+        table.querySelectorAll('.conduct-select').forEach(sel => {
+            sel.addEventListener('change', () => {
+                syncValues();
+                saveRatings();
+            });
+        });
+    });
+</script>
 {% endblock %}

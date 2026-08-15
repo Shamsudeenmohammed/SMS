@@ -4,6 +4,8 @@ from django.http import HttpResponseForbidden, HttpResponseServerError
 from django.utils.timezone import now
 from .forms import AttendanceSessionForm, AttendanceRecordForm
 from .models import AttendanceSession, AttendanceRecord
+from .services import get_term_for_date
+from academics.models import Session
 from accounts.models import Teacher, Student
 import logging
 
@@ -30,13 +32,29 @@ def start_attendance_session(request):
         if request.method == "POST":
             form = AttendanceSessionForm(request.POST, teacher=teacher)
             if form.is_valid():
+                # Discipline: attendance is always tied to the active academic
+                # session/term automatically, never teacher-selected.
+                active_session = Session.objects.filter(is_current=True).first()
+                if not active_session:
+                    messages.error(request, "No active academic session found. Please contact the admin.")
+                    return redirect("start_attendance_session")
+
+                term = get_term_for_date(active_session, form.cleaned_data["date"])
+
                 # Create or get session for same teacher/subject/classroom/date
                 session, created = AttendanceSession.objects.get_or_create(
                     teacher=teacher,
                     subject=form.cleaned_data["subject"],
                     classroom=form.cleaned_data["classroom"],
-                    date=form.cleaned_data["date"]
+                    date=form.cleaned_data["date"],
+                    defaults={"session": active_session, "term": term},
                 )
+                # Keep existing rows aligned to the active session/term too
+                if session.session != active_session or session.term != term:
+                    session.session = active_session
+                    session.term = term
+                    session.save(update_fields=["session", "term"])
+
                 return redirect("take_attendance", session_id=session.id)
         else:
             form = AttendanceSessionForm(teacher=teacher)

@@ -5,6 +5,26 @@ from django.utils import timezone
 from accounts.models import Student, CustomUser
 from academics.models import Session, ClassRoom
 
+
+CONDUCT_RATING_CHOICES = [
+    ("", "Select"),
+    ("excellent", "Excellent"),
+    ("very_good", "Very Good"),
+    ("good", "Good"),
+    ("average", "Average"),
+    ("poor", "Poor"),
+    ("very_bad", "Very Bad"),
+]
+
+CONDUCT_FIELDS = [
+    "punctuality_rating",
+    "neatness_rating",
+    "class_participation_rating",
+    "respect_discipline_rating",
+    "homework_rating",
+]
+
+
 class ReportCard(models.Model):
     TERM_CHOICES = [
         ("1st", "1st Term"),
@@ -16,6 +36,13 @@ class ReportCard(models.Model):
     session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
     term = models.CharField(max_length=10, choices=TERM_CHOICES)
     classroom = models.ForeignKey(ClassRoom, on_delete=models.SET_NULL, null=True)
+
+    # Conduct & Attitude ratings (selected by the teacher, not handwritten)
+    punctuality_rating = models.CharField(max_length=20, choices=CONDUCT_RATING_CHOICES, blank=True)
+    neatness_rating = models.CharField(max_length=20, choices=CONDUCT_RATING_CHOICES, blank=True)
+    class_participation_rating = models.CharField(max_length=20, choices=CONDUCT_RATING_CHOICES, blank=True)
+    respect_discipline_rating = models.CharField(max_length=20, choices=CONDUCT_RATING_CHOICES, blank=True)
+    homework_rating = models.CharField(max_length=20, choices=CONDUCT_RATING_CHOICES, blank=True)
 
     # auto calculated later
     overall_average = models.DecimalField(max_digits=5, decimal_places=2, default=0)

@@ -112,7 +112,7 @@ body { font-family: "Segoe UI", sans-serif; margin: 0; padding: 0; }
     <div class="data-box">
         <div><b>Class Position:</b> {{ overall_position }} of {{ total_students }}</div>
         <div><b>CGPA:</b> {{ cgpa|default:"N/A" }}</div>
-        <div><b>Attendance (P/A):</b> {{ attendance.present|default:"-" }}/{{ attendance.absent|default:"-" }} ({{ attendance.percent|default:"-" }}%)</div>
+        <div><b>Attendance:</b> {{ attendance.attended|default:"-" }}/{{ attendance.total|default:"-" }} ({{ attendance.percent|default:"-" }}%)</div>
     </div>
 
     <div class="section-title">Academic Performance</div>
@@ -142,11 +142,11 @@ body { font-family: "Segoe UI", sans-serif; margin: 0; padding: 0; }
     <table class="conduct-table">
         <thead><tr><th>Behaviour</th><th>Rating</th></tr></thead>
         <tbody>
-            <tr><td>Punctuality</td><td>_________</td></tr>
-            <tr><td>Neatness</td><td>_________</td></tr>
-            <tr><td>Class Participation</td><td>_________</td></tr>
-            <tr><td>Respect & Discipline</td><td>_________</td></tr>
-            <tr><td>Homework</td><td>_________</td></tr>
+            <tr><td>Punctuality</td><td>{{ report.get_punctuality_rating_display|default:"_________" }}</td></tr>
+            <tr><td>Neatness</td><td>{{ report.get_neatness_rating_display|default:"_________" }}</td></tr>
+            <tr><td>Class Participation</td><td>{{ report.get_class_participation_rating_display|default:"_________" }}</td></tr>
+            <tr><td>Respect & Discipline</td><td>{{ report.get_respect_discipline_rating_display|default:"_________" }}</td></tr>
+            <tr><td>Homework</td><td>{{ report.get_homework_rating_display|default:"_________" }}</td></tr>
         </tbody>
     </table>
 
