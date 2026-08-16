@@ -50,3 +50,4 @@ htmlcov/
 *.bak
 build/
 dist/
+.env
